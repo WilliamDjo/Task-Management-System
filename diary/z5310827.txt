@@ -1,1 +1,5 @@
+Week 1
+We formed and named our group in class and then decided on doing Project 4 - Task Management System. We then selected myself as the scrum master and also established our jira site. We then did some brainstorming regarding out novel functions using exisiting task management sites such as monday.com and teamwork.com. We also had initial discussions on what software we would be using regarding system architecture.
 
+Week 2
+We started splitting up and assigning work for our project proposal using the jira boards and used story points to ensure that the work was allocated evenly. I was assigned with creating our sprints and epics plan for the project as well as helping work on user story creation. We also decided on our backend and frontend software as well as out novel functions.
