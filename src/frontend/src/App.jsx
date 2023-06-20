@@ -12,7 +12,7 @@ import EditAccount from './pages/EditAccount';
 import AdminDashboard from './pages/AdminDashboard';
 import PageNotFound from './pages/PageNotFound';
 
-function App() {
+function App () {
   return (
     <ChakraProvider theme={theme}>
       <BrowserRouter>
