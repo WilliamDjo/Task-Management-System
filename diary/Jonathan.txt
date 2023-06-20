@@ -2,7 +2,10 @@ Week 1
 Group formed and named. Selected Scrum Master. Registered for Jira and Jira site was created. As a group, decided on Topic, the given topic 4 (Task Management). Though about novel functionalities and looked at similar sites. Will start project proposal next week.
 
 Week 2
-As a group started our project proposal. Worked on background information for Monday.com and worked on creating user stories.
+As a group started our project proposal. Worked on background information for Monday.com and summary for task manager worked on creating user stories.
 
 Week 3
-Continued working on user stories and did some storyboards for user authentication and editing a profile.
+Continued working on user stories and did some storyboards for user authentication and editing a profile. Finished my background information for Monday.com and we submitted our proposal.
+
+Week 4
+Setup frontend to get started for our project.
