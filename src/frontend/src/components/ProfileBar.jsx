@@ -11,8 +11,8 @@ const ProfileBar = (props) => {
       <Flex height='100%'>
         <Box flex={1} bg='cornflowerblue' color='white' padding='10px' fontSize='xl' fontWeight='bold'>
           <Box bg={ props.pendingTasks ? 'black' : '' } padding='10px'><Text><Link>Pending Tasks</Link></Text></Box>
-          <Box bg={ props.myProfile ? 'black' : '' } padding='10px'><Text><Link onClick={() => navigate('edit')}>My Profile</Link></Text></Box>
-          <Box bg={ props.updateProfile ? 'black' : '' } padding='10px'><Text><Link>Update Profile</Link></Text></Box>
+          <Box bg={ props.myProfile ? 'black' : '' } padding='10px'><Text><Link onClick={() => navigate('/profile')}>My Profile</Link></Text></Box>
+          <Box bg={ props.updateProfile ? 'black' : '' } padding='10px'><Text><Link onClick={() => navigate('/profile/edit')}>Update Profile</Link></Text></Box>
           <Box bg={ props.connections ? 'black' : '' } padding='10px'><Text><Link>Connections</Link></Text></Box>
         </Box>
         <Box flex={4} padding='10px'>{props.children}</Box>
