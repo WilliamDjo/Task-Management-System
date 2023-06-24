@@ -5,6 +5,8 @@ import {
   FormControl,
   FormLabel,
   Input,
+  // InputGroup,
+  // InputRightElement,
   Checkbox,
   Stack,
   Link,
@@ -19,8 +21,11 @@ import {
   // Route,
   Link as RouteLink,
 } from 'react-router-dom';
+// import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
+import PasswordBar from '../components/PasswordBar/PasswordBar';
 
 const Login = () => {
+  // const [showPassword, setShowPassword] = useState(false);
   return (
     <Flex
       minH={'100vh'}
@@ -48,7 +53,7 @@ const Login = () => {
             </FormControl>
             <FormControl id="password">
               <FormLabel>Password</FormLabel>
-              <Input type="password" />
+              <PasswordBar />
             </FormControl>
             <Stack spacing={10}>
               <Stack
@@ -57,7 +62,9 @@ const Login = () => {
                 justify={'space-between'}
               >
                 <Checkbox>Remember me</Checkbox>
-                <Link color={'blue.400'}>Forgot password?</Link>
+                <RouteLink to="/forgotpassword">
+                  <Link color={'blue.400'}>Forgot password?</Link>
+                </RouteLink>
               </Stack>
               <Button
                 bg={'blue.400'}

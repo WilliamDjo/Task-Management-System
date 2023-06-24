@@ -1,13 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Flex,
   Box,
   FormControl,
   FormLabel,
   Input,
-  InputGroup,
   HStack,
-  InputRightElement,
   Stack,
   Button,
   Heading,
@@ -16,17 +14,15 @@ import {
   Link,
 } from '@chakra-ui/react';
 
-import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import {
   // BrowserRouter as Router,
   // Switch,
   // Route,
   Link as RouteLink,
 } from 'react-router-dom';
+import PasswordBar from '../components/PasswordBar/PasswordBar';
 
 const Register = () => {
-  const [showPassword, setShowPassword] = useState(false);
-
   return (
     <Flex
       minH={'100vh'}
@@ -70,19 +66,11 @@ const Register = () => {
             </FormControl>
             <FormControl id="password" isRequired>
               <FormLabel>Password</FormLabel>
-              <InputGroup>
-                <Input type={showPassword ? 'text' : 'password'} />
-                <InputRightElement h={'full'}>
-                  <Button
-                    variant={'ghost'}
-                    onClick={() =>
-                      setShowPassword(showPassword => !showPassword)
-                    }
-                  >
-                    {showPassword ? <ViewIcon /> : <ViewOffIcon />}
-                  </Button>
-                </InputRightElement>
-              </InputGroup>
+              <PasswordBar />
+            </FormControl>
+            <FormControl id="confirm-password" isRequired>
+              <FormLabel>Confirm Password</FormLabel>
+              <PasswordBar />
             </FormControl>
             <Stack spacing={10} pt={2}>
               <Button
