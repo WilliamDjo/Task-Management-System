@@ -6,18 +6,24 @@ import PropTypes from 'prop-types';
 const ProfileBar = (props) => {
   const navigate = useNavigate();
   return (
-    <Flex height='100vh' flexFlow='column'>
-      <Box bg='gold'><Heading>Navigation Bar</Heading></Box>
-      <Flex height='100%'>
-        <Box flex={1} bg='cornflowerblue' color='white' padding='10px' fontSize='xl' fontWeight='bold'>
-          <Box bg={ props.pendingTasks ? 'black' : '' } padding='10px'><Text><Link>Pending Tasks</Link></Text></Box>
-          <Box bg={ props.myProfile ? 'black' : '' } padding='10px'><Text><Link onClick={() => navigate('/profile')}>My Profile</Link></Text></Box>
-          <Box bg={ props.updateProfile ? 'black' : '' } padding='10px'><Text><Link onClick={() => navigate('/profile/edit')}>Update Profile</Link></Text></Box>
-          <Box bg={ props.connections ? 'black' : '' } padding='10px'><Text><Link>Connections</Link></Text></Box>
-        </Box>
-        <Box flex={4} padding='10px'>{props.children}</Box>
+    <Box minH='100vh' h='100vh'>
+      <Flex h='100%' flexFlow='column'>
+        <Box bg='black' color='blue.50'>
+          <Heading>Navigation Bar</Heading>
+          </Box>
+        <Flex flex={1}>
+          <Box flex={1} bg='blue.50' color='black' padding='2' fontSize='xl' fontWeight='bold'>
+            <Box bg={ props.pendingTasks ? 'blue.200' : '' } padding='1' paddingLeft='3' borderRadius='full'><Text><Link>Pending Tasks</Link></Text></Box>
+            <Box bg={ props.myProfile ? 'blue.200' : '' } padding='1' paddingLeft='3' borderRadius='full'><Text><Link onClick={() => navigate('/profile')}>My Profile</Link></Text></Box>
+            <Box bg={ props.updateProfile ? 'blue.200' : '' } padding='1' paddingLeft='3' borderRadius='full'><Text><Link onClick={() => navigate('/profile/edit')}>Update Profile</Link></Text></Box>
+            <Box bg={ props.connections ? 'blue.200' : '' } padding='1' paddingLeft='3' borderRadius='full'><Text><Link>Connections</Link></Text></Box>
+          </Box>
+          <Box flex={4} padding='2'>
+            {props.children}
+          </Box>
+        </Flex>
       </Flex>
-    </Flex>
+    </Box>
   )
 }
 

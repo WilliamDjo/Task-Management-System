@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Button, Card, CardBody, Divider, Flex, Heading, Image, Input, InputGroup, InputRightElement, Stack, Text } from '@chakra-ui/react';
+import { AspectRatio, Box, Button, Card, CardBody, Divider, Flex, Heading, Image, Input, InputGroup, InputRightElement, Stack, Text } from '@chakra-ui/react';
 import logo from '../logo.svg'
 
 import ProfileBar from '../components/ProfileBar';
@@ -28,7 +28,7 @@ const EditAccount = () => {
             <Button>Submit</Button>
             <Divider />
             <Box>
-              <Text>Password:</Text>
+            <Text>Current Password:</Text>
               <InputGroup size='md'>
                 <Input
                   pr='4.5rem'
@@ -41,6 +41,10 @@ const EditAccount = () => {
                   </Button>
                 </InputRightElement>
               </InputGroup>
+            </Box>
+            <Box>
+              <Text>New Password:</Text>
+              <Input type='password' placeholder='**********' />
               <Text>Confirm Password:</Text>
               <Input type='password' placeholder='**********' />
             </Box>
@@ -49,7 +53,11 @@ const EditAccount = () => {
             <Box>
               <Text>Update Profile Image:</Text>
               <Flex height='100px'>
-                <Image src={logo} borderRadius='full' height='100px' width='100px'></Image>
+                <Box>
+                  <AspectRatio ratio={1} minW='100px'>
+                    <Image src={logo} borderRadius='full'></Image>
+                  </AspectRatio>
+                </Box>
                 <Divider orientation='vertical' margin='10px' />
                 <Input type='file' height='100px' />
               </Flex>
