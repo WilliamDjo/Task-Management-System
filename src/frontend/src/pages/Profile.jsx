@@ -23,7 +23,7 @@ const Profile = () => {
   return (
     <ProfileBar myProfile>
       <Box>
-        <Heading>My Profile</Heading>
+        <Heading>Profile</Heading>
         <Card>
           <CardHeader>
             <Heading fontSize='lg'>Name</Heading>
