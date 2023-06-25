@@ -1,11 +1,61 @@
 import React from 'react';
-import { AspectRatio, Box, Button, Card, CardBody, Divider, FormControl, FormLabel, HStack, Heading, Image, Input, Stack } from '@chakra-ui/react';
+import { AspectRatio, Box, Button, Card, CardBody, Divider, FormControl, FormLabel, HStack, Heading, Image, Input, Stack, useToast } from '@chakra-ui/react';
 import logo from '../logo.svg'
 
 import ProfileBar from '../components/ProfileBar';
 import PasswordBar from '../components/PasswordBar/PasswordBar';
 
 const EditAccount = () => {
+  const [email, setEmail] = React.useState('');
+  const [confirmEmail, setConfirmEmail] = React.useState('');
+
+  const toast = useToast();
+
+  const handleSubmitName = () => {
+    toast({
+      title: 'Name successfully changed.',
+      status: 'success',
+      duration: 5000,
+      isClosable: true,
+    });
+  }
+
+  const handleSubmitEmail = () => {
+    if (email === confirmEmail) {
+      toast({
+        title: 'Email successfully changed.',
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
+    } else {
+      toast({
+        title: 'Email must match confirm email to change.',
+        status: 'warning',
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  }
+
+  const handleSubmitPassword = () => {
+    toast({
+      title: 'Password successfully changed.',
+      status: 'success',
+      duration: 5000,
+      isClosable: true,
+    });
+  }
+
+  const handleSubmitImage = () => {
+    toast({
+      title: 'Profile image successfully changed.',
+      status: 'success',
+      duration: 5000,
+      isClosable: true,
+    });
+  }
+
   return (
     <ProfileBar updateProfile>
       <Box>
@@ -16,26 +66,26 @@ const EditAccount = () => {
               <Box>
                 <FormControl>
                   <FormLabel>Name:</FormLabel>
-                  <Input placeholder='Name'></Input>
+                  <Input placeholder='Name' />
                 </FormControl>
               </Box>
-              <Button loadingText="Submitting" bg={'blue.400'} color={'white'} _hover={{ bg: 'blue.500' }}>
+              <Button loadingText="Submitting" bg={'blue.400'} color={'white'} _hover={{ bg: 'blue.500' }} onClick={handleSubmitName}>
                 Submit
               </Button>
               <Divider />
               <Box>
                 <FormControl>
                   <FormLabel>Email:</FormLabel>
-                  <Input placeholder='email@example.com' type='email'></Input>
+                  <Input placeholder='email@example.com' type='email' value={email} onChange={(event) => setEmail(event.target.value)}/>
                 </FormControl>
               </Box>
               <Box>
                 <FormControl>
                   <FormLabel>Confirm Email:</FormLabel>
-                  <Input type='email'></Input>
+                  <Input type='email' value={confirmEmail} onChange={(event) => setConfirmEmail(event.target.value)}/>
                   </FormControl>
               </Box>
-              <Button loadingText="Submitting" bg={'blue.400'} color={'white'} _hover={{ bg: 'blue.500' }}>
+              <Button loadingText="Submitting" bg={'blue.400'} color={'white'} _hover={{ bg: 'blue.500' }} onClick={handleSubmitEmail}>
                 Submit
               </Button>
               <Divider />
@@ -57,7 +107,7 @@ const EditAccount = () => {
                   <PasswordBar />
                 </FormControl>
               </Box>
-              <Button loadingText="Submitting" bg={'blue.400'} color={'white'} _hover={{ bg: 'blue.500' }}>
+              <Button loadingText="Submitting" bg={'blue.400'} color={'white'} _hover={{ bg: 'blue.500' }} onClick={handleSubmitPassword}>
                 Submit
               </Button>
               <Divider />
@@ -77,7 +127,7 @@ const EditAccount = () => {
                   </HStack>
                 </FormControl>
               </Box>
-              <Button loadingText="Submitting" bg={'blue.400'} color={'white'} _hover={{ bg: 'blue.500' }}>
+              <Button loadingText="Submitting" bg={'blue.400'} color={'white'} _hover={{ bg: 'blue.500' }} onClick={handleSubmitImage}>
                 Submit
               </Button>
             </Stack>

@@ -1,7 +1,8 @@
 import React from 'react';
-import { Box, Center, Flex, Heading, Link, Text, useMediaQuery } from '@chakra-ui/react';
+import { Box, Center, Flex, Link, Text, useMediaQuery } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import NavigationBar from './NavigationBar';
 
 const ProfileBar = (props) => {
   const navigate = useNavigate();
@@ -74,9 +75,7 @@ const ProfileBar = (props) => {
   return (
     <Box minH='100vh' h='100vh'>
       <Flex h='100%' flexFlow='column'>
-        <Box bg='black' color='blue.50'>
-          <Heading>Navigation Bar</Heading>
-        </Box>
+        <NavigationBar />
         { !isMobileSize ? desktopProfile(props) : mobileProfile(props)}
       </Flex>
     </Box>

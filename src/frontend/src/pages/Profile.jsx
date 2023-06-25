@@ -10,7 +10,6 @@ const Profile = () => {
   const [emailNotifications, setEmailNotifications] = React.useState(true);
 
   const handleEmailNotifications = (value) => {
-    console.log(value);
     setEmailNotifications(value);
     toast({
       title: value ? 'Email notifications turned on.' : 'Email notifications turned off.',
