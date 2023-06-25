@@ -11,6 +11,7 @@ import Profile from './pages/Profile';
 import EditAccount from './pages/EditAccount';
 import AdminDashboard from './pages/AdminDashboard';
 import PageNotFound from './pages/PageNotFound';
+import ForgotPassword from './pages/ForgotPassword';
 
 function App () {
   return (
@@ -30,6 +31,7 @@ function App () {
           </Route>
 
           <Route path="*" element={<PageNotFound />} />
+          <Route path="forgotpassword" element={<ForgotPassword />} />
         </Routes>
       </BrowserRouter>
     </ChakraProvider>
