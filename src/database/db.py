@@ -2,7 +2,8 @@ from pymongo import MongoClient
 from pymongo.database import Database
 from pymongo.collection import Collection
 from bson import Binary
-from config import url
+url = 'mongodb+srv://z5272191:QuyvHWVdlycdF84R@zombies.x0az3q5.mongodb.net/?retryWrites=true&w=majority'
+
 
 
 def getDB():
