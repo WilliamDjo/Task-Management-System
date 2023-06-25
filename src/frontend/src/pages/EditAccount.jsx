@@ -1,12 +1,11 @@
 import React from 'react';
-import { AspectRatio, Box, Button, Card, CardBody, Divider, FormControl, FormLabel, HStack, Heading, Image, Input, InputGroup, InputRightElement, Stack, Text } from '@chakra-ui/react';
+import { AspectRatio, Box, Button, Card, CardBody, Divider, FormControl, FormLabel, HStack, Heading, Image, Input, Stack } from '@chakra-ui/react';
 import logo from '../logo.svg'
 
 import ProfileBar from '../components/ProfileBar';
+import PasswordBar from '../components/PasswordBar/PasswordBar';
 
 const EditAccount = () => {
-  const [show, setShow] = React.useState(false);
-
   return (
     <ProfileBar updateProfile>
       <Box>
@@ -41,25 +40,22 @@ const EditAccount = () => {
               </Button>
               <Divider />
               <Box>
-              <Text>Current Password:</Text>
-                <InputGroup size='md'>
-                  <Input
-                    pr='4.5rem'
-                    type={show ? 'text' : 'password'}
-                    placeholder='**********'
-                  />
-                  <InputRightElement width='4.5rem'>
-                    <Button h='1.75rem' size='sm' onClick={() => setShow(!show)}>
-                      {show ? 'Hide' : 'Show'}
-                    </Button>
-                  </InputRightElement>
-                </InputGroup>
+                <FormControl>
+                  <FormLabel>Current Password: </FormLabel>
+                  <PasswordBar />
+                </FormControl>
               </Box>
               <Box>
-                <Text>New Password:</Text>
-                <Input type='password' placeholder='**********' />
-                <Text>Confirm Password:</Text>
-                <Input type='password' placeholder='**********' />
+                <FormControl>
+                  <FormLabel>New Password: </FormLabel>
+                  <PasswordBar />
+                </FormControl>
+              </Box>
+              <Box>
+                <FormControl>
+                  <FormLabel>Confirm Password: </FormLabel>
+                  <PasswordBar />
+                </FormControl>
               </Box>
               <Button loadingText="Submitting" bg={'blue.400'} color={'white'} _hover={{ bg: 'blue.500' }}>
                 Submit
