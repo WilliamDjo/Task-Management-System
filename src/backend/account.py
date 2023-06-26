@@ -18,13 +18,17 @@ from flask import Flask, request, jsonify
 import os
 import re
 
-
 parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_folder)
 
 from database import db
+import tokens
 
 class User:
+
+    '''User information'''
+    active_users = {}
+
     def __init__(self, name, username, email, password, sys_admin) -> None:
 
         self.name = name
@@ -33,9 +37,22 @@ class User:
         self.password =   generate_password_hash(password)
         self.sys_admin = sys_admin
 
-    def to_json(self):
-        return json.dumps(self.__dict__)
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'username': self.username,
+            'email': self.email,
+            'password': self.password,
+            'sys_admin': self.sys_admin
+        }
+        
 
+    def add_active_user(email):
+        User.active_users['email'] = tokens.generate_jwt_token(email)
+
+    def remove_active_user(email):
+        if email in User.active_users:
+            del User.active_users[email]
 
 
 '''Helper Functions'''
@@ -64,16 +81,20 @@ def is_password_valid(password):
     return True
 
 
+
+#Return login token
 def account_register(name, username, email, password, sys_admin):
 
     #Check if email exists
     email_exists = db.checkUser(email)
+    
+    print("email_exits")
+    print(email_exists)
+
+
     if not email_exists['Success']:
         return {'Success': False, 'Message': 'Email already exists.'}
 
-
-    #Check if username is valid
-    
     #length should be between 4 and 20
     if len(username) < 4  or len(username) > 20:
         return {'Success': False, 'Message': 'Username Too Short'}
@@ -95,13 +116,35 @@ def account_register(name, username, email, password, sys_admin):
     #Return true if success | Add user to DB
 
     new_user = User(name, username, email, password, sys_admin)
-    new_user_json = new_user.to_json()
+    new_user_dict = new_user.to_dict()
 
-    print(new_user_json)
+    login_token = tokens.generate_jwt_token(email)
+
+    User.add_active_user(email)
+    db.addNewUser(new_user_dict)
+    del new_user
+    return {'Success': True, 'Message': 'User created', 'token': login_token}
 
 
-    return {'Success': True, 'Message': 'User created'}
 
+
+def account_login(email, password):
+
+    #Check if email/pw combo matches || Existence is checked in the databse
+    email_password_match = db.isValidUser(email, password)
+    
+    if not email_password_match['Success']:
+        return {'Success': False, 'Message': 'Email or Password does not match'}
+
+
+    #Return token
+    login_token = tokens.generate_jwt_token(email)
+
+    User.add_active_user(email)
+    return {'Success': True, 'Message': 'Logged in', 'token': login_token}
+
+def account_logout(email):
+    pass
 
 
 if (__name__ == '__main__'):
@@ -113,7 +156,7 @@ if (__name__ == '__main__'):
     test_sys = True
 
     test_success = account_register(test_name, test_username, test_email, test_password, test_sys)
-    print(test_success)
+    
    
 
 
