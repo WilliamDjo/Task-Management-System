@@ -144,6 +144,11 @@ def account_login(email, password):
     return {'Success': True, 'Message': 'Logged in', 'token': login_token}
 
 def account_logout(email):
+    '''
+    change argument to token?
+    since the token for the user session will become invalidated when they logout
+    '''
+
     pass
 
 

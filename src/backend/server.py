@@ -45,9 +45,16 @@ def login():
 
     #return the log in success details
     return jsonify(login_success)
-        
 
+'''        
+@app.route('/logout', methods=['POST'])
+def logout():
+    #Request
+    token = request.json.get('token')
 
+    #return the logout details
+    return jsonify(account_logout(token))
+'''
 
 
 if (__name__ == '__main__'):
