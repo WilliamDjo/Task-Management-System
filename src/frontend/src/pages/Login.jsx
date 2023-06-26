@@ -62,8 +62,8 @@ const Login = () => {
                 justify={'space-between'}
               >
                 <Checkbox>Remember me</Checkbox>
-                <RouteLink to="/forgotpassword">
-                  <Link color={'blue.400'}>Forgot password?</Link>
+                <RouteLink to="/cantlogin">
+                  <Link color={'blue.400'}>{"Can't Login?"}</Link>
                 </RouteLink>
               </Stack>
               <Button
