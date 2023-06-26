@@ -1,12 +1,12 @@
 import React from 'react';
-import { AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, Box, Button, ButtonGroup, Center, Flex, Heading, SimpleGrid, Text, useDisclosure } from '@chakra-ui/react';
+import { AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, Box, Button, ButtonGroup, Center, Flex, FormControl, FormLabel, Heading, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, SimpleGrid, Stack, Text, useDisclosure, useToast } from '@chakra-ui/react';
 import NavigationBar from '../components/NavigationBar';
+import PasswordBar from '../components/PasswordBar/PasswordBar';
 
 const AdminDashboard = () => {
-  const [deleteUser, setDeleteUser] = React.useState();
-  const [deleteUserId, setDeleteUserId] = React.useState();
+  const [selectedUser, setSelectedUser] = React.useState();
+  const [selectedUserId, setSelectedUserId] = React.useState();
 
-  const { isOpen, onOpen, onClose } = useDisclosure();
   const [users, setUsers] = React.useState([
     {
       name: 'Akshay',
@@ -35,18 +35,47 @@ const AdminDashboard = () => {
     }
   ]);
 
+  const { isOpen: isAlertOpen, onOpen: onAlertOpen, onClose: onAlertClose } = useDisclosure();
+  const { isOpen: isModalOpen, onOpen: onModalOpen, onClose: onModalClose } = useDisclosure();
+  const toast = useToast();
+
   const handleDeleteButton = (user, id) => {
-    setDeleteUser(user);
-    setDeleteUserId(id);
-    onOpen()
+    setSelectedUser(user);
+    setSelectedUserId(id);
+    onAlertOpen();
   }
 
   const handleFinalDelete = () => {
     const newUsers = [...users];
-    const newUsersFiltered = newUsers.filter((user) => user.uid !== deleteUserId);
+    const newUsersFiltered = newUsers.filter((user) => user.uid !== selectedUserId);
     setUsers(newUsersFiltered);
-    onClose();
+    onAlertClose();
+
+    toast({
+      title: `${selectedUser}'s account successfully deleted.`,
+      status: 'success',
+      duration: 5000,
+      isClosable: true,
+    });
   }
+
+  const handleResetButton = (user, id) => {
+    setSelectedUser(user);
+    setSelectedUserId(id);
+    onModalOpen();
+  }
+
+  const handleFinalPasswordReset = () => {
+    onModalClose();
+
+    toast({
+      title: `${selectedUser}'s password successfully reset.`,
+      status: 'success',
+      duration: 5000,
+      isClosable: true,
+    });
+  }
+
   return (
     <Box minH='100vh' h='100vh'>
       <Flex h='100%' flexFlow='column'>
@@ -61,8 +90,8 @@ const AdminDashboard = () => {
                 <Text>ID: {user.uid}</Text>
                 <Center>
                   <ButtonGroup size='sm' isAttached>
-                    <Button bg={'red.400'} color={'white'} _hover={{ bg: 'blue.500' }} onClick={() => handleDeleteButton(user.name, user.uid)}>Delete</Button>
-                    <Button bg={'blue.400'} color={'white'} _hover={{ bg: 'blue.500' }}>Reset Password</Button>
+                    <Button bg={'red.400'} color={'white'} _hover={{ bg: 'red.500' }} onClick={() => handleDeleteButton(user.name, user.uid)}>Delete</Button>
+                    <Button bg={'blue.400'} color={'white'} _hover={{ bg: 'blue.500' }} onClick={() => handleResetButton(user.name, user.id)}>Reset Password</Button>
                   </ButtonGroup>
                 </Center>
               </Box>
@@ -71,19 +100,19 @@ const AdminDashboard = () => {
         </SimpleGrid>
       </Flex>
       <AlertDialog
-        isOpen={isOpen}
-        onClose={onClose}
+        isOpen={isAlertOpen}
+        onClose={onAlertClose}
       >
         <AlertDialogOverlay>
           <AlertDialogContent>
             <AlertDialogHeader fontSize='lg' fontWeight='bold'>
-              Delete {deleteUser}
+              Delete {selectedUser}&rsquo;s Account
             </AlertDialogHeader>
             <AlertDialogBody>
               Are you sure? You cannot undo this action afterwards.
             </AlertDialogBody>
             <AlertDialogFooter>
-              <Button onClick={onClose}>
+              <Button onClick={onAlertClose}>
                 Cancel
               </Button>
               <Button colorScheme='red' onClick={handleFinalDelete} ml={3}>
@@ -93,6 +122,32 @@ const AdminDashboard = () => {
           </AlertDialogContent>
         </AlertDialogOverlay>
       </AlertDialog>
+
+      <Modal isOpen={isModalOpen} onClose={onModalClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Reset {selectedUser}&rsquo;s Password</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Stack spacing={4}>
+              <FormControl>
+                <FormLabel>New Password:</FormLabel>
+                <PasswordBar />
+              </FormControl>
+              <FormControl>
+                <FormLabel>Confirm Password:</FormLabel>
+                <PasswordBar />
+              </FormControl>
+            </Stack>
+          </ModalBody>
+
+          <ModalFooter>
+              <Button loadingText="Submitting" bg={'blue.400'} color={'white'} _hover={{ bg: 'blue.500' }} onClick={handleFinalPasswordReset}>
+                Submit
+              </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Box>
   );
 }
