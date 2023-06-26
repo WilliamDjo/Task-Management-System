@@ -1,4 +1,4 @@
-import { Box, Flex, Heading, Spacer, Text } from '@chakra-ui/react';
+import { Box, Flex, Heading, Spacer, Text, Tooltip } from '@chakra-ui/react';
 import { ChatIcon, SettingsIcon } from '@chakra-ui/icons'
 import React from 'react';
 import { Link as RouteLink } from 'react-router-dom';
@@ -14,10 +14,14 @@ const NavigationBar = () => {
         </RouteLink>
         <Spacer />
         <RouteLink to="/connections">
-          <ChatIcon m='1' _hover={hoverStyle} />
+          <Tooltip label='Connections'>
+            <ChatIcon m='1' _hover={hoverStyle} />
+          </Tooltip>
         </RouteLink>
         <RouteLink to="/profile">
-          <SettingsIcon m='1' _hover={hoverStyle} />
+          <Tooltip label='Profile'>
+            <SettingsIcon m='1' _hover={hoverStyle} />
+          </Tooltip>
         </RouteLink>
         <Text m='1' _hover={hoverStyle}>
           <RouteLink to="/">Logout</RouteLink>

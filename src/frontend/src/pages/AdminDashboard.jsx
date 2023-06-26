@@ -7,6 +7,9 @@ const AdminDashboard = () => {
   const [selectedUser, setSelectedUser] = React.useState();
   const [selectedUserId, setSelectedUserId] = React.useState();
 
+  const [newPassword, setNewPassword] = React.useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = React.useState('');
+
   const [users, setUsers] = React.useState([
     {
       name: 'Akshay',
@@ -62,18 +65,28 @@ const AdminDashboard = () => {
   const handleResetButton = (user, id) => {
     setSelectedUser(user);
     setSelectedUserId(id);
+    setNewPassword('');
+    setConfirmNewPassword('');
     onModalOpen();
   }
 
   const handleFinalPasswordReset = () => {
-    onModalClose();
-
-    toast({
-      title: `${selectedUser}'s password successfully reset.`,
-      status: 'success',
-      duration: 5000,
-      isClosable: true,
-    });
+    if (newPassword !== confirmNewPassword) {
+      toast({
+        title: 'Passwords do not match.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    } else {
+      toast({
+        title: `${selectedUser}'s password successfully reset.`,
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
+      onModalClose();
+    }
   }
 
   return (
@@ -81,7 +94,7 @@ const AdminDashboard = () => {
       <Flex h='100%' flexFlow='column'>
         <NavigationBar />
         <Heading>Admin Dashboard</Heading>
-        <SimpleGrid columns={[1, 2, 3]} spacing='3' m='3'>
+        <SimpleGrid columns={[1, 2, 3, 4, 5]} spacing='3' m='3'>
           {users.map((user, index) => {
             return (
               <Box bg='blue.50' key={index} borderRadius='xl' p='2'>
@@ -132,11 +145,11 @@ const AdminDashboard = () => {
             <Stack spacing={4}>
               <FormControl>
                 <FormLabel>New Password:</FormLabel>
-                <PasswordBar />
+                <PasswordBar value={newPassword} onChange={(event) => setNewPassword(event.target.value)} />
               </FormControl>
               <FormControl>
                 <FormLabel>Confirm Password:</FormLabel>
-                <PasswordBar />
+                <PasswordBar value={confirmNewPassword} onChange={(event) => setConfirmNewPassword(event.target.value)} />
               </FormControl>
             </Stack>
           </ModalBody>
