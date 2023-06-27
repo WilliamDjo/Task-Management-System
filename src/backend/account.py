@@ -173,6 +173,18 @@ def getAccountInfo(token):
     return userInformation
 
 
+def getAllAccounts(token):
+    valid_jwt = tokens.check_jwt_token(token)
+    if not valid_jwt["Success"]:
+        return {"Success": False, "Message": "Error!"}
+    email = valid_jwt["Data"]["email"]
+    userInformation = db.checkUser(email)
+
+    if not userInformation["SystemAdmin"]:
+        return {"Succes": False, "Error": "Not an admin"}
+    return {"Succes": True, "Error": "", "Data": userInformation}
+
+
 if __name__ == "__main__":
     db.clear_collection("user_info")
     test_name = "adam"

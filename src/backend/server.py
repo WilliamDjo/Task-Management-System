@@ -57,6 +57,13 @@ def getuserprofile():
     return jsonify(user_profile_info)
 
 
+@app.route("/getallusers", methods=["GET"])
+def getallusers():
+    token = request.json["token"]
+    users = account.getAllAccounts(token)
+    return jsonify(users)
+
+
 if __name__ == "__main__":
     app.run()
     test_name = "adam"
