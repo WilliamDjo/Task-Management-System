@@ -314,7 +314,10 @@ def getAllAccounts(token):
 
     if not userInformation["Data"]["SystemAdmin"]:
         return {"Succes": False, "Error": "Not an admin"}
-    return {"Succes": True, "Error": "", "Data": userInformation}
+
+    allUserInfo = db.getAllUserInformation()
+    print(allUserInfo)
+    return {"Succes": True, "Error": "", "Data": allUserInfo}
 
 
 if __name__ == "__main__":
