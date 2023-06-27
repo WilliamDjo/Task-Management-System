@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Flex,
   Box,
@@ -25,7 +25,30 @@ import {
 import PasswordBar from '../components/PasswordBar/PasswordBar';
 
 const Login = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   // const [showPassword, setShowPassword] = useState(false);
+  const handleLogin = async () => {
+    try {
+      const response = await fetch('/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (response.ok) {
+        // Login successful, perform necessary actions
+        console.log('Login successful');
+      } else {
+        // Login failed, handle the error
+        console.error('Login failed');
+      }
+    } catch (error) {
+      console.error('An error occurred while logging in', error);
+    }
+  };
   return (
     <Flex
       minH={'100vh'}
@@ -49,11 +72,18 @@ const Login = () => {
           <Stack spacing={4}>
             <FormControl id="email">
               <FormLabel>Email address</FormLabel>
-              <Input type="email" />
+              <Input
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                type="email"
+              />
             </FormControl>
             <FormControl id="password">
               <FormLabel>Password</FormLabel>
-              <PasswordBar />
+              <PasswordBar
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+              />
             </FormControl>
             <Stack spacing={10}>
               <Stack
@@ -72,6 +102,7 @@ const Login = () => {
                 _hover={{
                   bg: 'blue.500',
                 }}
+                onClick={handleLogin}
               >
                 Sign in
               </Button>
