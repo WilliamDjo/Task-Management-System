@@ -71,69 +71,60 @@ const Register = () => {
       setRegistrationSuccess(false);
       console.error('Password and Confirm Password mismatch');
     }
-    // Get existing user accounts from local storage
-    const existingAccounts =
-      JSON.parse(localStorage.getItem('userAccounts')) || [];
+    // // Get existing user accounts from local storage
+    // const existingAccounts =
+    //   JSON.parse(localStorage.getItem('userAccounts')) || [];
 
-    // Check if user already exists
-    const userExists = existingAccounts.some(
-      user => user.email === email || user.username === username
-    );
-    if (userExists) {
-      // User with the same email or username already exists
-      setRegistrationError(true);
-      setRegistrationSuccess(false);
-      console.error('User with the same email or username already exists');
-    } else {
-      // Create user object
-      const newUser = {
-        email,
-        password,
-        // eslint-disable-next-line camelcase
-        first_name,
-        // eslint-disable-next-line camelcase
-        last_name,
-        username,
-        // eslint-disable-next-line camelcase
-        sys_admin,
-      };
-      // // Add the new user to existing user accounts
-      // const updatedAccounts = [...existingAccounts, newUser];
+    // // Check if user already exists
+    // const userExists = existingAccounts.some(
+    //   user => user.email === email || user.username === username
+    // );
+    // Create user object
+    const newUser = {
+      email,
+      password,
+      first_name,
+      last_name,
+      username,
+      sys_admin,
+    };
+    // // Add the new user to existing user accounts
+    // const updatedAccounts = [...existingAccounts, newUser];
 
-      // // Save the updated user accounts to local storage
-      // localStorage.setItem('userAccounts', JSON.stringify(updatedAccounts));
+    // // Save the updated user accounts to local storage
+    // localStorage.setItem('userAccounts', JSON.stringify(updatedAccounts));
 
-      console.log('User account saved to local storage');
-      try {
-        const response = await fetch('/signup', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(newUser),
-        });
+    // console.log('User account saved to local storage');
 
-        if (response.ok) {
-          // Registration successful, receive the token from the backend
-          const data = await response.json();
-          const { token } = data;
+    try {
+      const response = await fetch('/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newUser),
+      });
 
-          // Store the token in localStorage or sessionStorage
-          localStorage.setItem('token', token);
+      if (response.ok) {
+        // Registration successful, receive the token from the backend
+        const data = await response.json();
+        const { token } = data;
 
-          console.log('User account created and token received');
+        // Store the token in localStorage or sessionStorage
+        localStorage.setItem('token', token);
 
-          // Redirect the user to the login page
-          // You can use a router library like react-router-dom for navigation
-          // Example:
-          // history.push('/login');
-        } else {
-          // Registration failed
-          console.error('Registration failed');
-        }
-      } catch (error) {
-        console.error('Error registering user', error);
+        console.log('User account created and token received');
+
+        // Redirect the user to the login page
+        // You can use a router library like react-router-dom for navigation
+        // Example:
+        // history.push('/login');
+      } else {
+        // Registration failed
+        console.error('Registration failed');
       }
+    } catch (error) {
+      console.error('Error registering user', error);
     }
   };
 
