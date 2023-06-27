@@ -16,10 +16,14 @@ app = Flask(__name__)
 def server_register():
     username = request.json["username"]
     password = request.json["password"]
-    name = request.json["name"]
+    first_name = request.json["first_name"]
+    last_name = request.json["last_name"]
+
     email = request.json["email"]
     sys_admin = request.json["sys_admin"]
-    status = account.account_register(name, username, email, password, sys_admin)
+    status = account.account_register(
+        first_name, last_name, username, email, password, sys_admin
+    )
     return status
 
 
