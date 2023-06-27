@@ -3,6 +3,7 @@ from email.quoprimime import quote
 from errno import ESPIPE
 import json
 from json.tool import main
+from lib2to3.pgen2 import token
 from time import monotonic_ns
 from xmlrpc.client import boolean
 import bcrypt
@@ -39,20 +40,19 @@ class User:
 
     def to_dict(self):
         return {
-            'name': self.name,
-            'username': self.username,
-            'email': self.email,
+            'user': self.username,
             'password': self.password,
-            'sys_admin': self.sys_admin
+            'email': self.email,
+            'Name': self.name,
+            'SystemAdmin': self.sys_admin
         }
         
-
     def add_active_user(email):
         User.active_users['email'] = tokens.generate_jwt_token(email)
 
     def remove_active_user(email):
-        if email in User.active_users:
-            del User.active_users[email]
+        if email in User.active_users.values:
+            del User.active_users[token]
 
 
 '''Helper Functions'''
@@ -125,16 +125,14 @@ def account_register(name, username, email, password, sys_admin):
     del new_user
     return {'Success': True, 'Message': 'User created', 'token': login_token}
 
-
-
-
 def account_login(email, password):
 
     #Check if email/pw combo matches || Existence is checked in the databse
     email_password_match = db.isValidUser(email, password)
     
     if not email_password_match['Success']:
-        return {'Success': False, 'Message': 'Email or Password does not match'}
+        return email_password_match
+
 
 
     #Return token
@@ -143,17 +141,18 @@ def account_login(email, password):
     User.add_active_user(email)
     return {'Success': True, 'Message': 'Logged in', 'token': login_token}
 
-def account_logout(email):
-    '''
-    change argument to token?
-    since the token for the user session will become invalidated when they logout
-    '''
+def account_logout(token):
+   
+    if not token in User.active_users.values:
+        return {'Success': True, 'Message': 'Logout unsuccessful'}
 
-    pass
+    User.remove_active_user(token)
+
+    return {'Success': True, 'Message': 'Logout Successful'}
 
 
 if (__name__ == '__main__'):
-    
+    db.clear_collection('user_info')
     test_name = 'adam'
     test_password = 'Password123!'
     test_email = 'adam@test.com'
@@ -161,8 +160,14 @@ if (__name__ == '__main__'):
     test_sys = True
 
     test_success = account_register(test_name, test_username, test_email, test_password, test_sys)
-    
-   
+    test_login = account_login(test_email, test_password)
+
+    print(test_login)
+
+
+    '''Debug code'''
+    db.print_all_from_collection('user_info')
+
 
 
 

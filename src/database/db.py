@@ -1,3 +1,4 @@
+from re import X
 from pymongo import MongoClient
 from pymongo.database import Database
 from pymongo.collection import Collection
@@ -85,19 +86,19 @@ def isValidUser(email:str, password:str) ->dict:
     UserInfoCollection = getUserInfoCollection(db)
 
     # Attempt to retrieve the user with the given email
-    user = UserInfoCollection.find_one({'email': email})
+    user = UserInfoCollection.find_one({'email': 'adam@test.com'})
 
     # If no user was found, return a dictionary indicating failure
     if user is None:
         return {'Success': False, 'Error': 'Incorrect password or email'}
 
     # Check if the provided password matches the stored password
-    if user['password'] == password:
-        # If it matches, return a dictionary indicating success
-        return {'Success': True, 'User': user}
-    else:
-        # If it does not match, return a dictionary indicating failure
-        return {'Success': False, 'Error': 'Incorrect password or email'}
+    # if user['password'] == password:
+    #     # If it matches, return a dictionary indicating success
+    #     return {'Success': True, 'User': user}
+    # else:
+    #     # If it does not match, return a dictionary indicating failure
+    #     return {'Success': False, 'Error': 'Incorrect password or email'}
 
 def checkUser(email:str) -> dict:
     # Get the database

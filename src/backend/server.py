@@ -14,8 +14,6 @@ sys.path.append(parent_folder)
 
 '''Flask Set up'''
 app = Flask(__name__)
-# app.config['MONGO_URI'] = 'mongodb+srv://z5272191:QuyvHWVdlycdF84R@zombies.x0az3q5.mongodb.net/?retryWrites=true&w=majority'
-# mongo = PyMongo(app)
 
 
 
@@ -28,9 +26,6 @@ def server_register():
     email = request.json['email']
     sys_admin = request.json['sys_admin']
     status = account_register(name, username, email, password, sys_admin)
-
-    print(status)
-    print("\n\n\n\n")
     return status
 
 
