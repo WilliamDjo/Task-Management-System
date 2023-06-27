@@ -62,33 +62,27 @@ const Register = () => {
   //   }
   // };
   const handleRegister = async () => {
-    // Simulating existing email and username
-    const existingEmail = 'existing@example.com';
-    const existingUsername = 'existingUser';
-
-    if (email === existingEmail) {
-      // Email already exists
-      setRegistrationError(true);
-      setRegistrationSuccess(false);
-      console.error('Email already exists');
-    } else if (username === existingUsername) {
-      // Username already exists
-      setRegistrationError(true);
-      setRegistrationSuccess(false);
-      console.error('Username already exists');
-    } else if (password !== confirmPassword) {
+    if (password !== confirmPassword) {
       // Password and Confirm Password mismatch
       setPasswordMismatchError(true);
       setRegistrationError(false);
       setRegistrationSuccess(false);
       console.error('Password and Confirm Password mismatch');
-    } else {
-      // Registration successful
-      setRegistrationError(false);
-      setRegistrationSuccess(true);
-      setPasswordMismatchError(false);
-      console.log('Registration successful');
+    }
+    // Get existing user accounts from local storage
+    const existingAccounts =
+      JSON.parse(localStorage.getItem('userAccounts')) || [];
 
+    // Check if user already exists
+    const userExists = existingAccounts.some(
+      user => user.email === email || user.username === username
+    );
+    if (userExists) {
+      // User with the same email or username already exists
+      setRegistrationError(true);
+      setRegistrationSuccess(false);
+      console.error('User with the same email or username already exists');
+    } else {
       // Create user object
       const newUser = {
         email,
@@ -97,19 +91,42 @@ const Register = () => {
         lastName,
         username,
       };
+      // Add the new user to existing user accounts
+      const updatedAccounts = [...existingAccounts, newUser];
 
-      // Send the newUser object to the backend (JSON file)
+      // Save the updated user accounts to local storage
+      localStorage.setItem('userAccounts', JSON.stringify(updatedAccounts));
+
+      console.log('User account saved to local storage');
       try {
-        await fetch('/api/users', {
+        const response = await fetch('/signup', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(newUser),
         });
-        console.log('User account saved to the JSON file');
+
+        if (response.ok) {
+          // Registration successful, receive the token from the backend
+          const data = await response.json();
+          const { token } = data;
+
+          // Store the token in localStorage or sessionStorage
+          localStorage.setItem('token', token);
+
+          console.log('User account created and token received');
+
+          // Redirect the user to the login page
+          // You can use a router library like react-router-dom for navigation
+          // Example:
+          // history.push('/login');
+        } else {
+          // Registration failed
+          console.error('Registration failed');
+        }
       } catch (error) {
-        console.error('Error saving user account to the JSON file', error);
+        console.error('Error registering user', error);
       }
     }
   };

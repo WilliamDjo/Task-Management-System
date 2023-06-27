@@ -10,6 +10,7 @@ import {
   Stack,
   useColorModeValue,
 } from '@chakra-ui/react';
+import { fetchBackend } from '../fetch';
 
 const ChangeEmail = () => {
   const [username, setUsername] = useState('');
@@ -26,16 +27,21 @@ const ChangeEmail = () => {
 
     if (user) {
       // User found, change email
-      user.email = newEmail;
-      localStorage.setItem('userAccounts', JSON.stringify(userAccounts));
-      setUsernameError(false);
-      setEmailChanged(true);
-      console.log('Email changed successfully');
-    } else {
-      // User not found or invalid username
-      setUsernameError(true);
-      setEmailChanged(false);
-      console.error('Username not found');
+      const token = localStorage.getItem('token');
+      fetchBackend('/update/email', 'PUT', { token, username }).then(data => {
+        if (data.error) {
+          user.email = newEmail;
+          localStorage.setItem('userAccounts', JSON.stringify(userAccounts));
+          setUsernameError(false);
+          setEmailChanged(true);
+          console.log('Email changed successfully');
+        } else {
+          // User not found or invalid username
+          setUsernameError(true);
+          setEmailChanged(false);
+          console.error('Username not found');
+        }
+      });
     }
   };
 

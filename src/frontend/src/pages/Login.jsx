@@ -29,33 +29,9 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState(false);
   const [loginSuccess, setLoginSuccess] = useState(false);
-  // const [showPassword, setShowPassword] = useState(false);
-  // Simulating incorrect login credentials
-  // const handleLogin = async () => {
-  //   try {
-  //     const response = await fetch('/login', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({ email, password }),
-  //     });
 
-  //     if (response.ok) {
-  //       // Login successful, perform necessary actions
-  //       console.log('Login successful');
-  //     } else {
-  //       // Login failed, handle the error
-  //       console.error('Login failed');
-  //     }
-  //   } catch (error) {
-  //     console.error('An error occurred while logging in', error);
-  //   }
-  // };
   const handleLogin = async () => {
     // Simulating incorrect login credentials
-    const dummyEmail = 'dummy@example.com';
-    const dummyPassword = 'password123';
     // Get user accounts from local storage
     const userAccounts = JSON.parse(localStorage.getItem('userAccounts')) || [];
 
@@ -64,7 +40,7 @@ const Login = () => {
       user => user.email === email && user.password === password
     );
 
-    if ((email === dummyEmail && password === dummyPassword) || user) {
+    if (user) {
       // Login successful
       setLoginError(false);
       setLoginSuccess(true);
@@ -74,6 +50,39 @@ const Login = () => {
       setLoginError(true);
       setLoginSuccess(false);
       console.error('Login failed');
+    }
+    const credentials = {
+      email,
+      password,
+    };
+
+    try {
+      const response = await fetch('/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(credentials),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // eslint-disable-next-line camelcase
+        const { token, sys_admin } = data;
+
+        // Store the token and isAdmin status in localStorage
+        localStorage.setItem('token', token);
+        localStorage.setItem('sys_admin', sys_admin);
+
+        console.log('Login successful');
+      } else {
+        // Login failed, handle the error
+        setLoginError(true);
+        setLoginSuccess(false);
+        console.error('Login failed');
+      }
+    } catch (error) {
+      console.error('An error occurred while logging in', error);
     }
   };
   return (
@@ -119,8 +128,8 @@ const Login = () => {
                 justify={'space-between'}
               >
                 <Checkbox>Remember me</Checkbox>
-                <RouteLink to="/cantlogin">
-                  <Link color={'blue.400'}>{"Can't Login?"}</Link>
+                <RouteLink to="/forgotpassword">
+                  <Link color={'blue.400'}>Forgot Password</Link>
                 </RouteLink>
               </Stack>
               {loginError && (

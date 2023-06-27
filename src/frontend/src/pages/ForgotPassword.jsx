@@ -11,6 +11,7 @@ import {
   Text,
 } from '@chakra-ui/react';
 import PasswordBar from '../components/PasswordBar/PasswordBar';
+import { fetchBackend } from '../fetch';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -22,40 +23,43 @@ const ForgotPassword = () => {
   const [passwordChanged, setPasswordChanged] = useState(false);
 
   const handleSubmit = () => {
-    // Simulating existing email
-    const existingEmail = 'existing-email@example.com';
-
     // Get user accounts from local storage
     const userAccounts = JSON.parse(localStorage.getItem('userAccounts')) || [];
 
     // Find the user with matching email
     const user = userAccounts.find(user => user.email === email);
 
-    if (!user || email === existingEmail) {
-      // Email does not exist
+    if (user) {
+      if (password === confirmPassword) {
+        const token = localStorage.getItem('token');
+        fetchBackend('/update/password', 'PUT', { token, password }).then(
+          data => {
+            if (data.error) {
+              setPasswordError(true);
+              setConfirmPasswordError(true);
+              setPasswordChanged(false);
+              console.error('Password and Confirm Password do not match');
+            } else {
+              // Password change successful
+              user.password = password; // Update the password in the user object
+              localStorage.setItem(
+                'userAccounts',
+                JSON.stringify(userAccounts)
+              ); // Update the user accounts in local storage
+              setEmailError(false);
+              setPasswordError(false);
+              setConfirmPasswordError(false);
+              setPasswordChanged(true);
+              console.log('Password changed successfully');
+            }
+          }
+        );
+      }
+    } else {
       setEmailError(true);
       setPasswordChanged(false);
       console.error('Email does not exist');
-      return;
     }
-
-    if (password !== confirmPassword) {
-      // Password and Confirm Password do not match
-      setPasswordError(true);
-      setConfirmPasswordError(true);
-      setPasswordChanged(false);
-      console.error('Password and Confirm Password do not match');
-      return;
-    }
-
-    // Password change successful
-    user.password = password; // Update the password in the user object
-    localStorage.setItem('userAccounts', JSON.stringify(userAccounts)); // Update the user accounts in local storage
-    setEmailError(false);
-    setPasswordError(false);
-    setConfirmPasswordError(false);
-    setPasswordChanged(true);
-    console.log('Password changed successfully');
   };
 
   return (
