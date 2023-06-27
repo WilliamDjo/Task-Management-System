@@ -25,7 +25,13 @@ const ForgotPassword = () => {
     // Simulating existing email
     const existingEmail = 'existing-email@example.com';
 
-    if (email !== existingEmail) {
+    // Get user accounts from local storage
+    const userAccounts = JSON.parse(localStorage.getItem('userAccounts')) || [];
+
+    // Find the user with matching email
+    const user = userAccounts.find(user => user.email === email);
+
+    if (!user || email === existingEmail) {
       // Email does not exist
       setEmailError(true);
       setPasswordChanged(false);
@@ -43,6 +49,8 @@ const ForgotPassword = () => {
     }
 
     // Password change successful
+    user.password = password; // Update the password in the user object
+    localStorage.setItem('userAccounts', JSON.stringify(userAccounts)); // Update the user accounts in local storage
     setEmailError(false);
     setPasswordError(false);
     setConfirmPasswordError(false);
