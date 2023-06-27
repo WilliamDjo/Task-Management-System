@@ -361,6 +361,16 @@ def admin_delete_acc(token, email_to_delete):
     return result
 
 
+def reset_password(email, username, new_password):
+    userInformation = db.checkUser(email)
+    if userInformation["Success"]:
+        return userInformation
+    user = userInformation["Data"]["user"]
+    if user != username:
+        return {"Success": False, "Error": "Invalid details"}
+    return db.updateUserInfo(email, {"password": generate_password_hash(new_password)})
+
+
 if __name__ == "__main__":
     db.clear_collection("user_info")
     db.clear_collection("user_profile")
