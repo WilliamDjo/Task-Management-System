@@ -62,7 +62,7 @@ const AdminDashboard = () => {
         if (data.error) {
           toast({
             title: data.error,
-            status: 'failure',
+            status: 'error',
             duration: 5000,
             isClosable: true,
           });
@@ -104,7 +104,7 @@ const AdminDashboard = () => {
         if (data.error) {
           toast({
             title: data.error,
-            status: 'failure',
+            status: 'error',
             duration: 5000,
             isClosable: true,
           });

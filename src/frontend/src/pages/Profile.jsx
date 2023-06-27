@@ -3,21 +3,60 @@ import { AspectRatio, Box, Card, CardBody, CardHeader, Flex, FormControl, FormLa
 import logo from '../logo.svg'
 
 import ProfileBar from '../components/ProfileBar';
+import { fetchBackend } from '../fetch';
 
 const Profile = () => {
-  const toast = useToast();
-
+  const [name, setName] = React.useState('Name');
+  const [username, setUsername] = React.useState('username');
+  const [email, setEmail] = React.useState('email@example.com');
+  const [connections, setConnections] = React.useState(1);
+  const [organisation, setOrganisation] = React.useState('Example Company');
   const [emailNotifications, setEmailNotifications] = React.useState(true);
 
+  const toast = useToast();
+
   const handleEmailNotifications = (value) => {
-    setEmailNotifications(value);
-    toast({
-      title: value ? 'Email notifications turned on.' : 'Email notifications turned off.',
-      status: 'success',
-      duration: 5000,
-      isClosable: true,
-    })
+    fetchBackend('/update/notifications', 'PUT', { token: localStorage.getItem('token'), value })
+      .then((data) => {
+        if (data.error) {
+          toast({
+            title: data.error,
+            status: 'error',
+            duration: 5000,
+            isClosable: true,
+          })
+        } else {
+          setEmailNotifications(value);
+          toast({
+            title: value ? 'Email notifications turned on.' : 'Email notifications turned off.',
+            status: 'success',
+            duration: 5000,
+            isClosable: true,
+          })
+        }
+      })
   }
+
+  React.useEffect(() => {
+    fetchBackend('/getuserprofile', 'POST', { token: localStorage.getItem('token') })
+      .then((data) => {
+        if (data.error) {
+          toast({
+            title: data.error,
+            status: 'error',
+            duration: 5000,
+            isClosable: true,
+          })
+        } else {
+          setEmail(data.email);
+          setEmailNotifications(data.emailNotifications);
+          setConnections(data.connections);
+          setName(`${data.first_name} ${data.last_name}`);
+          setUsername(data.username);
+          setOrganisation(data.organisation);
+        }
+      })
+  }, [])
 
   return (
     <ProfileBar myProfile>
@@ -25,7 +64,7 @@ const Profile = () => {
         <Heading>Profile</Heading>
         <Card>
           <CardHeader>
-            <Heading fontSize='lg'>Name</Heading>
+            <Heading fontSize='lg'>{name}</Heading>
           </CardHeader>
           <CardBody>
             <Flex>
@@ -35,10 +74,11 @@ const Profile = () => {
                 </AspectRatio>
               </Box>
               <Box padding='10px'>
-                <Text>Email: email@example.com</Text>
+                <Text>User Name: {username}</Text>
+                <Text>Email: {email}</Text>
                 <Text>Password: **********</Text>
-                <Text>Connections: ??</Text>
-                <Text>Organisation: Example Company</Text>
+                <Text>Connections: {connections}</Text>
+                <Text>Organisation: {organisation}</Text>
                 <FormControl display='flex' alignItems='center'>
                   <FormLabel htmlFor='email-alerts' mb='0' fontWeight='normal'>
                     Email Notifications:
