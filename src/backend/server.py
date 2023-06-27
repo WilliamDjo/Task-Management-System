@@ -20,7 +20,6 @@ def server_register():
     last_name = request.json["last_name"]
 
     email = request.json["email"]
-    sys_admin = request.json["sys_admin"]
     status = account.account_register(
         first_name, last_name, username, email, password, sys_admin
     )
