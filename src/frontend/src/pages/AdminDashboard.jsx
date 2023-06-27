@@ -36,7 +36,8 @@ const AdminDashboard = () => {
   // const [users, setUsers] = React.useState([]);
 
   React.useEffect(() => {
-    fetchBackend('/getallusers', 'POST', { token: localStorage.getItem('token') })
+    const token = localStorage.getItem('token')
+    fetchBackend('/getallusers', 'POST', { token })
       .then((data) => {
         if (data.error) {
           console.log(data.error);
@@ -57,7 +58,8 @@ const AdminDashboard = () => {
   }
 
   const handleFinalDelete = () => {
-    fetchBackend('/admin/delete', 'DELETE', { token: localStorage.getItem('token'), email: selectedUserEmail })
+    const token = localStorage.getItem('token')
+    fetchBackend('/admin/delete', 'DELETE', { token, email: selectedUserEmail })
       .then((data) => {
         if (data.error) {
           toast({
@@ -99,7 +101,8 @@ const AdminDashboard = () => {
       });
       return
     }
-    fetchBackend('/admin/reset', 'PUT', { token: localStorage.getItem('token'), email: selectedUserEmail, password: newPassword })
+    const token = localStorage.getItem('token')
+    fetchBackend('/admin/reset', 'PUT', { token, email: selectedUserEmail, password: newPassword })
       .then((data) => {
         if (data.error) {
           toast({

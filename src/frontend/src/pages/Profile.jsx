@@ -16,7 +16,8 @@ const Profile = () => {
   const toast = useToast();
 
   const handleEmailNotifications = (value) => {
-    fetchBackend('/update/notifications', 'PUT', { token: localStorage.getItem('token'), value })
+    const token = localStorage.getItem('token')
+    fetchBackend('/update/notifications', 'PUT', { token, value })
       .then((data) => {
         if (data.error) {
           toast({
@@ -38,7 +39,8 @@ const Profile = () => {
   }
 
   React.useEffect(() => {
-    fetchBackend('/getuserprofile', 'POST', { token: localStorage.getItem('token') })
+    const token = localStorage.getItem('token')
+    fetchBackend('/getuserprofile', 'POST', { token })
       .then((data) => {
         if (data.error) {
           toast({

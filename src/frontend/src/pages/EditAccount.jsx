@@ -16,7 +16,8 @@ const EditAccount = () => {
   const toast = useToast();
 
   const handleSubmitName = () => {
-    fetchBackend('/update/username', 'PUT', { token: localStorage.getItem('token'), username })
+    const token = localStorage.getItem('token')
+    fetchBackend('/update/username', 'PUT', { token, username })
       .then((data) => {
         if (data.error) {
           toast({
@@ -38,7 +39,8 @@ const EditAccount = () => {
 
   const handleSubmitEmail = () => {
     if (email === confirmEmail) {
-      fetchBackend('/update/email', 'PUT', { token: localStorage.getItem('token'), email })
+      const token = localStorage.getItem('token')
+      fetchBackend('/update/email', 'PUT', { token, email })
         .then((data) => {
           if (data.error) {
             toast({
@@ -68,7 +70,8 @@ const EditAccount = () => {
 
   const handleSubmitPassword = () => {
     if (password === confirmPassword) {
-      fetchBackend('/update/password', 'PUT', { token: localStorage.getItem('token'), password })
+      const token = localStorage.getItem('token')
+      fetchBackend('/update/password', 'PUT', { token, password })
         .then((data) => {
           if (data.error) {
             toast({
