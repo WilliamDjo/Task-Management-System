@@ -32,11 +32,11 @@ const ForgotPassword = () => {
     if (password === confirmPassword) {
       try {
         const response = await fetch('http://127.0.0.1:5000/reset/password', {
-          method: 'POST',
+          method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(username, email),
+          body: JSON.stringify(username, email, password),
         });
         if (response.ok) {
           setEmailError(false);
