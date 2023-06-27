@@ -320,6 +320,50 @@ def getAllAccounts(token):
     return {"Succes": True, "Error": "", "Data": allUserInfo}
 
 
+
+'''
+Admin Functions
+'''
+def admin_reset_pw(token, new_password, reset_email):
+
+    valid_jwt = tokens.check_jwt_token(token)
+    if not valid_jwt["Success"]:
+        return {"Success": False, "Message": "Error!"}
+    email = valid_jwt["Data"]["email"]
+    userInformation = db.checkUser(email)
+
+    if not userInformation["Data"]["SystemAdmin"]:
+        return {"Succes": False, "Error": "Not an admin"}
+
+    new_user_dict = {"password": generate_password_hash(new_password)}
+    result = db.updateUserInfo(reset_email, new_user_dict)
+
+    remove_active_user(reset_email)
+
+    return result
+
+
+def admin_delete_acc(token, email_to_delete):
+
+    valid_jwt = tokens.check_jwt_token(token)
+    if not valid_jwt["Success"]:
+        return {"Success": False, "Message": "Error!"}
+    email = valid_jwt["Data"]["email"]
+    userInformation = db.checkUser(email)
+
+    if not userInformation["Data"]["SystemAdmin"]:
+        return {"Succes": False, "Error": "Not an admin"}
+
+    remove_active_user(email_to_delete)
+    result = db.deleteUser(email_to_delete)
+
+    return result
+
+
+
+
+
+
 if __name__ == "__main__":
     db.clear_collection("user_info")
     db.clear_collection("user_profile")

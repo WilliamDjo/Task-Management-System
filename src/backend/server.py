@@ -3,6 +3,7 @@ from flask import Flask, request, jsonify
 import sys
 import os
 import account
+from backend.account import admin_delete_acc, admin_reset_pw
 
 """ Accessing Other Files"""
 parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -106,6 +107,27 @@ def getallusers():
     token = request.json["token"]
     users = account.getAllAccounts(token)
     return jsonify(users)
+
+
+@app.route("/admin/reset", methods=["PUT"])
+def server_admin_reset_password():
+    token = request.json["token"]
+    email_to_reset = request.json["email"]
+    new_password = request.json["password"]
+
+    result = admin_reset_pw(token, new_password, email_to_reset)
+    return result
+
+
+@app.route("/admin/delete", methods=["DELETE"])
+def server_admin_delete_email():
+    
+    token = request.json["token"]
+    email_to_delete = request.json["email"]
+
+    result = admin_delete_acc(token, email_to_delete)
+    return result
+
 
 
 if __name__ == "__main__":
