@@ -11,10 +11,11 @@ import {
   Text,
 } from '@chakra-ui/react';
 import PasswordBar from '../components/PasswordBar/PasswordBar';
-import { fetchBackend } from '../fetch';
+// import { fetchBackend } from '../fetch';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [emailError, setEmailError] = useState(false);
@@ -22,44 +23,69 @@ const ForgotPassword = () => {
   const [confirmPasswordError, setConfirmPasswordError] = useState(false);
   const [passwordChanged, setPasswordChanged] = useState(false);
 
-  const handleSubmit = () => {
-    // Get user accounts from local storage
-    const userAccounts = JSON.parse(localStorage.getItem('userAccounts')) || [];
+  const handleSubmit = async () => {
+    // // Get user accounts from local storage
+    // const userAccounts = JSON.parse(localStorage.getItem('userAccounts')) || [];
 
-    // Find the user with matching email
-    const user = userAccounts.find(user => user.email === email);
-
-    if (user) {
-      if (password === confirmPassword) {
-        const token = localStorage.getItem('token');
-        fetchBackend('/update/password', 'PUT', { token, password }).then(
-          data => {
-            if (data.error) {
-              setPasswordError(true);
-              setConfirmPasswordError(true);
-              setPasswordChanged(false);
-              console.error('Password and Confirm Password do not match');
-            } else {
-              // Password change successful
-              user.password = password; // Update the password in the user object
-              localStorage.setItem(
-                'userAccounts',
-                JSON.stringify(userAccounts)
-              ); // Update the user accounts in local storage
-              setEmailError(false);
-              setPasswordError(false);
-              setConfirmPasswordError(false);
-              setPasswordChanged(true);
-              console.log('Password changed successfully');
-            }
-          }
-        );
+    // // Find the user with matching email
+    // const user = userAccounts.find(user => user.email === email);
+    if (password === confirmPassword) {
+      try {
+        const response = await fetch('http://127.0.0.1:5000/reset/password', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(username, email),
+        });
+        if (response.ok) {
+          setEmailError(false);
+          setPasswordError(false);
+          setConfirmPasswordError(false);
+          setPasswordChanged(true);
+          console.log('Password changed successfully');
+        } else {
+          setEmailError(true);
+          setPasswordChanged(false);
+          console.error('Email or Username does not exist');
+        }
+      } catch (error) {
+        console.error('An error occurred while logging in', error);
       }
     } else {
-      setEmailError(true);
+      setPasswordError(true);
+      setConfirmPasswordError(true);
       setPasswordChanged(false);
-      console.error('Email does not exist');
+      console.error('Password and Confirm Password do not match');
     }
+    // if (password === confirmPassword) {
+    //     const token = localStorage.getItem('token');
+    //     fetchBackend('/update/password', 'PUT', { token, password }).then(
+    //       data => {
+    //         if (data.error) {
+    //           setPasswordError(true);
+    //           setConfirmPasswordError(true);
+    //           setPasswordChanged(false);
+    //           console.error('Password and Confirm Password do not match');
+    //         } else {
+    //           // Password change successful
+    //           user.password = password; // Update the password in the user object
+    //           localStorage.setItem(
+    //             'userAccounts',
+    //             JSON.stringify(userAccounts)
+    //           ); // Update the user accounts in local storage
+    //           setEmailError(false);
+    //           setPasswordError(false);
+    //           setConfirmPasswordError(false);
+    //           setPasswordChanged(true);
+    //           console.log('Password changed successfully');
+    //         }
+    //       }
+    //     );
+    //   }
+    // } else {
+
+    // }
   };
 
   return (
@@ -82,6 +108,14 @@ const ForgotPassword = () => {
         <Heading lineHeight={1.1} fontSize={{ base: '2xl', md: '3xl' }}>
           Enter new password
         </Heading>
+        <FormControl id="username" isRequired>
+          <FormLabel>Username</FormLabel>
+          <Input
+            type="text"
+            value={username}
+            onChange={e => setUsername(e.target.value)}
+          />
+        </FormControl>
         <FormControl id="email" isRequired>
           <FormLabel>Email address</FormLabel>
           <Input
@@ -94,7 +128,7 @@ const ForgotPassword = () => {
         </FormControl>
         {emailError && (
           <Text color="red.500" fontSize="sm">
-            The provided email does not exist.
+            The provided email or username does not exist.
           </Text>
         )}
         <FormControl id="password" isRequired>
