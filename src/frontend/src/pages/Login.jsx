@@ -27,26 +27,46 @@ import PasswordBar from '../components/PasswordBar/PasswordBar';
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loginError, setLoginError] = useState(false);
+  const [loginSuccess, setLoginSuccess] = useState(false);
   // const [showPassword, setShowPassword] = useState(false);
-  const handleLogin = async () => {
-    try {
-      const response = await fetch('/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
+  // Simulating incorrect login credentials
+  // const handleLogin = async () => {
+  //   try {
+  //     const response = await fetch('/login', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({ email, password }),
+  //     });
 
-      if (response.ok) {
-        // Login successful, perform necessary actions
-        console.log('Login successful');
-      } else {
-        // Login failed, handle the error
-        console.error('Login failed');
-      }
-    } catch (error) {
-      console.error('An error occurred while logging in', error);
+  //     if (response.ok) {
+  //       // Login successful, perform necessary actions
+  //       console.log('Login successful');
+  //     } else {
+  //       // Login failed, handle the error
+  //       console.error('Login failed');
+  //     }
+  //   } catch (error) {
+  //     console.error('An error occurred while logging in', error);
+  //   }
+  // };
+  const handleLogin = async () => {
+    // Simulating incorrect login credentials
+    const dummyEmail = 'dummy@example.com';
+    const dummyPassword = 'password123';
+
+    if (email === dummyEmail && password === dummyPassword) {
+      // Login successful
+      setLoginError(false);
+      setLoginSuccess(true);
+      console.log('Login successful');
+    } else {
+      // Login failed, handle the error
+      setLoginError(true);
+      setLoginSuccess(false);
+      console.error('Login failed');
     }
   };
   return (
@@ -96,6 +116,16 @@ const Login = () => {
                   <Link color={'blue.400'}>{"Can't Login?"}</Link>
                 </RouteLink>
               </Stack>
+              {loginError && (
+                <Text color="red.500" fontSize="sm">
+                  Invalid email or password. Please try again.
+                </Text>
+              )}
+              {loginSuccess && (
+                <Text color="green.500" fontSize="sm">
+                  Login successful! Redirecting...
+                </Text>
+              )}
               <Button
                 bg={'blue.400'}
                 color={'white'}
