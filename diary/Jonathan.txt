@@ -8,4 +8,7 @@ Week 3
 Continued working on user stories and did some storyboards for user authentication and editing a profile. Finished my background information for Monday.com and we submitted our proposal.
 
 Week 4
-Setup frontend to get started for our project.
+Setup frontend to get started for our project. Worked on the frontend screen for your profile and updating your profile. Also worked on the dashboard screen for admin control such as resetting password and deleting accounts of taskmasters.
+
+Week 5
+Finished the screen for admin control.
