@@ -216,6 +216,7 @@ def updateEmail(old_email: str, new_email: str) -> dict:
     return {"Success": True, "Message": "Email updated successfully"}
 
 
+
 def getSingleUserInformation(email: str) -> dict:
     db = getDB()
     # Get the collection object for 'UserInfo' from the database
@@ -278,7 +279,6 @@ def getAllUserInformation() -> list:
     merged_data = list(users.values())
 
     return merged_data
-
 
 # FOR TESTING ONLY
 def clear_collection(collection_name: str) -> dict:

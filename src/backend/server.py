@@ -1,7 +1,9 @@
+import json
 from flask import Flask, request, jsonify
 import sys
 import os
 import account
+from backend.account import update_email_account, update_notificiation_set, update_password_account, update_username
 
 
 """ Accessing Other Files"""
@@ -49,7 +51,49 @@ def logout():
     # return the logout details
     return jsonify(logout_success)
 
+@app.route("/update/username", methods=["PUT"])
+def update_useranme():
 
+    token = request.json["token"]
+    new_username = request.json["username"]
+    update_status = account.update_username(new_username)
+    return jsonify(update_status)
+
+
+'''
+Update email wrapper function
+'''
+@app.route("/update/email", methods=["PUT"])
+def update_email():
+    token = request.json["token"]
+    new_email = request.json["email"]
+    update_status = update_email_account(new_email)
+
+    return jsonify(update_status)
+
+
+
+
+'''
+Update password
+'''
+@app.route("/update/password", methods=["PUT"])
+def update_password():
+    token = request.json["token"]
+    new_password = request.json["password"]
+    update_status = update_password_account(new_password, token)
+
+    return jsonify(update_status)
+
+
+'''Update notificitons Set true'''
+@app.route("/update/notifications", methods=["PUT"])
+def server_update_notifications_true():
+    token = request.json['token']
+    value = request.json['value']
+    update_status = update_notificiation_set(value, token)
+    return jsonify(update_status)
+    
 @app.route("/getuserprofile", methods=["GET"])
 def getuserprofile():
     token = request.json["token"]
