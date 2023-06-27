@@ -13,6 +13,8 @@ from database import db
 import tokens
 
 active_users = {}
+
+
 def generate_password_hash(data):
     sha256_hash = hashlib.sha256()
     sha256_hash.update(data.encode("utf-8"))
@@ -26,6 +28,7 @@ def remove_active_user(email):
 
 def add_active_user(email):
     active_users[email] = tokens.generate_jwt_token(email)
+
 
 class User:
 
@@ -52,8 +55,6 @@ class User:
         }
 
 
-
-
 """Helper Functions"""
 
 
@@ -61,8 +62,8 @@ def is_email_valid(email):
     pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
     return re.match(pattern, email) is not None
 
+
 def is_username_valid(username):
-    
     if len(username) < 4 or len(username) > 20:
         return {"Success": False, "Message": "Username Too Short"}
 
@@ -71,6 +72,7 @@ def is_username_valid(username):
         return {"Success": False, "Message": "Username not valid"}
 
     return {"Success": True, "Message": "Username valid"}
+
 
 """
 8 length minimum
@@ -107,9 +109,7 @@ def account_register(first_name, last_name, username, email, password, sys_admin
     username_valid = is_username_valid(username)
 
     if not username_valid["Success"]:
-        return username_valid 
-
-
+        return username_valid
 
     # Check if email is valid
     if not is_email_valid(email):
@@ -172,11 +172,13 @@ def account_logout(token):
 
     return {"Success": True, "Message": "Logout Successful"}
 
-'''
+
+"""
 Updates the username based on token and new_username
-'''
+"""
+
+
 def update_username(new_username, token):
-    
     if not is_username_valid(new_username)["Success"]:
         return {"Success": False, "Message": "Username not valid "}
 
@@ -190,19 +192,19 @@ def update_username(new_username, token):
     if email not in active_users:
         return {"Success": False, "Message": "User not active"}
 
-    new_user_dict = {
-        "user": new_username
-    }
+    new_user_dict = {"user": new_username}
 
-    #Update step
+    # Update step
     result = db.updateUserInfo(email, new_user_dict)
     return result
 
-'''
-Update password
-'''
-def update_password_account(new_password, token):
 
+"""
+Update password
+"""
+
+
+def update_password_account(new_password, token):
     if not is_password_valid(new_password):
         return {"Success": False, "Message": "Password not valid "}
 
@@ -216,20 +218,18 @@ def update_password_account(new_password, token):
     if email not in active_users:
         return {"Success": False, "Message": "User not active"}
 
-
-    new_user_dict = {
-        "password": generate_password_hash(new_password)
-    }
-
+    new_user_dict = {"password": generate_password_hash(new_password)}
 
     result = db.updateUserInfo(email, new_user_dict)
     return result
 
-'''
-Update email on backened
-'''
-def update_email_account(new_email, token):
 
+"""
+Update email on backened
+"""
+
+
+def update_email_account(new_email, token):
     if not is_email_valid(new_email):
         return is_email_valid
 
@@ -243,26 +243,25 @@ def update_email_account(new_email, token):
     if email not in active_users:
         return {"Success": False, "Message": "User not active"}
 
-    new_user_dict = {
-        "email": new_email
-    }
+    new_user_dict = {"email": new_email}
 
-
-    #new token 
+    # new token
     new_token = generate_jwt_token(new_email)
 
     result = db.updateUserInfo(email, new_user_dict)
 
     remove_active_user(email)
-    active_users[new_email] = new_token 
-    
+    active_users[new_email] = new_token
+
     return result
+
 
 """
 Update notfication 
 """
+
+
 def update_notificiation_set(bool_val, token):
-    
     valid_jwt = tokens.check_jwt_token(token)
 
     if not valid_jwt["Success"]:
@@ -273,20 +272,10 @@ def update_notificiation_set(bool_val, token):
     if email not in active_users:
         return {"Success": False, "Message": "User not active"}
 
-    new_dict = {
-        "notifications" : bool_val
-    }
+    new_dict = {"notifications": bool_val}
 
     result = db.updateUserProfile(email, new_dict)
     return result
-
-
-
-
-
-
-
-
 
 
 def getAccountInfo(token):
@@ -306,13 +295,12 @@ def getAllAccounts(token):
     email = valid_jwt["Data"]["email"]
     userInformation = db.checkUser(email)
 
-    if not userInformation["SystemAdmin"]:
+    if not userInformation["Data"]["SystemAdmin"]:
         return {"Succes": False, "Error": "Not an admin"}
     return {"Succes": True, "Error": "", "Data": userInformation}
 
 
 if __name__ == "__main__":
-    
     db.clear_collection("user_info")
     test_name = "adam"
     test_password = "Password123!"
@@ -321,14 +309,14 @@ if __name__ == "__main__":
     test_username = "adam_user"
     test_sys = True
 
-
     new_user_test = "new_user_01"
-    new_user_email ="new_email@gmail.com"
-    test_success = account_register(test_name, test_username, test_email, test_password, test_sys)
+    new_user_email = "new_email@gmail.com"
+    test_success = account_register(
+        test_name, test_username, test_email, test_password, test_sys
+    )
 
-
-    update_username(new_user_test, test_success["token"])   
-    print(update_password_account(new_password, test_success["token"]) ) 
+    update_username(new_user_test, test_success["token"])
+    print(update_password_account(new_password, test_success["token"]))
 
     expected_pass = generate_password_hash(new_password)
 

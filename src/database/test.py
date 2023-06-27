@@ -1,8 +1,9 @@
 from db import *
 
-clear_collection('user_info')
-clear_collection('user_profile')
+clear_collection("user_info")
+clear_collection("user_profile")
 
+""" 
 user_info = {
         'user': 'BL4NK',
         'email': 'sanyamjain00@gmail.com',
@@ -15,7 +16,7 @@ a = addNewUser(user_info)
 print(a)
 
 a = isValidUser('sanyamjain00@gmail.com', 'salt123')
-print(a)
+print(a) """
 # a = isValidUser(user_info['email'], 'salt456')
 # print(a)
 # a = isValidUser('sanymjain00@gmail.com', user_info['password'])
@@ -33,7 +34,7 @@ print(a)
 #         'password': 'salt1',
 #         'Name': 'Sanym',
 #         'SystemAdmin': False,
-       
+
 #     }
 
 # a = updateUserInfo('sanyamjain00@gmail.com',user_info)
