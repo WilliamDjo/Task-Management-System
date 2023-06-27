@@ -179,7 +179,7 @@ const AdminDashboard = () => {
                     color={'white'}
                     _hover={{ bg: 'red.500' }}
                     onClick={() =>
-                      handleDeleteButton(user.username, user.email)
+                      handleDeleteButton(user.Data.username, user.Data.email)
                     }
                   >
                     Delete
@@ -188,7 +188,9 @@ const AdminDashboard = () => {
                     bg={'blue.400'}
                     color={'white'}
                     _hover={{ bg: 'blue.500' }}
-                    onClick={() => handleResetButton(user.username, user.email)}
+                    onClick={() =>
+                      handleResetButton(user.Data.username, user.Data.email)
+                    }
                   >
                     Reset Password
                   </Button>

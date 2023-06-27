@@ -11,6 +11,12 @@ import {
   Text,
 } from '@chakra-ui/react';
 import PasswordBar from '../components/PasswordBar/PasswordBar';
+import {
+  // BrowserRouter as Router,
+  // Switch,
+  // Route,
+  useNavigate,
+} from 'react-router-dom';
 // import { fetchBackend } from '../fetch';
 
 const ForgotPassword = () => {
@@ -22,6 +28,7 @@ const ForgotPassword = () => {
   const [passwordError, setPasswordError] = useState(false);
   const [confirmPasswordError, setConfirmPasswordError] = useState(false);
   const [passwordChanged, setPasswordChanged] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async () => {
     // // Get user accounts from local storage
@@ -44,6 +51,7 @@ const ForgotPassword = () => {
           setConfirmPasswordError(false);
           setPasswordChanged(true);
           console.log('Password changed successfully');
+          navigate('/login');
         } else {
           setEmailError(true);
           setPasswordChanged(false);
