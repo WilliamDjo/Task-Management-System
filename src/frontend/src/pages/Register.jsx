@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import React, { useState } from 'react';
 import {
   Flex,
@@ -26,9 +27,10 @@ const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+  const [first_name, setFirstName] = useState('');
+  const [last_name, setLastName] = useState('');
   const [username, setUsername] = useState('');
+  const sys_admin = false;
   const [registrationError, setRegistrationError] = useState(false);
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const [passwordMismatchError, setPasswordMismatchError] = useState(false);
@@ -87,9 +89,13 @@ const Register = () => {
       const newUser = {
         email,
         password,
-        firstName,
-        lastName,
+        // eslint-disable-next-line camelcase
+        first_name,
+        // eslint-disable-next-line camelcase
+        last_name,
         username,
+        // eslint-disable-next-line camelcase
+        sys_admin,
       };
       // // Add the new user to existing user accounts
       // const updatedAccounts = [...existingAccounts, newUser];
@@ -160,7 +166,7 @@ const Register = () => {
                   <FormLabel>First Name</FormLabel>
                   <Input
                     type="text"
-                    value={firstName}
+                    value={first_name}
                     onChange={e => setFirstName(e.target.value)}
                   />
                 </FormControl>
@@ -170,7 +176,7 @@ const Register = () => {
                   <FormLabel>Last Name</FormLabel>
                   <Input
                     type="text"
-                    value={lastName}
+                    value={last_name}
                     onChange={e => setLastName(e.target.value)}
                   />
                 </FormControl>
