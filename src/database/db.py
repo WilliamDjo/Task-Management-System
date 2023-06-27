@@ -1,8 +1,10 @@
+from re import X
 from pymongo import MongoClient
 from pymongo.database import Database
 from pymongo.collection import Collection
 from bson import Binary
-from config import url
+
+url = "mongodb+srv://z5272191:QuyvHWVdlycdF84R@zombies.x0az3q5.mongodb.net/?retryWrites=true&w=majority"
 
 
 def getDB():
@@ -78,7 +80,6 @@ def addNewUser(data: dict) -> dict:
 
     # Return a dictionary with 'Success': True and the 'inserted_id' of the new user
     return {"Success": True, "inserted_id": str(inserted_id)}
-
 
 def isValidUser(email: str, password: str) -> dict:
     # Get the database
@@ -187,6 +188,7 @@ def updateUserProfile(email: str, data: dict) -> dict:
     # Update the user document with the data from the input dictionary
     UserProfileCollection.update_one({"_id": user["_id"]}, {"$set": data})
 
+
     # Return a dictionary indicating success
     return {"Success": True, "Message": "User updated successfully"}
 
@@ -210,6 +212,7 @@ def updateEmail(old_email: str, new_email: str) -> dict:
 
     # Return a dictionary indicating success
     return {"Success": True, "Message": "Email updated successfully"}
+
 
 
 # FOR TESTING ONLY
