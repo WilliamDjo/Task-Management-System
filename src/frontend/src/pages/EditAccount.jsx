@@ -4,30 +4,58 @@ import logo from '../logo.svg'
 
 import ProfileBar from '../components/ProfileBar';
 import PasswordBar from '../components/PasswordBar/PasswordBar';
+import { fetchBackend } from '../fetch';
 
 const EditAccount = () => {
   const [email, setEmail] = React.useState('');
   const [confirmEmail, setConfirmEmail] = React.useState('');
+  const [username, setUsername] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [confirmPassword, setConfirmPassword] = React.useState('');
 
   const toast = useToast();
 
   const handleSubmitName = () => {
-    toast({
-      title: 'Name successfully changed.',
-      status: 'success',
-      duration: 5000,
-      isClosable: true,
-    });
+    fetchBackend('/update/username', 'PUT', { token: localStorage.getItem('token'), username })
+      .then((data) => {
+        if (data.error) {
+          toast({
+            title: data.error,
+            status: 'error',
+            duration: 5000,
+            isClosable: true,
+          });
+        } else {
+          toast({
+            title: 'Username successfully changed.',
+            status: 'success',
+            duration: 5000,
+            isClosable: true,
+          });
+        }
+      })
   }
 
   const handleSubmitEmail = () => {
     if (email === confirmEmail) {
-      toast({
-        title: 'Email successfully changed.',
-        status: 'success',
-        duration: 5000,
-        isClosable: true,
-      });
+      fetchBackend('/update/email', 'PUT', { token: localStorage.getItem('token'), email })
+        .then((data) => {
+          if (data.error) {
+            toast({
+              title: data.error,
+              status: 'error',
+              duration: 5000,
+              isClosable: true,
+            });
+          } else {
+            toast({
+              title: 'Email successfully changed.',
+              status: 'success',
+              duration: 5000,
+              isClosable: true,
+            });
+          }
+        })
     } else {
       toast({
         title: 'Email must match confirm email to change.',
@@ -39,15 +67,37 @@ const EditAccount = () => {
   }
 
   const handleSubmitPassword = () => {
-    toast({
-      title: 'Password successfully changed.',
-      status: 'success',
-      duration: 5000,
-      isClosable: true,
-    });
+    if (password === confirmPassword) {
+      fetchBackend('/update/password', 'PUT', { token: localStorage.getItem('token'), password })
+        .then((data) => {
+          if (data.error) {
+            toast({
+              title: data.error,
+              status: 'error',
+              duration: 5000,
+              isClosable: true,
+            });
+          } else {
+            toast({
+              title: 'Password successfully changed.',
+              status: 'success',
+              duration: 5000,
+              isClosable: true,
+            });
+          }
+        })
+    } else {
+      toast({
+        title: 'Password must match confirm password to change.',
+        status: 'warning',
+        duration: 5000,
+        isClosable: true,
+      });
+    }
   }
 
   const handleSubmitImage = () => {
+    // Not yet fully implemented
     toast({
       title: 'Profile image successfully changed.',
       status: 'success',
@@ -65,8 +115,8 @@ const EditAccount = () => {
             <Stack spacing='4'>
               <Box>
                 <FormControl>
-                  <FormLabel>Name:</FormLabel>
-                  <Input placeholder='Name' />
+                  <FormLabel>New User Name:</FormLabel>
+                  <Input placeholder='User Name' value={username} onChange={(event) => setUsername(event.target.value)}/>
                 </FormControl>
               </Box>
               <Button loadingText="Submitting" bg={'blue.400'} color={'white'} _hover={{ bg: 'blue.500' }} onClick={handleSubmitName}>
@@ -75,7 +125,7 @@ const EditAccount = () => {
               <Divider />
               <Box>
                 <FormControl>
-                  <FormLabel>Email:</FormLabel>
+                  <FormLabel>New Email:</FormLabel>
                   <Input placeholder='email@example.com' type='email' value={email} onChange={(event) => setEmail(event.target.value)}/>
                 </FormControl>
               </Box>
@@ -91,20 +141,14 @@ const EditAccount = () => {
               <Divider />
               <Box>
                 <FormControl>
-                  <FormLabel>Current Password: </FormLabel>
-                  <PasswordBar />
-                </FormControl>
-              </Box>
-              <Box>
-                <FormControl>
                   <FormLabel>New Password: </FormLabel>
-                  <PasswordBar />
+                  <PasswordBar value={password} onChange={(event) => setPassword(event.target.value)}/>
                 </FormControl>
               </Box>
               <Box>
                 <FormControl>
                   <FormLabel>Confirm Password: </FormLabel>
-                  <PasswordBar />
+                  <PasswordBar value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)}/>
                 </FormControl>
               </Box>
               <Button loadingText="Submitting" bg={'blue.400'} color={'white'} _hover={{ bg: 'blue.500' }} onClick={handleSubmitPassword}>
