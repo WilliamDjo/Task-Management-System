@@ -1,70 +1,89 @@
 import React from 'react';
-import { AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, Box, Button, ButtonGroup, Center, Flex, FormControl, FormLabel, Heading, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, SimpleGrid, Stack, Text, useDisclosure, useToast } from '@chakra-ui/react';
+import { AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, Box, Button, ButtonGroup, Flex, FormControl, FormLabel, Heading, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, SimpleGrid, Stack, Text, useDisclosure, useToast } from '@chakra-ui/react';
 import NavigationBar from '../components/NavigationBar';
 import PasswordBar from '../components/PasswordBar/PasswordBar';
+import { fetchBackend } from '../fetch';
 
 const AdminDashboard = () => {
   const [selectedUser, setSelectedUser] = React.useState();
-  const [selectedUserId, setSelectedUserId] = React.useState();
+  const [selectedUserEmail, setSelectedUserEmail] = React.useState();
 
   const [newPassword, setNewPassword] = React.useState('');
   const [confirmNewPassword, setConfirmNewPassword] = React.useState('');
 
   const [users, setUsers] = React.useState([
     {
-      name: 'Akshay',
+      username: 'Akshay',
       email: 'akshay@taskmaster.com',
-      uid: 1234,
     },
     {
-      name: 'Cameron',
+      username: 'Cameron',
       email: 'cameron@taskmaster.com',
-      uid: 5678,
     },
     {
-      name: 'Sanyam',
+      username: 'Sanyam',
       email: 'sanyam@taskmaster.com',
-      uid: 9012,
     },
     {
-      name: 'William',
+      username: 'William',
       email: 'william@taskmaster.com',
-      uid: 3456,
     },
     {
-      name: 'Jonathan',
+      username: 'Jonathan',
       email: 'jonathan@taskmaster.com',
-      uid: 7890,
     }
   ]);
+  // const [users, setUsers] = React.useState([]);
+
+  React.useEffect(() => {
+    fetchBackend('/getallusers', 'POST', { token: localStorage.getItem('token') })
+      .then((data) => {
+        if (data.error) {
+          console.log(data.error);
+        } else {
+          setUsers(data.Data)
+        }
+      })
+  }, [])
 
   const { isOpen: isAlertOpen, onOpen: onAlertOpen, onClose: onAlertClose } = useDisclosure();
   const { isOpen: isModalOpen, onOpen: onModalOpen, onClose: onModalClose } = useDisclosure();
   const toast = useToast();
 
-  const handleDeleteButton = (user, id) => {
+  const handleDeleteButton = (user, email) => {
     setSelectedUser(user);
-    setSelectedUserId(id);
+    setSelectedUserEmail(email);
     onAlertOpen();
   }
 
   const handleFinalDelete = () => {
-    const newUsers = [...users];
-    const newUsersFiltered = newUsers.filter((user) => user.uid !== selectedUserId);
-    setUsers(newUsersFiltered);
-    onAlertClose();
-
-    toast({
-      title: `${selectedUser}'s account successfully deleted.`,
-      status: 'success',
-      duration: 5000,
-      isClosable: true,
-    });
+    fetchBackend('/admin/delete', 'DELETE', { token: localStorage.getItem('token'), email: selectedUserEmail })
+      .then((data) => {
+        if (data.error) {
+          toast({
+            title: data.error,
+            status: 'failure',
+            duration: 5000,
+            isClosable: true,
+          });
+        } else {
+          const newUsers = [...users];
+          const newUsersFiltered = newUsers.filter((user) => user.email !== selectedUserEmail);
+          setUsers(newUsersFiltered);
+          onAlertClose();
+          toast({
+            title: `${selectedUser}'s account successfully deleted.`,
+            status: 'success',
+            duration: 5000,
+            isClosable: true,
+          });
+        }
+      })
   }
 
-  const handleResetButton = (user, id) => {
+  const handleResetButton = (user, email) => {
     setSelectedUser(user);
-    setSelectedUserId(id);
+    setSelectedUserEmail(email);
     setNewPassword('');
     setConfirmNewPassword('');
     onModalOpen();
@@ -78,15 +97,27 @@ const AdminDashboard = () => {
         duration: 5000,
         isClosable: true,
       });
-    } else {
-      toast({
-        title: `${selectedUser}'s password successfully reset.`,
-        status: 'success',
-        duration: 5000,
-        isClosable: true,
-      });
-      onModalClose();
+      return
     }
+    fetchBackend('/admin/reset', 'PUT', { token: localStorage.getItem('token'), email: selectedUserEmail, password: newPassword })
+      .then((data) => {
+        if (data.error) {
+          toast({
+            title: data.error,
+            status: 'failure',
+            duration: 5000,
+            isClosable: true,
+          });
+        } else {
+          toast({
+            title: `${selectedUser}'s password successfully reset.`,
+            status: 'success',
+            duration: 5000,
+            isClosable: true,
+          });
+          onModalClose();
+        }
+      })
   }
 
   return (
@@ -98,15 +129,11 @@ const AdminDashboard = () => {
           {users.map((user, index) => {
             return (
               <Box bg='blue.50' key={index} borderRadius='xl' p='2'>
-                <Text as='b'>{user.name}</Text>
-                <Text>{user.email}</Text>
-                <Text>ID: {user.uid}</Text>
-                <Center>
+                <Text as='b'>{user.email}</Text>
                   <ButtonGroup size='sm' isAttached>
-                    <Button bg={'red.400'} color={'white'} _hover={{ bg: 'red.500' }} onClick={() => handleDeleteButton(user.name, user.uid)}>Delete</Button>
-                    <Button bg={'blue.400'} color={'white'} _hover={{ bg: 'blue.500' }} onClick={() => handleResetButton(user.name, user.id)}>Reset Password</Button>
+                    <Button bg={'red.400'} color={'white'} _hover={{ bg: 'red.500' }} onClick={() => handleDeleteButton(user.username, user.email)}>Delete</Button>
+                    <Button bg={'blue.400'} color={'white'} _hover={{ bg: 'blue.500' }} onClick={() => handleResetButton(user.username, user.email)}>Reset Password</Button>
                   </ButtonGroup>
-                </Center>
               </Box>
             )
           })}
