@@ -18,10 +18,14 @@ app = Flask(__name__)
 def server_register():
     username = request.json["username"]
     password = request.json["password"]
-    name = request.json["name"]
+    first_name = request.json["first_name"]
+    last_name = request.json["last_name"]
+
     email = request.json["email"]
     sys_admin = request.json["sys_admin"]
-    status = account.account_register(name, username, email, password, sys_admin)
+    status = account.account_register(
+        first_name, last_name, username, email, password, sys_admin
+    )
     return status
 
 
@@ -46,8 +50,6 @@ def logout():
     logout_success = account.account_logout(token)
     # return the logout details
     return jsonify(logout_success)
-
-
 
 @app.route("/update/username", methods=["PUT"])
 def update_useranme():
@@ -92,16 +94,18 @@ def server_update_notifications_true():
     update_status = update_notificiation_set(value, token)
     return jsonify(update_status)
     
-    
+@app.route("/getuserprofile", methods=["GET"])
+def getuserprofile():
+    token = request.json["token"]
+    user_profile_info = account.getAccountInfo(token)
+    return jsonify(user_profile_info)
 
 
-
-
-
-
-
-
-
+@app.route("/getallusers", methods=["GET"])
+def getallusers():
+    token = request.json["token"]
+    users = account.getAllAccounts(token)
+    return jsonify(users)
 
 
 if __name__ == "__main__":

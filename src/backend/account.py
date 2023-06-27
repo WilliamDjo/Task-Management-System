@@ -31,8 +31,11 @@ class User:
 
     """User information"""
 
-    def __init__(self, name, username, email, password, sys_admin) -> None:
-        self.name = name
+    def __init__(
+        self, first_name, last_name, username, email, password, sys_admin
+    ) -> None:
+        self.first_name = first_name
+        self.last_name = last_name
         self.username = username
         self.email = email
         self.password = generate_password_hash(password)
@@ -43,7 +46,8 @@ class User:
             "user": self.username,
             "password": self.password,
             "email": self.email,
-            "Name": self.name,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
             "SystemAdmin": self.sys_admin,
         }
 
@@ -93,12 +97,9 @@ def is_password_valid(password):
 
 
 # Return login token
-def account_register(name, username, email, password, sys_admin):
+def account_register(first_name, last_name, username, email, password, sys_admin):
     # Check if email exists
     email_exists = db.checkUser(email)
-
-    print("email_exits")
-    print(email_exists)
 
     if not email_exists["Success"]:
         return {"Success": False, "Message": "Email already exists."}
@@ -120,7 +121,7 @@ def account_register(name, username, email, password, sys_admin):
 
     # Return true if success | Add user to DB
 
-    new_user = User(name, username, email, password, sys_admin)
+    new_user = User(first_name, last_name, username, email, password, sys_admin)
     new_user_dict = new_user.to_dict()
 
     login_token = tokens.generate_jwt_token(email)
@@ -130,24 +131,34 @@ def account_register(name, username, email, password, sys_admin):
 
     db.addNewUser(new_user_dict)
     del new_user
-    return {"Success": True, "Message": "User created", "token": login_token}
+    return {
+        "Success": True,
+        "Message": "User created",
+        "token": login_token,
+        "sys_admin": sys_admin,
+    }
 
 
 def account_login(email, password):
     # Check if email/pw combo matches || Existence is checked in the databse
     password = generate_password_hash(password)
-    print(password)
     email_password_match = db.isValidUser(email, password)
 
     if not email_password_match["Success"]:
         return email_password_match
 
+    userInfo = email_password_match["User"]
     # Return token
     login_token = tokens.generate_jwt_token(email)
 
     active_users[email] = login_token  # Make a function for this HERE
 
-    return {"Success": True, "Message": "Logged in", "token": login_token}
+    return {
+        "Success": True,
+        "Message": "Logged in",
+        "token": login_token,
+        "sys_admin": userInfo["SystemAdmin"],
+    }
 
 
 def account_logout(token):
@@ -276,6 +287,28 @@ def update_notificiation_set(bool_val, token):
 
 
 
+
+
+def getAccountInfo(token):
+    valid_jwt = tokens.check_jwt_token(token)
+    if not valid_jwt["Success"]:
+        return {"Success": False, "Message": "Error!"}
+    email = valid_jwt["Data"]["email"]
+    userInformation = db.getSingleUserInformation(email)
+
+    return userInformation
+
+
+def getAllAccounts(token):
+    valid_jwt = tokens.check_jwt_token(token)
+    if not valid_jwt["Success"]:
+        return {"Success": False, "Message": "Error!"}
+    email = valid_jwt["Data"]["email"]
+    userInformation = db.checkUser(email)
+
+    if not userInformation["SystemAdmin"]:
+        return {"Succes": False, "Error": "Not an admin"}
+    return {"Succes": True, "Error": "", "Data": userInformation}
 
 
 if __name__ == "__main__":

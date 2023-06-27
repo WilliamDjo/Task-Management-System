@@ -35,7 +35,8 @@ def addNewUser(data: dict) -> dict:
         "user": "",
         "email": "",
         "password": "",
-        "Name": "",
+        "first_name": "",
+        "last_name": "",
         "SystemAdmin": False,
     }
 
@@ -64,6 +65,7 @@ def addNewUser(data: dict) -> dict:
         "notifications": False,
         "image": Binary(bytes(0)),
         "organization_name": "",
+        "connections": 1,
     }
 
     # Loop over the keys in the input data
@@ -80,6 +82,7 @@ def addNewUser(data: dict) -> dict:
 
     # Return a dictionary with 'Success': True and the 'inserted_id' of the new user
     return {"Success": True, "inserted_id": str(inserted_id)}
+
 
 def isValidUser(email: str, password: str) -> dict:
     # Get the database
@@ -118,7 +121,7 @@ def checkUser(email: str) -> dict:
     if user is None:
         return {"Success": True, "Error": ""}
     else:
-        return {"Success": False, "Error": "User already exists"}
+        return {"Success": False, "Error": "User already exists", "Data": user}
 
 
 def deleteUser(email: str) -> dict:
@@ -188,7 +191,6 @@ def updateUserProfile(email: str, data: dict) -> dict:
     # Update the user document with the data from the input dictionary
     UserProfileCollection.update_one({"_id": user["_id"]}, {"$set": data})
 
-
     # Return a dictionary indicating success
     return {"Success": True, "Message": "User updated successfully"}
 
@@ -213,6 +215,70 @@ def updateEmail(old_email: str, new_email: str) -> dict:
     # Return a dictionary indicating success
     return {"Success": True, "Message": "Email updated successfully"}
 
+
+
+def getSingleUserInformation(email: str) -> dict:
+    db = getDB()
+    # Get the collection object for 'UserInfo' from the database
+    UserInfoCollection = getUserInfoCollection(db)
+
+    # Attempt to retrieve the user with the given old email
+    userInfo = UserInfoCollection.find_one({"email": email})
+
+    # If no user was found, return a dictionary indicating failure
+    if userInfo is None:
+        return {"Success": False, "Error": "No user found with the given email"}
+
+    id = userInfo["_uid"]
+
+    UserProfileCollection = getUserProfileCollection(db)
+    userProfile = UserProfileCollection.find_one({"_uid": id})
+    if userProfile is None:
+        return {"Success": False, "Error": "No user found with the given email"}
+
+    # {"name": "", "email": "", "username": "", emailNotifications: false, "organisation": "", "connections": 1}
+    user = {
+        "first_name": userInfo["first_name"],
+        "last_name": userInfo["last_name"],
+        "email": userInfo["email"],
+        "username": userInfo["user"],
+        "emailNotifications": userProfile["notifications"],
+        "organization": userProfile["organization_name"],
+        "connections": userProfile["connections"],
+    }
+    return {"Success": False, "Error": "", "Data": user}
+
+
+def getAllUserInformation() -> list:
+    # Get the database
+    db = getDB()
+
+    # Get the collection object for 'UserInfo' from the database
+    UserInfoCollection = getUserInfoCollection(db)
+
+    # Get all documents in 'UserInfo' collection
+    user_infos = UserInfoCollection.find()
+
+    # Get the collection object for 'UserProfile' from the database
+    UserProfileCollection = getUserProfileCollection(db)
+
+    # Get all documents in 'UserProfile' collection
+    user_profiles = UserProfileCollection.find()
+
+    # Create a dictionary where the keys are user '_id' and the values are user data
+    users = {user["_id"]: user for user in user_infos}
+
+    # Loop through each user profile
+    for profile in user_profiles:
+        user_id = profile["_id"]
+        if user_id in users:
+            # If the user exists in the users dictionary, merge the user profile with the user data
+            users[user_id].update(profile)
+
+    # Convert the values of the users dictionary to a list
+    merged_data = list(users.values())
+
+    return merged_data
 
 # FOR TESTING ONLY
 def clear_collection(collection_name: str) -> dict:
