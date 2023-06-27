@@ -3,13 +3,6 @@ from flask import Flask, request, jsonify
 import sys
 import os
 import account
-from backend.account import (
-    update_email_account,
-    update_notificiation_set,
-    update_password_account,
-    update_username,
-)
-
 
 """ Accessing Other Files"""
 parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -27,7 +20,6 @@ def server_register():
     last_name = request.json["last_name"]
 
     email = request.json["email"]
-    sys_admin = request.json["sys_admin"]
     status = account.account_register(
         first_name, last_name, username, email, password, sys_admin
     )
@@ -39,8 +31,6 @@ def login():
     # Request
     email = request.json["email"]
     password = request.json["password"]
-    print(email)
-    print(password)
     # Log the user
     login_success = account.account_login(email, password)
 
@@ -74,7 +64,7 @@ Update email wrapper function
 def update_email():
     token = request.json["token"]
     new_email = request.json["email"]
-    update_status = update_email_account(new_email, token)
+    update_status = account.update_email_account(new_email, token)
 
     return jsonify(update_status)
 
@@ -88,7 +78,7 @@ Update password
 def update_password():
     token = request.json["token"]
     new_password = request.json["password"]
-    update_status = update_password_account(new_password, token)
+    update_status = account.update_password_account(new_password, token)
 
     return jsonify(update_status)
 
@@ -100,7 +90,7 @@ def update_password():
 def server_update_notifications_true():
     token = request.json["token"]
     value = request.json["value"]
-    update_status = update_notificiation_set(value, token)
+    update_status = account.update_notificiation_set(value, token)
     return jsonify(update_status)
 
 

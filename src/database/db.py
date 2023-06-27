@@ -2,7 +2,8 @@ from re import X
 from pymongo import MongoClient
 from pymongo.database import Database
 from pymongo.collection import Collection
-from bson import Binary
+from bson import Binary, json_util
+import json
 
 url = "mongodb+srv://z5272191:QuyvHWVdlycdF84R@zombies.x0az3q5.mongodb.net/?retryWrites=true&w=majority"
 
@@ -265,17 +266,22 @@ def getAllUserInformation() -> list:
     user_profiles = UserProfileCollection.find()
 
     # Create a dictionary where the keys are user '_id' and the values are user data
-    users = {user["_id"]: user for user in user_infos}
+    users = {str(user["_id"]): user for user in user_infos}
 
     # Loop through each user profile
     for profile in user_profiles:
-        user_id = profile["_id"]
+        # Convert the '_id' to string
+        user_id = str(profile["_id"])
         if user_id in users:
             # If the user exists in the users dictionary, merge the user profile with the user data
             users[user_id].update(profile)
 
     # Convert the values of the users dictionary to a list
     merged_data = list(users.values())
+
+    # Convert the list of dictionaries to a JSON string and then back to a list of dictionaries
+    # This step ensures that all BSON types are converted to JSON serializable types
+    merged_data = json.loads(json_util.dumps(merged_data))
 
     return merged_data
 
