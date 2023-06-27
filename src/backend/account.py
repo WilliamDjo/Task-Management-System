@@ -3,6 +3,7 @@ import hashlib
 import sys
 import os
 import re
+from tokens import check_jwt_token
 
 parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_folder)
@@ -11,8 +12,6 @@ from database import db
 import tokens
 
 active_users = {}
-
-
 def generate_password_hash(data):
     sha256_hash = hashlib.sha256()
     sha256_hash.update(data.encode("utf-8"))
@@ -55,6 +54,16 @@ def is_email_valid(email):
     pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
     return re.match(pattern, email) is not None
 
+def is_username_valid(username):
+    
+    if len(username) < 4 or len(username) > 20:
+        return {"Success": False, "Message": "Username Too Short"}
+
+    regex_pattern = r"^[a-zA-Z0-9_]+$"
+    if not re.match(regex_pattern, username):
+        return {"Success": False, "Message": "Username not valid"}
+
+    return {"Success": True, "Message": "Username valid"}
 
 """
 8 length minimum
@@ -91,14 +100,12 @@ def account_register(name, username, email, password, sys_admin):
     if not email_exists["Success"]:
         return {"Success": False, "Message": "Email already exists."}
 
-    # length should be between 4 and 20
-    if len(username) < 4 or len(username) > 20:
-        return {"Success": False, "Message": "Username Too Short"}
+    username_valid = is_username_valid(username)
 
-    # Regex  match
-    regex_pattern = r"^[a-zA-Z0-9_]+$"
-    if not re.match(regex_pattern, username):
-        return {"Success": False, "Message": "Username not valid"}
+    if not username_valid["Success"]:
+        return username_valid 
+
+
 
     # Check if email is valid
     if not is_email_valid(email):
@@ -152,7 +159,39 @@ def account_logout(token):
     return {"Success": True, "Message": "Logout Successful"}
 
 
+
+'''
+Updates the username based on token and new_username
+'''
+def update_username(new_username, token):
+    
+    if not is_username_valid(new_username)["Success"]:
+        return is_username_valid
+
+
+    valid_jwt = tokens.check_jwt_token(token)
+
+
+    if not valid_jwt["Success"]:
+        return {"Success": False, "Message": "user not logged in"}
+
+    email = valid_jwt["Data"]["email"]
+
+    if email not in active_users:
+        return {"Success": False, "Message": "User not active"}
+
+    new_user_dict = {
+        "user": new_username
+    }
+
+    #Update step
+    result = db.updateUserInfo(email, new_user_dict)
+
+
+    return result
+
 if __name__ == "__main__":
+    
     db.clear_collection("user_info")
     test_name = "adam"
     test_password = "Password123!"
@@ -160,12 +199,12 @@ if __name__ == "__main__":
     test_username = "adam_user"
     test_sys = True
 
-    test_success = account_register(
-        test_name, test_username, test_email, test_password, test_sys
-    )
-    test_login = account_login(test_email, test_password)
 
-    print(test_login)
+    new_user_test = "tp"
+    test_success = account_register(test_name, test_username, test_email, test_password, test_sys)
+
+    update_username(new_user_test, test_success["token"])
+
 
     """Debug code"""
     db.print_all_from_collection("user_info")

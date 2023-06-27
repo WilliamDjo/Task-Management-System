@@ -168,7 +168,9 @@ def updateUserInfo(email: str, data: dict) -> dict:
     # Return a dictionary indicating success
     return {"Success": True, "Message": "User updated successfully"}
 
-
+'''
+U
+'''
 def updateUserProfile(email: str, data: dict) -> dict:
     # Get the database
     db = getDB()
