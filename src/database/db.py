@@ -81,7 +81,6 @@ def addNewUser(data: dict) -> dict:
     # Return a dictionary with 'Success': True and the 'inserted_id' of the new user
     return {"Success": True, "inserted_id": str(inserted_id)}
 
-
 def isValidUser(email: str, password: str) -> dict:
     # Get the database
     db = getDB()
@@ -91,9 +90,10 @@ def isValidUser(email: str, password: str) -> dict:
 
     # Attempt to retrieve the user with the given email
     user = UserInfoCollection.find_one({"email": email})
+
     # If no user was found, return a dictionary indicating failure
     if user is None:
-        return {"Success": False, "Error": "NONE TYPE Incorrect password or email"}
+        return {"Success": False, "Error": "Incorrect password or email"}
 
     # Check if the provided password matches the stored password
     if user["password"] == password:
@@ -188,8 +188,31 @@ def updateUserProfile(email: str, data: dict) -> dict:
     # Update the user document with the data from the input dictionary
     UserProfileCollection.update_one({"_id": user["_id"]}, {"$set": data})
 
+
     # Return a dictionary indicating success
     return {"Success": True, "Message": "User updated successfully"}
+
+
+def updateEmail(old_email: str, new_email: str) -> dict:
+    # Get the database
+    db = getDB()
+
+    # Get the collection object for 'UserInfo' from the database
+    UserInfoCollection = getUserInfoCollection(db)
+
+    # Attempt to retrieve the user with the given old email
+    user = UserInfoCollection.find_one({"email": old_email})
+
+    # If no user was found, return a dictionary indicating failure
+    if user is None:
+        return {"Success": False, "Error": "No user found with the given email"}
+
+    # Update the user document with the new email
+    UserInfoCollection.update_one({"email": old_email}, {"$set": {"email": new_email}})
+
+    # Return a dictionary indicating success
+    return {"Success": True, "Message": "Email updated successfully"}
+
 
 
 # FOR TESTING ONLY
