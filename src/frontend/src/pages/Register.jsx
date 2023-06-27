@@ -1,5 +1,6 @@
 /* eslint-disable camelcase */
 import React, { useState } from 'react';
+
 import {
   Flex,
   Box,
@@ -20,8 +21,10 @@ import {
   // Switch,
   // Route,
   Link as RouteLink,
+  useNavigate,
 } from 'react-router-dom';
 import PasswordBar from '../components/PasswordBar/PasswordBar';
+// import { fetchBackend } from '../fetch';
 
 const Register = () => {
   const [email, setEmail] = useState('');
@@ -30,10 +33,11 @@ const Register = () => {
   const [first_name, setFirstName] = useState('');
   const [last_name, setLastName] = useState('');
   const [username, setUsername] = useState('');
-  const sys_admin = false;
+  const [sys_admin, setSysAdmin] = useState(false);
   const [registrationError, setRegistrationError] = useState(false);
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const [passwordMismatchError, setPasswordMismatchError] = useState(false);
+  const navigate = useNavigate();
 
   // const [showPassword, setShowPassword] = useState(false);
   // const handleRegister = async () => {
@@ -95,9 +99,8 @@ const Register = () => {
     // localStorage.setItem('userAccounts', JSON.stringify(updatedAccounts));
 
     // console.log('User account saved to local storage');
-
     try {
-      const response = await fetch('/signup', {
+      const response = await fetch('http://127.0.0.1:5000/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -108,12 +111,20 @@ const Register = () => {
       if (response.ok) {
         // Registration successful, receive the token from the backend
         const data = await response.json();
-        const { token } = data;
+        const { token, sys_admin } = data;
 
         // Store the token in localStorage or sessionStorage
         localStorage.setItem('token', token);
+        // Store the sys_admin value in state
+        setSysAdmin(sys_admin);
 
         console.log('User account created and token received');
+        // Redirect the user based on the sys_admin value
+        if (sys_admin) {
+          navigate('/admin');
+        } else {
+          navigate('/dashboard');
+        }
 
         // Redirect the user to the login page
         // You can use a router library like react-router-dom for navigation

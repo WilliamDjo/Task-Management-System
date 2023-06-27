@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import React, { useState } from 'react';
 import {
   Flex,
@@ -20,6 +21,7 @@ import {
   // Switch,
   // Route,
   Link as RouteLink,
+  useNavigate,
 } from 'react-router-dom';
 // import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import PasswordBar from '../components/PasswordBar/PasswordBar';
@@ -29,35 +31,20 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState(false);
   const [loginSuccess, setLoginSuccess] = useState(false);
+  // eslint-disable-next-line no-unused-vars
+  const [sys_admin, setSysAdmin] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogin = async () => {
     // Simulating incorrect login credentials
     // Get user accounts from local storage
-    const userAccounts = JSON.parse(localStorage.getItem('userAccounts')) || [];
-
-    // Find the user with matching email and password
-    const user = userAccounts.find(
-      user => user.email === email && user.password === password
-    );
-
-    if (user) {
-      // Login successful
-      setLoginError(false);
-      setLoginSuccess(true);
-      console.log('Login successful');
-    } else {
-      // Login failed, handle the error
-      setLoginError(true);
-      setLoginSuccess(false);
-      console.error('Login failed');
-    }
     const credentials = {
       email,
       password,
     };
 
     try {
-      const response = await fetch('/login', {
+      const response = await fetch('http://127.0.0.1:5000/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -72,9 +59,14 @@ const Login = () => {
 
         // Store the token and isAdmin status in localStorage
         localStorage.setItem('token', token);
-        localStorage.setItem('sys_admin', sys_admin);
+        setSysAdmin(sys_admin);
 
         console.log('Login successful');
+        if (sys_admin) {
+          navigate('/admin');
+        } else {
+          navigate('/dashboard');
+        }
       } else {
         // Login failed, handle the error
         setLoginError(true);
