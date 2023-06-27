@@ -40,7 +40,7 @@ def login():
 @app.route("/logout", methods=["POST"])
 def logout():
     # Request
-    token = request.json.get("token")
+    token = request.json["token"]
     logout_success = account.account_logout(token)
     # return the logout details
     return jsonify(logout_success)
