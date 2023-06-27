@@ -50,6 +50,13 @@ def logout():
     return jsonify(logout_success)
 
 
+@app.route("/getuserprofile", methods=["GET"])
+def getuserprofile():
+    token = request.json["token"]
+    user_profile_info = account.getAccountInfo(token)
+    return jsonify(user_profile_info)
+
+
 if __name__ == "__main__":
     app.run()
     test_name = "adam"

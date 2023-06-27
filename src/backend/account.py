@@ -163,6 +163,16 @@ def account_logout(token):
     return {"Success": True, "Message": "Logout Successful"}
 
 
+def getAccountInfo(token):
+    valid_jwt = tokens.check_jwt_token(token)
+    if not valid_jwt["Success"]:
+        return {"Success": False, "Message": "Error!"}
+    email = valid_jwt["Data"]["email"]
+    userInformation = db.getSingleUserInformation(email)
+
+    return userInformation
+
+
 if __name__ == "__main__":
     db.clear_collection("user_info")
     test_name = "adam"

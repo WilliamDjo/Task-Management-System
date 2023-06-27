@@ -65,6 +65,7 @@ def addNewUser(data: dict) -> dict:
         "notifications": False,
         "image": Binary(bytes(0)),
         "organization_name": "",
+        "connections": 1,
     }
 
     # Loop over the keys in the input data
@@ -213,6 +214,38 @@ def updateEmail(old_email: str, new_email: str) -> dict:
 
     # Return a dictionary indicating success
     return {"Success": True, "Message": "Email updated successfully"}
+
+
+def getSingleUserInformation(email: str) -> dict:
+    db = getDB()
+    # Get the collection object for 'UserInfo' from the database
+    UserInfoCollection = getUserInfoCollection(db)
+
+    # Attempt to retrieve the user with the given old email
+    userInfo = UserInfoCollection.find_one({"email": email})
+
+    # If no user was found, return a dictionary indicating failure
+    if userInfo is None:
+        return {"Success": False, "Error": "No user found with the given email"}
+
+    id = userInfo["_uid"]
+
+    UserProfileCollection = getUserProfileCollection(db)
+    userProfile = UserProfileCollection.find_one({"_uid": id})
+    if userProfile is None:
+        return {"Success": False, "Error": "No user found with the given email"}
+
+    # {"name": "", "email": "", "username": "", emailNotifications: false, "organisation": "", "connections": 1}
+    user = {
+        "first_name": userInfo["first_name"],
+        "last_name": userInfo["last_name"],
+        "email": userInfo["email"],
+        "username": userInfo["user"],
+        "emailNotifications": userProfile["notifications"],
+        "organization": userProfile["organization_name"],
+        "connections": userProfile["connections"],
+    }
+    return {"Success": False, "Error": "", "Data": user}
 
 
 # FOR TESTING ONLY
