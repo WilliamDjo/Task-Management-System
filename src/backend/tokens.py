@@ -1,6 +1,6 @@
 import jwt
 import secrets
-from datetime import datetime, timedelta
+from datetime import datetime
 
 
 active_tokens = []
@@ -21,9 +21,9 @@ def generate_jwt_token(email):
 def check_jwt_token(token):
     try:
         # Verify the JWT token using the provided secret key
-        jwt.decode(token, secret_key, algorithms=["HS256"])
+        decoded_data = jwt.decode(token, secret_key, algorithms=["HS256"])
         if token in active_tokens:
-            return True
+            return {"Success": True, "Data": decoded_data}
     except jwt.ExpiredSignatureError:
         # Handle token expiration error
         print("Token has expired.")
@@ -34,7 +34,7 @@ def check_jwt_token(token):
         # Handle other exceptions
         print(f"Error occurred while decoding token: {e}")
 
-    return False
+    return {"Success": True, "Data": None}
 
 
 if __name__ == "__main__":

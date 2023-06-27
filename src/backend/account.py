@@ -19,6 +19,11 @@ def generate_password_hash(data):
     return sha256_hash.hexdigest()
 
 
+def remove_active_user(email):
+    if email in active_users.values():
+        active_users[token]
+
+
 class User:
 
     """User information"""
@@ -41,10 +46,6 @@ class User:
 
     def add_active_user(email):
         active_users[email] = tokens.generate_jwt_token(email)
-
-    def remove_active_user(email):
-        if email in active_users.values:
-            User.active_users[token]
 
 
 """Helper Functions"""
@@ -125,6 +126,7 @@ def account_register(name, username, email, password, sys_admin):
 def account_login(email, password):
     # Check if email/pw combo matches || Existence is checked in the databse
     password = generate_password_hash(password)
+    print(password)
     email_password_match = db.isValidUser(email, password)
 
     if not email_password_match["Success"]:
@@ -139,10 +141,13 @@ def account_login(email, password):
 
 
 def account_logout(token):
-    if not token in User.active_users.values:
-        return {"Success": True, "Message": "Logout unsuccessful"}
+    valid_jwt = tokens.check_jwt_token(token)
+    if not valid_jwt["Success"]:
+        return {"Success": False, "Message": "Logout unsuccessful"}
 
-    User.remove_active_user(token)
+    email = valid_jwt["Data"]["email"]
+    if email in active_users:
+        del active_users[email]
 
     return {"Success": True, "Message": "Logout Successful"}
 

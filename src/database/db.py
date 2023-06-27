@@ -90,7 +90,7 @@ def isValidUser(email: str, password: str) -> dict:
     UserInfoCollection = getUserInfoCollection(db)
 
     # Attempt to retrieve the user with the given email
-    user = UserInfoCollection.find_one({"email": "adam@test.com"})
+    user = UserInfoCollection.find_one({"email": email})
     # If no user was found, return a dictionary indicating failure
     if user is None:
         return {"Success": False, "Error": "NONE TYPE Incorrect password or email"}
