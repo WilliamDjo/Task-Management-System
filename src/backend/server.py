@@ -1,9 +1,7 @@
-import json
 from flask import Flask, request, jsonify
 import sys
 import os
 import account
-from backend.account import admin_delete_acc, admin_reset_pw
 from flask_cors import CORS
 
 """ Accessing Other Files"""
@@ -117,8 +115,8 @@ def server_admin_reset_password():
     email_to_reset = request.json["email"]
     new_password = request.json["password"]
 
-    result = admin_reset_pw(token, new_password, email_to_reset)
-    return result
+    result = account.admin_reset_pw(token, new_password, email_to_reset)
+    return jsonify(result)
 
 
 @app.route("/admin/delete", methods=["DELETE"])
@@ -126,8 +124,17 @@ def server_admin_delete_email():
     token = request.json["token"]
     email_to_delete = request.json["email"]
 
-    result = admin_delete_acc(token, email_to_delete)
-    return result
+    result = account.admin_delete_acc(token, email_to_delete)
+    return jsonify(result)
+
+
+@app.route("/reset/password", methods=["PUT"])
+def reset_password():
+    email = request.json["email"]
+    username = request.json["username"]
+    password = request.json["password"]
+    result = account.reset_password(email, username, password)
+    return jsonify(result)
 
 
 if __name__ == "__main__":
