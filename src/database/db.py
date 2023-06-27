@@ -216,7 +216,6 @@ def updateEmail(old_email: str, new_email: str) -> dict:
     return {"Success": True, "Message": "Email updated successfully"}
 
 
-
 def getSingleUserInformation(email: str) -> dict:
     db = getDB()
     # Get the collection object for 'UserInfo' from the database
@@ -229,10 +228,10 @@ def getSingleUserInformation(email: str) -> dict:
     if userInfo is None:
         return {"Success": False, "Error": "No user found with the given email"}
 
-    id = userInfo["_uid"]
+    id = userInfo["_id"]
 
     UserProfileCollection = getUserProfileCollection(db)
-    userProfile = UserProfileCollection.find_one({"_uid": id})
+    userProfile = UserProfileCollection.find_one({"_id": id})
     if userProfile is None:
         return {"Success": False, "Error": "No user found with the given email"}
 
@@ -279,6 +278,7 @@ def getAllUserInformation() -> list:
     merged_data = list(users.values())
 
     return merged_data
+
 
 # FOR TESTING ONLY
 def clear_collection(collection_name: str) -> dict:

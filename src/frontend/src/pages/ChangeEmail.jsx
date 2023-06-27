@@ -13,23 +13,29 @@ import {
 
 const ChangeEmail = () => {
   const [username, setUsername] = useState('');
+  const [newEmail, setNewEmail] = useState('');
   const [usernameError, setUsernameError] = useState(false);
   const [emailChanged, setEmailChanged] = useState(false);
 
   const handleChangeEmail = () => {
-    // Simulating existing username
-    const existingUsername = 'existingUser';
+    // Get user accounts from local storage
+    const userAccounts = JSON.parse(localStorage.getItem('userAccounts')) || [];
 
-    if (username !== existingUsername) {
-      // Username does not exist
-      setUsernameError(true);
-      setEmailChanged(false);
-      console.error('Username does not exist');
-    } else {
-      // Email change successful
+    // Find the user with matching username
+    const user = userAccounts.find(user => user.username === username);
+
+    if (user) {
+      // User found, change email
+      user.email = newEmail;
+      localStorage.setItem('userAccounts', JSON.stringify(userAccounts));
       setUsernameError(false);
       setEmailChanged(true);
       console.log('Email changed successfully');
+    } else {
+      // User not found or invalid username
+      setUsernameError(true);
+      setEmailChanged(false);
+      console.error('Username not found');
     }
   };
 
@@ -73,7 +79,11 @@ const ChangeEmail = () => {
         )}
         <FormControl id="email">
           <FormLabel>New Email address</FormLabel>
-          <Input type="email" />
+          <Input
+            type="email"
+            value={newEmail}
+            onChange={e => setNewEmail(e.target.value)}
+          />
         </FormControl>
         <Stack spacing={6}>
           <Button
