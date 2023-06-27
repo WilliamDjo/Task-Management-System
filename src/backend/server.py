@@ -19,7 +19,7 @@ def server_register():
     password = request.json["password"]
     first_name = request.json["first_name"]
     last_name = request.json["last_name"]
-
+    sys_admin = request.json["sys_admin"]
     email = request.json["email"]
     status = account.account_register(
         first_name, last_name, username, email, password, sys_admin
@@ -121,13 +121,11 @@ def server_admin_reset_password():
 
 @app.route("/admin/delete", methods=["DELETE"])
 def server_admin_delete_email():
-    
     token = request.json["token"]
     email_to_delete = request.json["email"]
 
     result = admin_delete_acc(token, email_to_delete)
     return result
-
 
 
 if __name__ == "__main__":
