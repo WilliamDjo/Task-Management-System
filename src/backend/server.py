@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify
 import sys
 import os
 import account
-from backend.account import update_email_account, update_username
+from backend.account import update_email_account, update_notificiation_set, update_password_account, update_username
 
 
 """ Accessing Other Files"""
@@ -61,7 +61,7 @@ def update_useranme():
 '''
 Update email wrapper function
 '''
-@app.route("/update/username", methods=["PUT"])
+@app.route("/update/email", methods=["PUT"])
 def update_email():
     token = request.json["token"]
     new_email = request.json["email"]
@@ -71,7 +71,37 @@ def update_email():
 
 
 
+
+'''
+Update password
+'''
+@app.route("/update/password", methods=["PUT"])
+def update_password():
+    token = request.json["token"]
+    new_password = request.json["password"]
+    update_status = update_password_account(new_password, token)
+
+    return jsonify(update_status)
+
+
+'''Update notificitons Set true'''
+@app.route("/update/notifications", methods=["PUT"])
+def server_update_notifications_true():
+    token = request.json['token']
+    value = request.json['value']
+    update_status = update_notificiation_set(value, token)
+    return jsonify(update_status)
     
+    
+
+
+
+
+
+
+
+
+
 
 
 if __name__ == "__main__":
