@@ -320,12 +320,12 @@ def getAllAccounts(token):
     return {"Succes": True, "Error": "", "Data": allUserInfo}
 
 
-
-'''
+"""
 Admin Functions
-'''
-def admin_reset_pw(token, new_password, reset_email):
+"""
 
+
+def admin_reset_pw(token, new_password, reset_email):
     valid_jwt = tokens.check_jwt_token(token)
     if not valid_jwt["Success"]:
         return {"Success": False, "Message": "Error!"}
@@ -334,7 +334,9 @@ def admin_reset_pw(token, new_password, reset_email):
 
     if not userInformation["Data"]["SystemAdmin"]:
         return {"Succes": False, "Error": "Not an admin"}
-
+    check_pass = is_password_valid(new_password)
+    if not check_pass:
+        return {"Succes": False, "Error": "Password not valid"}
     new_user_dict = {"password": generate_password_hash(new_password)}
     result = db.updateUserInfo(reset_email, new_user_dict)
 
@@ -344,7 +346,6 @@ def admin_reset_pw(token, new_password, reset_email):
 
 
 def admin_delete_acc(token, email_to_delete):
-
     valid_jwt = tokens.check_jwt_token(token)
     if not valid_jwt["Success"]:
         return {"Success": False, "Message": "Error!"}
@@ -358,10 +359,6 @@ def admin_delete_acc(token, email_to_delete):
     result = db.deleteUser(email_to_delete)
 
     return result
-
-
-
-
 
 
 if __name__ == "__main__":
