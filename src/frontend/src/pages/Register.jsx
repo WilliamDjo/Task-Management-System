@@ -88,6 +88,29 @@ const Register = () => {
       setRegistrationSuccess(true);
       setPasswordMismatchError(false);
       console.log('Registration successful');
+
+      // Create user object
+      const newUser = {
+        email,
+        password,
+        firstName,
+        lastName,
+        username,
+      };
+
+      // Send the newUser object to the backend (JSON file)
+      try {
+        await fetch('/api/users', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(newUser),
+        });
+        console.log('User account saved to the JSON file');
+      } catch (error) {
+        console.error('Error saving user account to the JSON file', error);
+      }
     }
   };
 

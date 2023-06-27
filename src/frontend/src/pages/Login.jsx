@@ -56,8 +56,15 @@ const Login = () => {
     // Simulating incorrect login credentials
     const dummyEmail = 'dummy@example.com';
     const dummyPassword = 'password123';
+    // Get user accounts from local storage
+    const userAccounts = JSON.parse(localStorage.getItem('userAccounts')) || [];
 
-    if (email === dummyEmail && password === dummyPassword) {
+    // Find the user with matching email and password
+    const user = userAccounts.find(
+      user => user.email === email && user.password === password
+    );
+
+    if ((email === dummyEmail && password === dummyPassword) || user) {
       // Login successful
       setLoginError(false);
       setLoginSuccess(true);
