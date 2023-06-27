@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Flex,
   Box,
@@ -23,6 +23,39 @@ import {
 import PasswordBar from '../components/PasswordBar/PasswordBar';
 
 const Register = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [username, setUsername] = useState('');
+  // const [showPassword, setShowPassword] = useState(false);
+  const handleLogin = async () => {
+    try {
+      const response = await fetch('/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firstName,
+          lastName,
+          username,
+          email,
+          password,
+        }),
+      });
+
+      if (response.ok) {
+        // Login successful, perform necessary actions
+        console.log('Register successful');
+      } else {
+        // Login failed, handle the error
+        console.error('Register failed');
+      }
+    } catch (error) {
+      console.error('An error occurred while logging in', error);
+    }
+  };
   return (
     <Flex
       minH={'100vh'}
@@ -50,27 +83,46 @@ const Register = () => {
               <Box>
                 <FormControl id="firstName" isRequired>
                   <FormLabel>First Name</FormLabel>
-                  <Input type="text" />
+                  <Input
+                    type="text"
+                    value={firstName}
+                    onChange={e => setFirstName(e.target.value)}
+                  />
                 </FormControl>
               </Box>
               <Box>
                 <FormControl id="lastName">
                   <FormLabel>Last Name</FormLabel>
-                  <Input type="text" />
+                  <Input
+                    type="text"
+                    value={lastName}
+                    onChange={e => setLastName(e.target.value)}
+                  />
                 </FormControl>
               </Box>
             </HStack>
             <FormControl id="username" isRequired>
               <FormLabel>Username</FormLabel>
-              <Input type="text" />
+              <Input
+                type="text"
+                value={username}
+                onChange={e => setUsername(e.target.value)}
+              />
             </FormControl>
             <FormControl id="email" isRequired>
               <FormLabel>Email address</FormLabel>
-              <Input type="email" />
+              <Input
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+              />
             </FormControl>
             <FormControl id="password" isRequired>
               <FormLabel>Password</FormLabel>
-              <PasswordBar />
+              <PasswordBar
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+              />
             </FormControl>
             <FormControl id="confirm-password" isRequired>
               <FormLabel>Confirm Password</FormLabel>
@@ -85,6 +137,7 @@ const Register = () => {
                 _hover={{
                   bg: 'blue.500',
                 }}
+                onClick={handleLogin}
               >
                 Sign up
               </Button>
