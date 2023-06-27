@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify
 import sys
 import os
 import account
-from backend.account import update_username
+from backend.account import update_email_account, update_username
 
 
 """ Accessing Other Files"""
@@ -55,8 +55,24 @@ def update_useranme():
     token = request.json["token"]
     new_username = request.json["username"]
     update_status = account.update_username(new_username)
+    return jsonify(update_status)
+
+
+'''
+Update email wrapper function
+'''
+@app.route("/update/username", methods=["PUT"])
+def update_email():
+    token = request.json["token"]
+    new_email = request.json["email"]
+    update_status = update_email_account(new_email)
 
     return jsonify(update_status)
+
+
+
+    
+
 
 if __name__ == "__main__":
     app.run()

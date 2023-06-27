@@ -158,8 +158,6 @@ def account_logout(token):
 
     return {"Success": True, "Message": "Logout Successful"}
 
-
-
 '''
 Updates the username based on token and new_username
 '''
@@ -168,9 +166,7 @@ def update_username(new_username, token):
     if not is_username_valid(new_username)["Success"]:
         return is_username_valid
 
-
     valid_jwt = tokens.check_jwt_token(token)
-
 
     if not valid_jwt["Success"]:
         return {"Success": False, "Message": "user not logged in"}
@@ -186,9 +182,36 @@ def update_username(new_username, token):
 
     #Update step
     result = db.updateUserInfo(email, new_user_dict)
-
-
     return result
+
+
+
+
+'''
+Update email on backened
+'''
+def update_email_account(new_email, token):
+
+    if not is_email_valid(new_email):
+        return is_email_valid
+
+    valid_jwt = tokens.check_jwt_token(token)
+
+    if not valid_jwt["Success"]:
+        return {"Success": False, "Message": "user not logged in"}
+
+    email = valid_jwt["Data"]["email"]
+
+    if email not in active_users:
+        return {"Success": False, "Message": "User not active"}
+
+    new_user_dict = {
+        "email": new_email
+    }
+
+    result = db.updateUserInfo(email, new_user_dict)
+    return result
+
 
 if __name__ == "__main__":
     
@@ -200,10 +223,12 @@ if __name__ == "__main__":
     test_sys = True
 
 
-    new_user_test = "tp"
+    new_user_test = "new_user_01"
+    new_user_email ="new_email@gmail.com"
     test_success = account_register(test_name, test_username, test_email, test_password, test_sys)
 
-    update_username(new_user_test, test_success["token"])
+    update_username(new_user_test, test_success["token"])   
+    update_email_account(new_user_email, test_success["token"])   
 
 
     """Debug code"""
