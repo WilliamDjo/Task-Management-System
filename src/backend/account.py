@@ -1,10 +1,7 @@
-from lib2to3.pgen2 import token
 import hashlib
 import sys
 import os
 import re
-from tokens import generate_jwt_token
-from tokens import check_jwt_token
 
 parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_folder)
@@ -22,11 +19,13 @@ def generate_password_hash(data):
 
 
 def remove_active_user(email):
-    if email in active_users.values():
-        active_users[token]
+    global active_users
+    if email in active_users:
+        del active_users[email]
 
 
 def add_active_user(email):
+    global active_users
     active_users[email] = tokens.generate_jwt_token(email)
 
 
@@ -100,6 +99,8 @@ def is_password_valid(password):
 
 # Return login token
 def account_register(first_name, last_name, username, email, password, sys_admin):
+    global active_users
+
     # Check if email exists
     email_exists = db.checkUser(email)
 
@@ -140,6 +141,8 @@ def account_register(first_name, last_name, username, email, password, sys_admin
 
 
 def account_login(email, password):
+    global active_users
+
     # Check if email/pw combo matches || Existence is checked in the databse
     password = generate_password_hash(password)
     email_password_match = db.isValidUser(email, password)
@@ -162,6 +165,7 @@ def account_login(email, password):
 
 
 def account_logout(token):
+    global active_users
     valid_jwt = tokens.check_jwt_token(token)
     if not valid_jwt["Success"]:
         return {"Success": False, "Message": "Logout unsuccessful"}
@@ -179,6 +183,8 @@ Updates the username based on token and new_username
 
 
 def update_username(new_username, token):
+    global active_users
+
     if not is_username_valid(new_username)["Success"]:
         return {"Success": False, "Message": "Username not valid "}
 
@@ -205,6 +211,8 @@ Update password
 
 
 def update_password_account(new_password, token):
+    global active_users
+
     if not is_password_valid(new_password):
         return {"Success": False, "Message": "Password not valid "}
 
@@ -214,7 +222,8 @@ def update_password_account(new_password, token):
         return {"Success": False, "Message": "user not logged in"}
 
     email = valid_jwt["Data"]["email"]
-
+    print(email)
+    print(active_users)
     if email not in active_users:
         return {"Success": False, "Message": "User not active"}
 
@@ -230,6 +239,8 @@ Update email on backened
 
 
 def update_email_account(new_email, token):
+    global active_users
+
     if not is_email_valid(new_email):
         return is_email_valid
 
@@ -246,7 +257,7 @@ def update_email_account(new_email, token):
     new_user_dict = {"email": new_email}
 
     # new token
-    new_token = generate_jwt_token(new_email)
+    new_token = tokens.generate_jwt_token(new_email)
 
     result = db.updateUserInfo(email, new_user_dict)
 
@@ -262,6 +273,8 @@ Update notfication
 
 
 def update_notificiation_set(bool_val, token):
+    global active_users
+
     valid_jwt = tokens.check_jwt_token(token)
 
     if not valid_jwt["Success"]:
@@ -279,6 +292,8 @@ def update_notificiation_set(bool_val, token):
 
 
 def getAccountInfo(token):
+    global active_users
+
     valid_jwt = tokens.check_jwt_token(token)
     if not valid_jwt["Success"]:
         return {"Success": False, "Message": "Error!"}
@@ -289,6 +304,8 @@ def getAccountInfo(token):
 
 
 def getAllAccounts(token):
+    global active_users
+
     valid_jwt = tokens.check_jwt_token(token)
     if not valid_jwt["Success"]:
         return {"Success": False, "Message": "Error!"}
@@ -302,6 +319,7 @@ def getAllAccounts(token):
 
 if __name__ == "__main__":
     db.clear_collection("user_info")
+    db.clear_collection("user_profile")
     test_name = "adam"
     test_password = "Password123!"
     new_password = "Password321!0"
@@ -312,7 +330,7 @@ if __name__ == "__main__":
     new_user_test = "new_user_01"
     new_user_email = "new_email@gmail.com"
     test_success = account_register(
-        test_name, test_username, test_email, test_password, test_sys
+        test_name, test_name, test_username, test_email, test_password, test_sys
     )
 
     update_username(new_user_test, test_success["token"])
