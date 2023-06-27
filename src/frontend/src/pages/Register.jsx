@@ -91,11 +91,11 @@ const Register = () => {
         lastName,
         username,
       };
-      // Add the new user to existing user accounts
-      const updatedAccounts = [...existingAccounts, newUser];
+      // // Add the new user to existing user accounts
+      // const updatedAccounts = [...existingAccounts, newUser];
 
-      // Save the updated user accounts to local storage
-      localStorage.setItem('userAccounts', JSON.stringify(updatedAccounts));
+      // // Save the updated user accounts to local storage
+      // localStorage.setItem('userAccounts', JSON.stringify(updatedAccounts));
 
       console.log('User account saved to local storage');
       try {
