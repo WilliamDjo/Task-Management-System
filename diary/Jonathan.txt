@@ -11,4 +11,4 @@ Week 4
 Setup frontend to get started for our project. Worked on the frontend screen for your profile and updating your profile. Also worked on the dashboard screen for admin control such as resetting password and deleting accounts of taskmasters.
 
 Week 5
-Finished the screen for admin control.
+Finished the screen for admin control. Added the implemented backend routes to admin control, logout and profile, update profile screens. Attended the retro for demo 1.
