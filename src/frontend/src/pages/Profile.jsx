@@ -29,51 +29,38 @@ const Profile = () => {
 
   const toast = useToast();
 
-  const handleEmailNotifications = value => {
+  const handleEmailNotifications = (value) => {
+    const successEmailNotifications = () => {
+      setEmailNotifications(value);
+      toast({
+        title: value
+          ? 'Email notifications turned on.'
+          : 'Email notifications turned off.',
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+
     const token = localStorage.getItem('token');
-    fetchBackend('/update/notifications', 'PUT', { token, value }).then(
-      data => {
-        if (data.error) {
-          toast({
-            title: data.error,
-            status: 'error',
-            duration: 5000,
-            isClosable: true,
-          });
-        } else {
-          setEmailNotifications(value);
-          toast({
-            title: value
-              ? 'Email notifications turned on.'
-              : 'Email notifications turned off.',
-            status: 'success',
-            duration: 5000,
-            isClosable: true,
-          });
-        }
-      }
-    );
+    const body = {
+      token,
+      value
+    }
+    fetchBackend('/update/notifications', 'PUT', body, toast, successEmailNotifications);
   };
 
   React.useEffect(() => {
+    const successGetProfile = (data) => {
+      setEmail(data.Data.email);
+      setEmailNotifications(data.Data.emailNotifications);
+      setConnections(data.Data.connections);
+      setName(`${data.Data.first_name} ${data.Data.last_name}`);
+      setUsername(data.Data.username);
+      setOrganisation(data.Data.organisation);
+    }
     const token = localStorage.getItem('token');
-    fetchBackend('/getuserprofile', 'POST', { token }).then(data => {
-      if (data.error) {
-        toast({
-          title: data.error,
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-        });
-      } else {
-        setEmail(data.Data.email);
-        setEmailNotifications(data.Data.emailNotifications);
-        setConnections(data.Data.connections);
-        setName(`${data.Data.first_name} ${data.Data.last_name}`);
-        setUsername(data.Data.username);
-        setOrganisation(data.Data.organisation);
-      }
-    });
+    fetchBackend('/getuserprofile', 'POST', { token }, toast, successGetProfile);
   }, []);
 
   return (

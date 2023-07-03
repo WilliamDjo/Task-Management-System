@@ -31,46 +31,40 @@ const EditAccount = () => {
   const toast = useToast();
 
   const handleSubmitName = () => {
+    const successUsername = () => {
+      toast({
+        title: 'Username successfully changed.',
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+
     const token = localStorage.getItem('token');
-    fetchBackend('/update/username', 'PUT', { token, username }).then(data => {
-      if (data.error) {
-        toast({
-          title: data.error,
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-        });
-      } else {
-        toast({
-          title: 'Username successfully changed.',
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
-        });
-      }
-    });
+    const body = {
+      token,
+      username
+    }
+    fetchBackend('/update/username', 'PUT', body, toast, successUsername);
   };
 
   const handleSubmitEmail = () => {
+    const successEmail = () => {
+      toast({
+        title: 'Email successfully changed.',
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+
     if (email === confirmEmail) {
       const token = localStorage.getItem('token');
-      fetchBackend('/update/email', 'PUT', { token, email }).then(data => {
-        if (data.error) {
-          toast({
-            title: data.error,
-            status: 'error',
-            duration: 5000,
-            isClosable: true,
-          });
-        } else {
-          toast({
-            title: 'Email successfully changed.',
-            status: 'success',
-            duration: 5000,
-            isClosable: true,
-          });
-        }
-      });
+      const body = {
+        token,
+        email
+      }
+      fetchBackend('/update/email', 'PUT', body, toast, successEmail);
     } else {
       toast({
         title: 'Email must match confirm email to change.',
@@ -82,27 +76,22 @@ const EditAccount = () => {
   };
 
   const handleSubmitPassword = () => {
+    const successPassword = () => {
+      toast({
+        title: 'Password successfully changed.',
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+
     if (password === confirmPassword) {
       const token = localStorage.getItem('token');
-      fetchBackend('/update/password', 'PUT', { token, password }).then(
-        data => {
-          if (data.error) {
-            toast({
-              title: data.error,
-              status: 'error',
-              duration: 5000,
-              isClosable: true,
-            });
-          } else {
-            toast({
-              title: 'Password successfully changed.',
-              status: 'success',
-              duration: 5000,
-              isClosable: true,
-            });
-          }
-        }
-      );
+      const body = {
+        token,
+        password
+      }
+      fetchBackend('/update/password', 'PUT', body, toast, successPassword);
     } else {
       toast({
         title: 'Password must match confirm password to change.',
