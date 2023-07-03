@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify
 import sys
 import os
 import account
-from flask_cors import CORS
 
 """ Accessing Other Files"""
 parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -10,7 +9,7 @@ sys.path.append(parent_folder)
 
 """Flask Set up"""
 app = Flask(__name__)
-CORS(app)
+
 
 
 @app.route("/signup", methods=["POST"])

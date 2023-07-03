@@ -15,14 +15,11 @@ def getDB():
 
     return db
 
-
 def getUserInfoCollection(db: Database) -> Collection:
     return db["user_info"]
 
-
 def getUserProfileCollection(db: Database) -> Collection:
     return db["user_profile"]
-
 
 def addNewUser(data: dict) -> dict:
     # Establish a database connection and get the database object
@@ -84,7 +81,6 @@ def addNewUser(data: dict) -> dict:
     # Return a dictionary with 'Success': True and the 'inserted_id' of the new user
     return {"Success": True, "inserted_id": str(inserted_id)}
 
-
 def isValidUser(email: str, password: str) -> dict:
     # Get the database
     db = getDB()
@@ -107,7 +103,6 @@ def isValidUser(email: str, password: str) -> dict:
         # If it does not match, return a dictionary indicating failure
         return {"Success": False, "Error": "Incorrect password or email"}
 
-
 def checkUser(email: str) -> dict:
     # Get the database
     db = getDB()
@@ -123,7 +118,6 @@ def checkUser(email: str) -> dict:
         return {"Success": True, "Error": ""}
     else:
         return {"Success": False, "Error": "User already exists", "Data": user}
-
 
 def deleteUser(email: str) -> dict:
     # Get the database
@@ -151,7 +145,6 @@ def deleteUser(email: str) -> dict:
     # Return a dictionary indicating success
     return {"Success": True, "Message": "User and User Profile deleted successfully"}
 
-
 def updateUserInfo(email: str, data: dict) -> dict:
     # Get the database
     db = getDB()
@@ -171,7 +164,6 @@ def updateUserInfo(email: str, data: dict) -> dict:
 
     # Return a dictionary indicating success
     return {"Success": True, "Message": "User updated successfully"}
-
 
 def updateUserProfile(email: str, data: dict) -> dict:
     # Get the database
@@ -195,7 +187,6 @@ def updateUserProfile(email: str, data: dict) -> dict:
     # Return a dictionary indicating success
     return {"Success": True, "Message": "User updated successfully"}
 
-
 def updateEmail(old_email: str, new_email: str) -> dict:
     # Get the database
     db = getDB()
@@ -215,7 +206,6 @@ def updateEmail(old_email: str, new_email: str) -> dict:
 
     # Return a dictionary indicating success
     return {"Success": True, "Message": "Email updated successfully"}
-
 
 def getSingleUserInformation(email: str) -> dict:
     db = getDB()
@@ -247,7 +237,6 @@ def getSingleUserInformation(email: str) -> dict:
         "connections": userProfile["connections"],
     }
     return {"Success": False, "Error": "", "Data": user}
-
 
 def getAllUserInformation() -> list:
     # Get the database
