@@ -109,7 +109,6 @@ def is_username_valid(username):
 
     return {"Success": True, "Message": "Username valid"}
 
-
 '''
 Validates if the password meets the required criteria.
 
@@ -220,7 +219,7 @@ def account_login(email, password):
     email_password_match = db.isValidUser(email, password)
 
     if not email_password_match["Success"]:
-        return email_password_match
+        return {"Success": False, "Message": "Email or Password combination does not exist"}
 
     userInfo = email_password_match["User"]
     # Return token
@@ -266,7 +265,7 @@ def update_username(new_username, token):
     valid_jwt = tokens.check_jwt_token(token)
 
     if not valid_jwt["Success"]:
-        return {"Success": False, "Message": "user not logged in"}
+        return {"Success": False, "Message": "User not logged in"}
 
     email = valid_jwt["Data"]["email"]
 
@@ -291,8 +290,7 @@ def update_password_account(new_password, token):
         return {"Success": False, "Message": "user not logged in"}
 
     email = valid_jwt["Data"]["email"]
-    print(email)
-    print(active_users)
+    
     if email not in active_users:
         return {"Success": False, "Message": "User not active"}
 
@@ -311,7 +309,7 @@ def update_email_account(new_email, token):
     global active_users
 
     if not is_email_valid(new_email):
-        return is_email_valid
+        return {"Success": False, "Message": "Email Does not exist"}
 
     valid_jwt = tokens.check_jwt_token(token)
 
@@ -333,7 +331,7 @@ def update_email_account(new_email, token):
     remove_active_user(email)
     active_users[new_email] = new_token
 
-    return result
+    return r{"Success": True, "Message": "Email Changed"}
 
 
 """
@@ -357,7 +355,7 @@ def update_notificiation_set(bool_val, token):
     new_dict = {"notifications": bool_val}
 
     result = db.updateUserProfile(email, new_dict)
-    return result
+    return {"Success": False, "Message": "Notifications updated"}
 
 
 def getAccountInfo(token):
@@ -365,11 +363,11 @@ def getAccountInfo(token):
 
     valid_jwt = tokens.check_jwt_token(token)
     if not valid_jwt["Success"]:
-        return {"Success": False, "Message": "Error!"}
+        return {"Success": False, "Message": "User not logged in"}
     email = valid_jwt["Data"]["email"]
     userInformation = db.getSingleUserInformation(email)
 
-    return userInformation
+    return "Success": True, "Message": "Account info retrieved"}
 
 
 def getAllAccounts(token):
@@ -402,16 +400,16 @@ def admin_reset_pw(token, new_password, reset_email):
     userInformation = db.checkUser(email)
 
     if not userInformation["Data"]["SystemAdmin"]:
-        return {"Success": False, "Error": "Not an admin"}
+        return {"Success": False, "Message": "Not an admin"}
     check_pass = is_password_valid(new_password)
     if not check_pass:
-        return {"Success": False, "Error": "Password not valid"}
+        return {"Success": False, "Message": "Password not valid"}
     new_user_dict = {"password": generate_password_hash(new_password)}
     result = db.updateUserInfo(reset_email, new_user_dict)
 
     remove_active_user(reset_email)
 
-    return result
+    return {"Success": True, "Message": "Admin reset the password"}
 
 
 def admin_delete_acc(token, email_to_delete):
@@ -422,12 +420,12 @@ def admin_delete_acc(token, email_to_delete):
     userInformation = db.checkUser(email)
 
     if not userInformation["Data"]["SystemAdmin"]:
-        return {"Success": False, "Error": "Not an admin"}
+        return {"Success": False, "Message": "Not an admin"}
 
     remove_active_user(email_to_delete)
     result = db.deleteUser(email_to_delete)
 
-    return result
+    return  {"Success": False, "Message": "User deleted"}
 
 
 def reset_password(email, username, new_password):
@@ -439,33 +437,3 @@ def reset_password(email, username, new_password):
         return {"Success": False, "Error": "Invalid details"}
     return db.updateUserInfo(email, {"password": generate_password_hash(new_password)})
 
-
-if __name__ == "__main__":
-    db.clear_collection("user_info")
-    db.clear_collection("user_profile")
-    test_name = "adam"
-    test_password = "Password123!"
-    new_password = "Password321!0"
-    test_email = "adam@test.com"
-    test_username = "adam_user"
-    test_sys = True
-
-    new_user_test = "new_user_01"
-    new_user_email = "new_email@gmail.com"
-    test_success = account_register(
-        test_name, test_name, test_username, test_email, test_password, test_sys
-    )
-
-    update_username(new_user_test, test_success["token"])
-    print(update_password_account(new_password, test_success["token"]))
-
-    expected_pass = generate_password_hash(new_password)
-
-    old_pass = generate_password_hash(test_password)
-
-    print(old_pass)
-
-    print(expected_pass)
-
-    """Debug code"""
-    db.print_all_from_collection("user_info")
