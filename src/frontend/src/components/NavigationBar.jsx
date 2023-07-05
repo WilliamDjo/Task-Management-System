@@ -17,11 +17,13 @@ const NavigationBar = () => {
         duration: 5000,
         isClosable: true,
       });
+      localStorage.removeItem('token');
       navigate('/');
     }
 
     const failLogout = () => {
-      navigate('/')
+      localStorage.removeItem('token');
+      navigate('/');
     }
     const token = localStorage.getItem('token');
     fetchBackend('/logout', 'POST', { token }, toast, successLogout, failLogout);
