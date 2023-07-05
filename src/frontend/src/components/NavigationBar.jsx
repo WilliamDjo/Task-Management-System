@@ -10,27 +10,23 @@ const NavigationBar = () => {
   const hoverStyle = { color: 'blue.200' };
 
   const handleLogout = () => {
+    const successLogout = () => {
+      toast({
+        title: 'Successfully logged out!',
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
+      localStorage.removeItem('token');
+      navigate('/');
+    }
+
+    const failLogout = () => {
+      localStorage.removeItem('token');
+      navigate('/');
+    }
     const token = localStorage.getItem('token');
-    fetchBackend('/logout', 'POST', { token })
-      .then((data) => {
-        if (data.error) {
-          toast({
-            title: data.error,
-            status: 'error',
-            duration: 5000,
-            isClosable: true,
-          });
-          navigate('/')
-        } else {
-          toast({
-            title: 'Successfully logged out!',
-            status: 'success',
-            duration: 5000,
-            isClosable: true,
-          });
-          navigate('/');
-        }
-      })
+    fetchBackend('/logout', 'POST', { token }, toast, successLogout, failLogout);
   }
 
   return (

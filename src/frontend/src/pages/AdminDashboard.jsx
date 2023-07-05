@@ -59,18 +59,6 @@ const AdminDashboard = () => {
       email: 'jonathan@taskmaster.com',
     },
   ]);
-  // const [users, setUsers] = React.useState([]);
-
-  React.useEffect(() => {
-    const token = localStorage.getItem('token');
-    fetchBackend('/getallusers', 'POST', { token }).then(data => {
-      if (data.error) {
-        console.log(data.error);
-      } else {
-        setUsers(data.Data);
-      }
-    });
-  }, []);
 
   const {
     isOpen: isAlertOpen,
@@ -84,6 +72,14 @@ const AdminDashboard = () => {
   } = useDisclosure();
   const toast = useToast();
 
+  React.useEffect(() => {
+    const successGetAllUsers = (data) => {
+      setUsers(data.Data);
+    }
+    const token = localStorage.getItem('token');
+    fetchBackend('/getallusers', 'POST', { token }, toast, successGetAllUsers);
+  }, []);
+
   const handleDeleteButton = (user, email) => {
     setSelectedUser(user);
     setSelectedUserEmail(email);
@@ -91,33 +87,27 @@ const AdminDashboard = () => {
   };
 
   const handleFinalDelete = () => {
+    const successAdminDelete = () => {
+      const newUsers = [...users];
+      const newUsersFiltered = newUsers.filter(
+        user => user.email !== selectedUserEmail
+      );
+      setUsers(newUsersFiltered);
+      onAlertClose();
+      toast({
+        title: `${selectedUser}'s account successfully deleted.`,
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+
     const token = localStorage.getItem('token');
-    fetchBackend('/admin/delete', 'DELETE', {
+    const body = {
       token,
-      email: selectedUserEmail,
-    }).then(data => {
-      if (data.error) {
-        toast({
-          title: data.error,
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-        });
-      } else {
-        const newUsers = [...users];
-        const newUsersFiltered = newUsers.filter(
-          user => user.email !== selectedUserEmail
-        );
-        setUsers(newUsersFiltered);
-        onAlertClose();
-        toast({
-          title: `${selectedUser}'s account successfully deleted.`,
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
-        });
-      }
-    });
+      email: selectedUserEmail
+    }
+    fetchBackend('/admin/delete', 'DELETE', body, toast, successAdminDelete);
   };
 
   const handleResetButton = (user, email) => {
@@ -129,6 +119,16 @@ const AdminDashboard = () => {
   };
 
   const handleFinalPasswordReset = () => {
+    const successAdminPasswordReset = () => {
+      toast({
+        title: `${selectedUser}'s password successfully reset.`,
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
+      onModalClose();
+    }
+
     if (newPassword !== confirmNewPassword) {
       toast({
         title: 'Passwords do not match.',
@@ -138,29 +138,14 @@ const AdminDashboard = () => {
       });
       return;
     }
+
     const token = localStorage.getItem('token');
-    fetchBackend('/admin/reset', 'PUT', {
+    const body = {
       token,
       email: selectedUserEmail,
-      password: newPassword,
-    }).then(data => {
-      if (data.error) {
-        toast({
-          title: data.error,
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-        });
-      } else {
-        toast({
-          title: `${selectedUser}'s password successfully reset.`,
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
-        });
-        onModalClose();
-      }
-    });
+      password: newPassword
+    }
+    fetchBackend('/admin/reset', 'PUT', body, toast, successAdminPasswordReset);
   };
 
   return (
