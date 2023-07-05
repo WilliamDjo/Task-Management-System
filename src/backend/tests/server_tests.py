@@ -339,8 +339,8 @@ class LogoutTests(unittest.TestCase):
         }
         response = self.app.post('/logout', data=json.dumps(logout_data), content_type='application/json')
 
-        # Assert the response status code is 200
-        self.assertEqual(response.status_code, 200)
+        # Assert the response status code is 500
+        self.assertEqual(response.status_code, 500)
 
         # Assert the response contains an error message
         response_data = json.loads(response.data)

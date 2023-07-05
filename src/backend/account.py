@@ -382,11 +382,11 @@ def getAllAccounts(token):
     userInformation = db.checkUser(email)
 
     if not userInformation["Data"]["SystemAdmin"]:
-        return {"Succes": False, "Error": "Not an admin"}
+        return {"Success": False, "Error": "Not an admin"}
 
     allUserInfo = db.getAllUserInformation()
     print(allUserInfo)
-    return {"Succes": True, "Error": "", "Data": allUserInfo}
+    return {"Success": True, "Error": "", "Data": allUserInfo}
 
 
 """
@@ -402,10 +402,10 @@ def admin_reset_pw(token, new_password, reset_email):
     userInformation = db.checkUser(email)
 
     if not userInformation["Data"]["SystemAdmin"]:
-        return {"Succes": False, "Error": "Not an admin"}
+        return {"Success": False, "Error": "Not an admin"}
     check_pass = is_password_valid(new_password)
     if not check_pass:
-        return {"Succes": False, "Error": "Password not valid"}
+        return {"Success": False, "Error": "Password not valid"}
     new_user_dict = {"password": generate_password_hash(new_password)}
     result = db.updateUserInfo(reset_email, new_user_dict)
 
@@ -422,7 +422,7 @@ def admin_delete_acc(token, email_to_delete):
     userInformation = db.checkUser(email)
 
     if not userInformation["Data"]["SystemAdmin"]:
-        return {"Succes": False, "Error": "Not an admin"}
+        return {"Success": False, "Error": "Not an admin"}
 
     remove_active_user(email_to_delete)
     result = db.deleteUser(email_to_delete)

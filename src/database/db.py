@@ -236,7 +236,7 @@ def getSingleUserInformation(email: str) -> dict:
         "organization": userProfile["organization_name"],
         "connections": userProfile["connections"],
     }
-    return {"Success": False, "Error": "", "Data": user}
+    return {"Success": True, "Error": "", "Data": user}
 
 def getAllUserInformation() -> list:
     # Get the database
@@ -273,7 +273,6 @@ def getAllUserInformation() -> list:
     merged_data = json.loads(json_util.dumps(merged_data))
 
     return merged_data
-
 
 # FOR TESTING ONLY
 def clear_collection(collection_name: str) -> dict:
