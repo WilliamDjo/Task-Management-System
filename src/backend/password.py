@@ -2,6 +2,45 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from threading import Thread
+import os
+import sys
+import random
+
+parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(parent_folder)
+
+from database import db
+
+reset_otps = []
+
+def reset_password(email):
+    # Check if email exists
+    email_exists = db.checkUser(email)
+
+    if email_exists["Success"]:
+        return {"Success": False, "Message": "Email doesn't exist"}
+    
+    for i in reset_otps:
+        if i['email'] == email:
+            return {"Success" : False, "Message": "OTP already sent"}
+
+    random_number = random.randint(100000, 999999)
+    send_email(email, random_number)
+    reset_otps.append({
+        'email':email,
+        'otp':random_number
+    })
+
+def check_otp(email, otp):
+    temp = None
+    for i in reset_otps:
+        if i['email'] == email and i['otp'] == otp:
+            temp = i
+    if temp is not None:
+        reset_otps.remove(temp)
+        return {"Success":True, "Message":""}
+    else:
+        return {"Success":False, "Message":"OTP did not match"}
 
 def send_email(email, otp):
     # Create a new thread to send the email
