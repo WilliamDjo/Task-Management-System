@@ -371,32 +371,21 @@ def reset_password(email, username, new_password):
     return db.updateUserInfo(email, {"password": generate_password_hash(new_password)})
 
 
+
+
+#testing code: DO NOT USE
+def add_sys_admin():
+    
+    first_name = "Sys"
+    last_name = "Admin"
+    username = "I_am_sys_admin"
+    email = "sysAdmin@gmmail.com"
+    password = "PassWord123!"
+    sys_admin = True
+    return account_register(first_name, last_name, username, email, password,  sys_admin)
+
+
 if __name__ == "__main__":
-    db.clear_collection("user_info")
-    db.clear_collection("user_profile")
-    test_name = "adam"
-    test_password = "Password123!"
-    new_password = "Password321!0"
-    test_email = "adam@test.com"
-    test_username = "adam_user"
-    test_sys = True
-
-    new_user_test = "new_user_01"
-    new_user_email = "new_email@gmail.com"
-    test_success = account_register(
-        test_name, test_name, test_username, test_email, test_password, test_sys
-    )
-
-    update_username(new_user_test, test_success["token"])
-    print(update_password_account(new_password, test_success["token"]))
-
-    expected_pass = generate_password_hash(new_password)
-
-    old_pass = generate_password_hash(test_password)
-
-    print(old_pass)
-
-    print(expected_pass)
-
-    """Debug code"""
-    db.print_all_from_collection("user_info")
+   result =  add_sys_admin()
+   print(result)
+    
