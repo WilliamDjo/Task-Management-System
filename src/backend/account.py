@@ -331,7 +331,7 @@ def update_email_account(new_email, token):
     remove_active_user(email)
     active_users[new_email] = new_token
 
-    return r{"Success": True, "Message": "Email Changed"}
+    return {"Success": True, "Message": "Email Changed"}
 
 
 """
