@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 import sys
 import os
 import account
+from flask_cors import CORS
 
 """ Accessing Other Files"""
 parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -9,7 +10,7 @@ sys.path.append(parent_folder)
 
 """Flask Set up"""
 app = Flask(__name__)
-
+CORS(app)
 
 
 @app.route("/signup", methods=["POST"])
@@ -127,12 +128,27 @@ def server_admin_delete_email():
     return jsonify(result)
 
 
-@app.route("/reset/password", methods=["PUT"])
+@app.route("/reset/password", methods=["POST"])
 def reset_password():
     email = request.json["email"]
-    username = request.json["username"]
-    password = request.json["password"]
-    result = account.reset_password(email, username, password)
+
+    result = account.reset_password(email)
+    return jsonify(result)
+
+
+@app.route("/reset/otp", methods=["POST"])
+def check_otp():
+    email = request.json["email"]
+    otp = request.json["otp"]
+    result = account.check_otp(email, otp)
+    return jsonify(result)
+
+
+@app.route("/reset/account", methods=["POST"])
+def reset_account():
+    email = request.json["email"]
+    new_password = request.json["new_password"]
+    result = account.change_password(email, new_password)
     return jsonify(result)
 
 
