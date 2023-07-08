@@ -137,11 +137,14 @@ def reset_password():
 
 
 if __name__ == "__main__":
-    app.run()
-    test_name = "adam"
-    test_password = "password"
+    
+    
+    test_first = "adam"
+    test_last = "driver"
+    test_password = "Password123!"
     test_email = "adam@test.com"
     test_username = "adam_user"
 
-    account.account_register(test_username, test_email, test_password, sys_admin=True)
+    server_register(test_first, test_last, test_username, test_email, test_password, sys_admin=True)
+    app.run()
     server_register()
