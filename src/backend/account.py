@@ -2,7 +2,6 @@ import hashlib
 import sys
 import os
 import re
-from tkinter import N
 
 parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_folder)
