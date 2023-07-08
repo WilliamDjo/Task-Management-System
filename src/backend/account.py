@@ -482,7 +482,7 @@ def change_password(email, new_password):
     if userInformation["Success"]:
         return {"Success": False, "Message": "User doesn't exists"}
 
-    if not is_password_valid(password):
+    if not is_password_valid(new_password):
         return {"Success": False, "Message": "Password not valid"}
 
     return db.updateUserInfo(email, {"password": generate_password_hash(new_password)})
