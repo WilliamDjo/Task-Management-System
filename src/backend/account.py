@@ -225,7 +225,7 @@ def account_login(email, password):
     # Return token
     login_token = tokens.generate_jwt_token(email)
 
-    active_users[email] = login_token  # Make a function for this HERE
+    active_users[email] = login_token 
 
     return {
         "Success": True,
@@ -367,7 +367,7 @@ def getAccountInfo(token):
     email = valid_jwt["Data"]["email"]
     userInformation = db.getSingleUserInformation(email)
 
-    return "Success": True, "Message": "Account info retrieved"}
+    return {"Success": True, "Message": "Account info retrieved"}
 
 
 def getAllAccounts(token):

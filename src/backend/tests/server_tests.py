@@ -172,6 +172,28 @@ class SignupTest(unittest.TestCase):
         self.assertEqual(response_data['Success'], True)
 
 
+    def test_sys_admin_invalid_signup(self):
+        clear_collection('user_info')
+        data = {
+            'first_name': 'Admin',
+            'last_name' : 'User123',
+            'username': 'adminuser',
+            'email': 'admin@example.com',
+            'password': 'Admin123!',
+            'sys_admin': True
+        }
+
+        # Send a POST request
+        response = self.app.post('/signup', data=json.dumps(data), content_type='application/json')
+
+        # Assert the response status code is 200
+        self.assertEqual(response.status_code, 200)
+
+        # Assert the response contains a success message
+        response_data = json.loads(response.data)
+        self.assertEqual(response_data['Success'], False)
+
+
 class LoginTests(unittest.TestCase):
     
     def setUp(self):
@@ -206,7 +228,17 @@ class LoginTests(unittest.TestCase):
         self.assertEqual(response_data['Success'], True)
 
     def test_invalid_email_login(self):
-
+        clear_collection('user_info')
+        # Register a user
+        register_data = {
+            'first_name': 'John',
+            'last_name' : 'Doe',
+            'username': 'johndoe',
+            'email': 'john@example.com',
+            'password': 'Password123!',
+            'sys_admin': False
+        }
+        self.app.post('/signup', data=json.dumps(register_data), content_type='application/json')
 
         # Login with invalid email
         login_data = {
@@ -286,7 +318,6 @@ class LoginTests(unittest.TestCase):
         self.assertEqual(response_data['Success'], False)
 
 
-
 class LogoutTests(unittest.TestCase):
 
     def setUp(self):
@@ -347,7 +378,368 @@ class LogoutTests(unittest.TestCase):
         self.assertEqual(response_data['Success'], False)
 
 
+class UpdateUsernameTests(unittest.TestCase):
+    def setUp(self):
+        self.app = app.test_client()
+        self.app.testing = True
 
+    def test_update_username(self):
+        clear_collection('user_info')
+        # Register a user
+        register_data = {
+            'first_name': 'John',
+            'last_name' : 'Doe',
+            'username': 'johndoe',
+            'email': 'john@example.com',
+            'password': 'Password123!',
+            'sys_admin': False
+        }
+        self.app.post('/signup', data=json.dumps(register_data), content_type='application/json')
+
+        # Login with valid credentials
+        login_data = {
+            'email': 'john@example.com',
+            'password': 'Password123!'
+        }
+        response = self.app.post('/login', data=json.dumps(login_data), content_type='application/json')
+
+        # Update with new credentials
+        updated_username = {
+            'token': 'token',
+            'new_username': 'username'
+        }
+        response = self.app.put('/update/username', data=json.dumps(updated_username), content_type='application/json')
+
+        # Assert the response status code is 200
+        self.assertEqual(response.status_code, 200)
+
+        # Assert the response contains a success message
+        response_data = json.loads(response.data)
+        self.assertEqual(response_data['Success'], True)
+
+    def test_update_invalid_username(self):
+        clear_collection('user_info')
+        # Register a user
+        register_data = {
+            'first_name': 'John',
+            'last_name' : 'Doe',
+            'username': 'johndoe',
+            'email': 'john@example.com',
+            'password': 'Password123!',
+            'sys_admin': False
+        }
+        self.app.post('/signup', data=json.dumps(register_data), content_type='application/json')
+
+        # Login with valid credentials
+        login_data = {
+            'email': 'john@example.com',
+            'password': 'Password123!'
+        }
+        response = self.app.post('/login', data=json.dumps(login_data), content_type='application/json')
+
+        # Update with new credentials
+        updated_username = {
+            'token': token,
+            'new_username': 'j' #username too short
+        }
+        response = self.app.put('/update/username', data=json.dumps(updated_username), content_type='application/json')
+
+        # Assert the response status code is 200
+        self.assertEqual(response.status_code, 200)
+
+        # Assert the response contains a success message
+        response_data = json.loads(response.data)
+        self.assertEqual(response_data['Success'], False)
+
+    def test_update_same_username(self):
+        clear_collection('user_info')
+        # Register a user
+        register_data = {
+            'first_name': 'John',
+            'last_name' : 'Doe',
+            'username': 'johndoe',
+            'email': 'john@example.com',
+            'password': 'Password123!',
+            'sys_admin': False
+        }
+        self.app.post('/signup', data=json.dumps(register_data), content_type='application/json')
+
+        # Login with valid credentials
+        login_data = {
+            'email': 'john@example.com',
+            'password': 'Password123!'
+        }
+        response = self.app.post('/login', data=json.dumps(login_data), content_type='application/json')
+
+        # Update with new credentials
+        updated_username = {
+            'token': 'token',
+            'new_username': 'johndoe' #username is unchanged
+        }
+        response = self.app.put('/update/username', data=json.dumps(updated_username), content_type='application/json')
+
+        # Assert the response status code is 200
+        self.assertEqual(response.status_code, 200)
+
+        # Assert the response contains a success message
+        response_data = json.loads(response.data)
+        self.assertEqual(response_data['Success'], False)
+
+
+class UpdateEmailTests(unittest.TestCase):
+    def setUp(self):
+        self.app = app.test_client()
+        self.app.testing = True
+
+    def test_update_username(self):
+        clear_collection('user_info')
+        # Register a user
+        register_data = {
+            'first_name': 'John',
+            'last_name' : 'Doe',
+            'username': 'johndoe',
+            'email': 'john@example.com',
+            'password': 'Password123!',
+            'sys_admin': False
+        }
+        self.app.post('/signup', data=json.dumps(register_data), content_type='application/json')
+
+        # Login with valid credentials
+        login_data = {
+            'email': 'john@example.com',
+            'password': 'Password123!'
+        }
+        response = self.app.post('/login', data=json.dumps(login_data), content_type='application/json')
+
+        # Update with new credentials
+        updated_email = {
+            'token': token,
+            'new_email': 'email@email.com'
+        }
+        response = self.app.put('/update/email', data=json.dumps(updated_email), content_type='application/json')
+
+        # Assert the response status code is 200
+        self.assertEqual(response.status_code, 200)
+
+        # Assert the response contains a success message
+        response_data = json.loads(response.data)
+        self.assertEqual(response_data['Success'], True)
+
+    def test_update_invalid_email(self):
+        clear_collection('user_info')
+        # Register a user
+        register_data = {
+            'first_name': 'John',
+            'last_name' : 'Doe',
+            'username': 'johndoe',
+            'email': 'john@example.com',
+            'password': 'Password123!',
+            'sys_admin': False
+        }
+        self.app.post('/signup', data=json.dumps(register_data), content_type='application/json')
+
+        # Login with valid credentials
+        login_data = {
+            'email': 'john@example.com',
+            'password': 'Password123!'
+        }
+        response = self.app.post('/login', data=json.dumps(login_data), content_type='application/json')
+
+        # Update with new credentials
+        updated_email = {
+            'token': token,
+            'email': 'invalid_email',  # Invalid email format
+        }
+        response = self.app.put('/update/email', data=json.dumps(updated_email), content_type='application/json')
+
+        # Assert the response status code is 200
+        self.assertEqual(response.status_code, 200)
+
+        # Assert the response contains a success message
+        response_data = json.loads(response.data)
+        self.assertEqual(response_data['Success'], False)
+
+    def test_update_same_email(self):
+        clear_collection('user_info')
+        # Register a user
+        register_data = {
+            'first_name': 'John',
+            'last_name' : 'Doe',
+            'username': 'johndoe',
+            'email': 'john@example.com',
+            'password': 'Password123!',
+            'sys_admin': False
+        }
+        self.app.post('/signup', data=json.dumps(register_data), content_type='application/json')
+
+        # Login with valid credentials
+        login_data = {
+            'email': 'john@example.com',
+            'password': 'Password123!'
+        }
+        response = self.app.post('/login', data=json.dumps(login_data), content_type='application/json')
+
+        # Update with new credentials
+        updated_email = {
+            'token': token,
+            'email': 'john@example.com' #email is unchanged
+        }
+        response = self.app.put('/update/emal', data=json.dumps(updated_email), content_type='application/json')
+
+        # Assert the response status code is 200
+        self.assertEqual(response.status_code, 200)
+
+        # Assert the response contains a success message
+        response_data = json.loads(response.data)
+        self.assertEqual(response_data['Success'], False)
+
+
+class UpdatePasswordTests(unittest.TestCase):
+    def setUp(self):
+        self.app = app.test_client()
+        self.app.testing = True
+
+    def test_update_password(self):
+        clear_collection('user_info')
+        # Register a user
+        register_data = {
+            'first_name': 'John',
+            'last_name' : 'Doe',
+            'username': 'johndoe',
+            'email': 'john@example.com',
+            'password': 'Password123!',
+            'sys_admin': False
+        }
+        self.app.post('/signup', data=json.dumps(register_data), content_type='application/json')
+
+        # Login with valid credentials
+        login_data = {
+            'email': 'john@example.com',
+            'password': 'Password123!'
+        }
+        response = self.app.post('/login', data=json.dumps(login_data), content_type='application/json')
+
+        # Update with new credentials
+        updated_password = {
+            'token': token,
+            'new_password': 'password'
+        }
+        response = self.app.put('/update/password', data=json.dumps(updated_password), content_type='application/json')
+
+        # Assert the response status code is 200
+        self.assertEqual(response.status_code, 200)
+
+        # Assert the response contains a success message
+        response_data = json.loads(response.data)
+        self.assertEqual(response_data['Success'], True)
+
+    def test_update_invalid_username(self):
+        clear_collection('user_info')
+        # Register a user
+        register_data = {
+            'first_name': 'John',
+            'last_name' : 'Doe',
+            'username': 'johndoe',
+            'email': 'john@example.com',
+            'password': 'Password123!',
+            'sys_admin': False
+        }
+        self.app.post('/signup', data=json.dumps(register_data), content_type='application/json')
+
+        # Login with valid credentials
+        login_data = {
+            'email': 'john@example.com',
+            'password': 'Password123!'
+        }
+        response = self.app.post('/login', data=json.dumps(login_data), content_type='application/json')
+
+        # Update with new credentials
+        updated_password = {
+            'token': token,
+            'new_password': 'p' #password too short
+        }
+        response = self.app.put('/update/password', data=json.dumps(updated_password), content_type='application/json')
+
+        # Assert the response status code is 200
+        self.assertEqual(response.status_code, 200)
+
+        # Assert the response contains a success message
+        response_data = json.loads(response.data)
+        self.assertEqual(response_data['Success'], False)
+
+    def test_update_same_username(self):
+        clear_collection('user_info')
+        # Register a user
+        register_data = {
+            'first_name': 'John',
+            'last_name' : 'Doe',
+            'username': 'johndoe',
+            'email': 'john@example.com',
+            'password': 'Password123!',
+            'sys_admin': False
+        }
+        self.app.post('/signup', data=json.dumps(register_data), content_type='application/json')
+
+        # Login with valid credentials
+        login_data = {
+            'email': 'john@example.com',
+            'password': 'Password123!'
+        }
+        response = self.app.post('/login', data=json.dumps(login_data), content_type='application/json')
+
+        # Update with new credentials
+        updated_password = {
+            'token': token,
+            'new_password': 'Password123!'
+        }
+        response = self.app.put('/update/password', data=json.dumps(updated_password), content_type='application/json')
+
+        # Assert the response status code is 200
+        self.assertEqual(response.status_code, 200)
+
+        # Assert the response contains a success message
+        response_data = json.loads(response.data)
+        self.assertEqual(response_data['Success'], False)
+
+
+class UpdateNotifsTests(unittest.TestCase):
+    def setUp(self):
+        self.app = app.test_client()
+        self.app.testing = True
+
+    def test_update_notifs(self):
+        clear_collection('user_info')
+        # Register a user
+        register_data = {
+            'first_name': 'John',
+            'last_name' : 'Doe',
+            'username': 'johndoe',
+            'email': 'john@example.com',
+            'password': 'Password123!',
+            'sys_admin': False
+        }
+        self.app.post('/signup', data=json.dumps(register_data), content_type='application/json')
+
+        # Login with valid credentials
+        login_data = {
+            'email': 'john@example.com',
+            'password': 'Password123!'
+        }
+        response = self.app.post('/login', data=json.dumps(login_data), content_type='application/json')
+
+        # Update with new credentials
+        updated_notifs = {
+            'token': token,
+            'value': value
+        }
+        response = self.app.put('/update/notifications', data=json.dumps(updated_notifs), content_type='application/json')
+
+        # Assert the response status code is 200
+        self.assertEqual(response.status_code, 200)
+
+        # Assert the response contains a success message
+        response_data = json.loads(response.data)
+        self.assertEqual(response_data['Success'], True)
 
 if __name__ == '__main__':
     unittest.main()
