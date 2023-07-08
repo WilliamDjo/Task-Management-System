@@ -15,14 +15,11 @@ def getDB():
 
     return db
 
-
 def getUserInfoCollection(db: Database) -> Collection:
     return db["user_info"]
 
-
 def getUserProfileCollection(db: Database) -> Collection:
     return db["user_profile"]
-
 
 def addNewUser(data: dict) -> dict:
     # Establish a database connection and get the database object
@@ -51,7 +48,7 @@ def addNewUser(data: dict) -> dict:
     for i in user_info:
         # If any key's value is empty, return a dictionary with 'Success': False
         if user_info[i] == "":
-            return {"Success": False}
+            return {"Success": False, "Message": "User does not exist"}
 
     # Insert the user_info dictionary into the UserInfoCollection
     # and get the result of the insertion
@@ -82,8 +79,7 @@ def addNewUser(data: dict) -> dict:
     UserProfileCollection.insert_one(user_profile)
 
     # Return a dictionary with 'Success': True and the 'inserted_id' of the new user
-    return {"Success": True, "inserted_id": str(inserted_id)}
-
+    return {"Success": True, "inserted_id": str(inserted_id), "Message": "User Successfully added"}
 
 def isValidUser(email: str, password: str) -> dict:
     # Get the database
@@ -97,7 +93,7 @@ def isValidUser(email: str, password: str) -> dict:
 
     # If no user was found, return a dictionary indicating failure
     if user is None:
-        return {"Success": False, "Error": "Incorrect password or email"}
+        return {"Success": False, "Message": "Incorrect password or email"}
 
     # Check if the provided password matches the stored password
     if user["password"] == password:
@@ -105,8 +101,7 @@ def isValidUser(email: str, password: str) -> dict:
         return {"Success": True, "User": user}
     else:
         # If it does not match, return a dictionary indicating failure
-        return {"Success": False, "Error": "Incorrect password or email"}
-
+        return {"Success": False, "Message": "Incorrect password or email"}
 
 def checkUser(email: str) -> dict:
     # Get the database
@@ -120,10 +115,9 @@ def checkUser(email: str) -> dict:
 
     # If no user was found, return a dictionary indicating failure
     if user is None:
-        return {"Success": True, "Error": ""}
+        return {"Success": True, "Message": ""}
     else:
-        return {"Success": False, "Error": "User already exists", "Data": user}
-
+        return {"Success": False, "Message": "User already exists", "Data": user}
 
 def deleteUser(email: str) -> dict:
     # Get the database
@@ -137,7 +131,7 @@ def deleteUser(email: str) -> dict:
 
     # If no user was found, return a dictionary indicating failure
     if user is None:
-        return {"Success": False, "Error": "No user found with given email"}
+        return {"Success": False, "Message": "No user found with given email"}
 
     # If a user was found, delete the user
     UserInfoCollection.delete_one({"email": email})
@@ -151,7 +145,6 @@ def deleteUser(email: str) -> dict:
     # Return a dictionary indicating success
     return {"Success": True, "Message": "User and User Profile deleted successfully"}
 
-
 def updateUserInfo(email: str, data: dict) -> dict:
     # Get the database
     db = getDB()
@@ -164,14 +157,13 @@ def updateUserInfo(email: str, data: dict) -> dict:
 
     # If no user was found, return a dictionary indicating failure
     if user is None:
-        return {"Success": False, "Error": "No user found with given email"}
+        return {"Success": False, "Message": "No user found with given email"}
 
     # Update the user document with the data from the input dictionary
     UserInfoCollection.update_one({"email": email}, {"$set": data})
 
     # Return a dictionary indicating success
     return {"Success": True, "Message": "User updated successfully"}
-
 
 def updateUserProfile(email: str, data: dict) -> dict:
     # Get the database
@@ -185,7 +177,7 @@ def updateUserProfile(email: str, data: dict) -> dict:
 
     # If no user was found, return a dictionary indicating failure
     if user is None:
-        return {"Success": False, "Error": "No user found with given email"}
+        return {"Success": False, "Message": "No user found with given email"}
 
     UserProfileCollection = getUserProfileCollection(db)
 
@@ -194,7 +186,6 @@ def updateUserProfile(email: str, data: dict) -> dict:
 
     # Return a dictionary indicating success
     return {"Success": True, "Message": "User updated successfully"}
-
 
 def updateEmail(old_email: str, new_email: str) -> dict:
     # Get the database
@@ -208,14 +199,13 @@ def updateEmail(old_email: str, new_email: str) -> dict:
 
     # If no user was found, return a dictionary indicating failure
     if user is None:
-        return {"Success": False, "Error": "No user found with the given email"}
+        return {"Success": False, "Message": "No user found with the given email"}
 
     # Update the user document with the new email
     UserInfoCollection.update_one({"email": old_email}, {"$set": {"email": new_email}})
 
     # Return a dictionary indicating success
     return {"Success": True, "Message": "Email updated successfully"}
-
 
 def getSingleUserInformation(email: str) -> dict:
     db = getDB()
@@ -227,14 +217,14 @@ def getSingleUserInformation(email: str) -> dict:
 
     # If no user was found, return a dictionary indicating failure
     if userInfo is None:
-        return {"Success": False, "Error": "No user found with the given email"}
+        return {"Success": False, "Message": "No user found with the given email"}
 
     id = userInfo["_id"]
 
     UserProfileCollection = getUserProfileCollection(db)
     userProfile = UserProfileCollection.find_one({"_id": id})
     if userProfile is None:
-        return {"Success": False, "Error": "No user found with the given email"}
+        return {"Success": False, "Message": "No user found with the given email"}
 
     # {"name": "", "email": "", "username": "", emailNotifications: false, "organisation": "", "connections": 1}
     user = {
@@ -246,8 +236,7 @@ def getSingleUserInformation(email: str) -> dict:
         "organization": userProfile["organization_name"],
         "connections": userProfile["connections"],
     }
-    return {"Success": False, "Error": "", "Data": user}
-
+    return {"Success": True, "Message": "", "Data": user}
 
 def getAllUserInformation() -> list:
     # Get the database
@@ -284,7 +273,6 @@ def getAllUserInformation() -> list:
     merged_data = json.loads(json_util.dumps(merged_data))
 
     return merged_data
-
 
 # FOR TESTING ONLY
 def clear_collection(collection_name: str) -> dict:
