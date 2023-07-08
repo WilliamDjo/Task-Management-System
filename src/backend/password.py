@@ -5,6 +5,7 @@ from threading import Thread
 import os
 import sys
 import random
+import threading
 
 parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_folder)
@@ -27,6 +28,14 @@ def reset_password(email):
 
     random_number = random.randint(100000, 999999)
     send_email(email, random_number)
+    delay = 5 * 60  # 5 minutes
+
+    # Create a Timer object with the delay and target function
+    timer = threading.Timer(delay, expire_otp, args=[email])
+
+    # Start the timer after the delay
+    timer.start()
+
     reset_otps.append({"email": email, "otp": random_number})
 
 
@@ -37,18 +46,23 @@ def check_otp(email, otp):
             temp = i
     if temp is not None:
         reset_otps.remove(temp)
-        return {"Success": True, "Message": ""}
+        return {"Success": True, "Message": "OPT Matched"}
     else:
         return {"Success": False, "Message": "OTP did not match"}
+
+
+def expire_otp(email):
+    reset_otps = [item for item in reset_otps if item.get("email") != email]
 
 
 def send_email(email, otp):
     # Create a new thread to send the email
     def run():
         # Your email credentials
-        username = "your-email@example.com"
-        password = "your-password"
-
+        username = "zombies3900w11a@gmx.com"
+        password = "wEvZ28Xm9b3uviN"
+        smtp_server = "mail.gmx.com"
+        smtp_port = 587
         # Creating the message
         msg = MIMEMultipart()
         msg["From"] = username
@@ -61,7 +75,7 @@ def send_email(email, otp):
 
         # Login and send the email
         try:
-            server = smtplib.SMTP("smtp.example.com", 587)
+            server = smtplib.SMTP(smtp_server, smtp_port)
             server.starttls()
             server.login(username, password)
             text = msg.as_string()

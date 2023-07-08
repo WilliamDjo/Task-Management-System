@@ -11,7 +11,6 @@ sys.path.append(parent_folder)
 app = Flask(__name__)
 
 
-
 @app.route("/signup", methods=["POST"])
 def server_register():
     username = request.json["username"]
@@ -127,12 +126,27 @@ def server_admin_delete_email():
     return jsonify(result)
 
 
-@app.route("/reset/password", methods=["PUT"])
+@app.route("/reset/password", methods=["POST"])
 def reset_password():
     email = request.json["email"]
-    username = request.json["username"]
-    password = request.json["password"]
-    result = account.reset_password(email, username, password)
+
+    result = account.reset_password(email)
+    return jsonify(result)
+
+
+@app.route("/reset/otp", methods=["POST"])
+def reset_password():
+    email = request.json["email"]
+    otp = request.json["otp"]
+    result = account.check_otp(email, otp)
+    return jsonify(result)
+
+
+@app.route("/reset/account", methods=["POST"])
+def reset_password():
+    email = request.json["email"]
+    new_password = request.json["new_password"]
+    result = account.change_password(email, new_password)
     return jsonify(result)
 
 
