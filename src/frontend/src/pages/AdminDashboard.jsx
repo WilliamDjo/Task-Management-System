@@ -74,7 +74,13 @@ const AdminDashboard = () => {
 
   React.useEffect(() => {
     const successGetAllUsers = (data) => {
-      setUsers(data.Data);
+      // Ensuring that the admin cannot delete their own account.
+      const successGetMyUser = (myData) => {
+        const myEmail = myData.Data.email;
+        const users = data.Data.filter((user) => user.email !== myEmail);
+        setUsers(users);
+      }
+      fetchBackend('/getuserprofile', 'POST', { token }, null, successGetMyUser);
     }
     const token = localStorage.getItem('token');
     fetchBackend('/getallusers', 'POST', { token }, toast, successGetAllUsers);
