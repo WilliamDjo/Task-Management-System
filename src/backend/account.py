@@ -366,7 +366,6 @@ Update email on backened
 """
 
 
-# CHECK THIS FUNCTION - Needs to return the new token as well.
 def update_email_account(new_email, token):
     global active_users
 
