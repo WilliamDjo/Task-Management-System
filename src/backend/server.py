@@ -145,6 +145,6 @@ if __name__ == "__main__":
     test_email = "adam@test.com"
     test_username = "adam_user"
 
-    server_register(test_first, test_last, test_username, test_email, test_password, sys_admin=True)
+    account.account_register(test_first, test_last, test_username, test_email, test_password, sys_admin=True)
     app.run()
     server_register()

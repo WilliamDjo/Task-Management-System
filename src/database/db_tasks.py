@@ -125,22 +125,39 @@ def getAllTasks() -> dict:
 
     return data
         
-counter = 0
 '''
 Helper function to generate IDs
 '''
 def get_next_task_id() -> str:
-    global counter
-    counter = counter + 1
 
-    return counter
+    db = getDB()
+    sequence_collection = db['sequence_collection']
+
+    sequence_name = 'task_id'
+
+    # Find the document for the given sequence name and atomically increment the value
+    sequence_doc = sequence_collection.find_one_and_update(
+        {'_id': sequence_name},
+        {'$inc': {'seq_value': 1}},
+        upsert=True,
+        return_document=True
+    )
+
+    # Retrieve the incremented value from the document
+    next_id = sequence_doc['seq_value']
+
+    # Format the task ID with a desired prefix
+    task_id_prefix = 'TASK'
+    formatted_id = f'{task_id_prefix}-{next_id:06d}'
+
+    return formatted_id
 
 
 
 
 if __name__ == '__main__':
 
-    clear_collection("task_system")
+    #clear_collection("task_system")
 
     deadline_task = datetime(2023, 3, 12)
 
@@ -178,9 +195,6 @@ if __name__ == '__main__':
     addNewTask(task_info)
     addNewTask(task_info)
 
-    data = getTaskFromID('1')
-
-    print(getAllTasks())
 
 
 
