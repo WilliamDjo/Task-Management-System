@@ -183,26 +183,51 @@ def account_register(first_name, last_name, username, email, password, sys_admin
 
     # Check if name is valid:
     if (not is_name_valid(first_name)) or (not is_name_valid(last_name)):
-        return {"Success": False, "Message": "Invalid name."}
+        return {
+            "Success": False,
+            "Message": "Invalid name.",
+            "token": "",
+            "sys_admin": "",
+        }
 
     # Check if email exists
     email_exists = db.checkUser(email)
 
     if not email_exists["Success"]:
-        return {"Success": False, "Message": "Email already exists."}
+        return {
+            "Success": False,
+            "Message": "Email already exists.",
+            "token": "",
+            "sys_admin": "",
+        }
 
     username_valid = is_username_valid(username)
 
     if not username_valid["Success"]:
-        return username_valid
+        return {
+            "Success": False,
+            "Message": username_valid["Message"],
+            "token": "",
+            "sys_admin": "",
+        }
 
     # Check if email is valid
     if not is_email_valid(email):
-        return {"Success": False, "Message": "Email not valid"}
+        return {
+            "Success": False,
+            "Message": "Email not valid",
+            "token": "",
+            "sys_admin": "",
+        }
 
     # Check if password is valid
     if not is_password_valid(password):
-        return {"Success": False, "Message": "Password not valid"}
+        return {
+            "Success": False,
+            "Message": "Password not valid",
+            "token": "",
+            "sys_admin": "",
+        }
 
     # Return true if success | Add user to DB
 
@@ -247,6 +272,8 @@ def account_login(email, password):
         return {
             "Success": False,
             "Message": "Email or Password combination does not exist",
+            "token": "",
+            "sys_admin": "",
         }
 
     userInfo = email_password_match["User"]
@@ -308,7 +335,8 @@ def update_username(new_username, token):
 
     # Update step
     result = db.updateUserInfo(email, new_user_dict)
-    return result
+
+    return {"Success": result["Success"], "Message": result["Message"]}
 
 
 def update_password_account(new_password, token):
@@ -330,7 +358,7 @@ def update_password_account(new_password, token):
     new_user_dict = {"password": generate_password_hash(new_password)}
 
     result = db.updateUserInfo(email, new_user_dict)
-    return result
+    return {"Success": result["Success"], "Message": result["Message"]}
 
 
 """
@@ -342,29 +370,29 @@ def update_email_account(new_email, token):
     global active_users
 
     if not is_email_valid(new_email):
-        return {"Success": False, "Message": "Email Does not exist"}
+        return {"Success": False, "Message": "Email Does not exist", "Token": ""}
 
     valid_jwt = tokens.check_jwt_token(token)
 
     if not valid_jwt["Success"]:
-        return {"Success": False, "Message": "user not logged in"}
+        return {"Success": False, "Message": "user not logged in", "Token": ""}
 
     email = valid_jwt["Data"]["email"]
 
     if email not in active_users:
-        return {"Success": False, "Message": "User not active"}
+        return {"Success": False, "Message": "User not active", "Token": ""}
 
     new_user_dict = {"email": new_email}
 
     # new token
     new_token = tokens.generate_jwt_token(new_email)
 
-    result = db.updateUserInfo(email, new_user_dict)
+    db.updateUserInfo(email, new_user_dict)
 
     remove_active_user(email)
     active_users[new_email] = new_token
 
-    return {"Success": True, "Message": "Email Changed"}
+    return {"Success": True, "Message": "Email Changed", "Token": new_token}
 
 
 """
@@ -396,11 +424,15 @@ def getAccountInfo(token):
 
     valid_jwt = tokens.check_jwt_token(token)
     if not valid_jwt["Success"]:
-        return {"Success": False, "Message": "User not logged in"}
+        return {"Success": False, "Message": "User not logged in", "Data": ""}
     email = valid_jwt["Data"]["email"]
     userInformation = db.getSingleUserInformation(email)
 
-    return {"Success": True, "Message": "Account info retrieved"}
+    return {
+        "Success": True,
+        "Message": "Account info retrieved",
+        "Data": userInformation["Data"],
+    }
 
 
 def getAllAccounts(token):
@@ -408,16 +440,20 @@ def getAllAccounts(token):
 
     valid_jwt = tokens.check_jwt_token(token)
     if not valid_jwt["Success"]:
-        return {"Success": False, "Message": "Error!"}
+        return {"Success": False, "Message": "Error!", "Data": ""}
     email = valid_jwt["Data"]["email"]
     userInformation = db.checkUser(email)
 
     if not userInformation["Data"]["SystemAdmin"]:
-        return {"Success": False, "Error": "Not an admin"}
+        return {"Success": False, "Message": "Not an admin", "Data": ""}
 
     allUserInfo = db.getAllUserInformation()
-    print(allUserInfo)
-    return {"Success": True, "Error": "", "Data": allUserInfo}
+    # print(allUserInfo)
+    return {
+        "Success": True,
+        "Message": "Info retrieved successfully",
+        "Data": allUserInfo,
+    }
 
 
 """
@@ -474,7 +510,8 @@ def check_otp(email, otp):
     if userInformation["Success"]:
         return {"Success": False, "Message": "User doesn't exists"}
     otp_return = password.check_otp(email, otp)
-    return otp_return
+
+    return {"Success": otp_return["Success"], "Message": otp_return["Message"]}
 
 
 def change_password(email, new_password):
@@ -485,4 +522,11 @@ def change_password(email, new_password):
     if not is_password_valid(new_password):
         return {"Success": False, "Message": "Password not valid"}
 
-    return db.updateUserInfo(email, {"password": generate_password_hash(new_password)})
+    update_password = db.updateUserInfo(
+        email, {"password": generate_password_hash(new_password)}
+    )
+
+    return {
+        "Success": update_password["Success"],
+        "Message": update_password["Message"],
+    }
