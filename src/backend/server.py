@@ -27,8 +27,8 @@ def server_register():
     to_return = {
         "Success": status["Success"],
         "Message": status["Message"],
-        "token": status["token"],
-        "sys_admin": status["sys_admin"],
+        "Token": status["token"],
+        "Sys_admin": status["sys_admin"],
     }
     return jsonify(to_return)
 
@@ -44,8 +44,8 @@ def login():
     to_return = {
         "Success": status["Success"],
         "Message": status["Message"],
-        "token": status["token"],
-        "sys_admin": status["sys_admin"],
+        "Token": status["token"],
+        "Sys_admin": status["sys_admin"],
     }
     return jsonify(to_return)
 
