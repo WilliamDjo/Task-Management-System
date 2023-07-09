@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Center,
   Heading,
@@ -7,20 +7,51 @@ import {
   Button,
   FormControl,
   Flex,
-  //   Input,
   Stack,
   useColorModeValue,
   HStack,
 } from '@chakra-ui/react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { fetchBackend } from '../fetch';
 
 const VerifyEmail = () => {
   const location = useLocation();
-  const email = location.state?.email || ''; // Retrieve the email from the route location state
+  const email = location.state?.email || '';
+
+  const [otp, setOtp] = useState(['', '', '', '', '', '']);
 
   const navigate = useNavigate();
-  const handleSubmit = () => {
-    navigate('/resetpassword');
+  const handleSubmit = async () => {
+    try {
+      const enteredOtp = parseInt(otp.join(''), 10); // Convert the joined OTP string to an integer
+      console.log(enteredOtp);
+      await fetchBackend(
+        '/reset/otp',
+        'POST',
+        { email, otp: enteredOtp },
+        null,
+        async data => {
+          const { Success } = data;
+          if (Success) {
+            console.log(email);
+            navigate('/resetpassword', { state: { email } });
+          } else {
+            console.error('OTP verification failed');
+          }
+        },
+        () => {
+          console.error('An error occurred while verifying the OTP');
+        }
+      );
+    } catch (error) {
+      console.error('An error occurred while verifying the OTP', error);
+    }
+  };
+
+  const handleOtpChange = (index, value) => {
+    const updatedOtp = [...otp];
+    updatedOtp[index] = value;
+    setOtp(updatedOtp);
   };
 
   return (
@@ -62,12 +93,30 @@ const VerifyEmail = () => {
           <Center>
             <HStack>
               <PinInput>
-                <PinInputField />
-                <PinInputField />
-                <PinInputField />
-                <PinInputField />
-                <PinInputField />
-                <PinInputField />
+                <PinInputField
+                  value={otp[0]}
+                  onChange={e => handleOtpChange(0, e.target.value)}
+                />
+                <PinInputField
+                  value={otp[1]}
+                  onChange={e => handleOtpChange(1, e.target.value)}
+                />
+                <PinInputField
+                  value={otp[2]}
+                  onChange={e => handleOtpChange(2, e.target.value)}
+                />
+                <PinInputField
+                  value={otp[3]}
+                  onChange={e => handleOtpChange(3, e.target.value)}
+                />
+                <PinInputField
+                  value={otp[4]}
+                  onChange={e => handleOtpChange(4, e.target.value)}
+                />
+                <PinInputField
+                  value={otp[5]}
+                  onChange={e => handleOtpChange(5, e.target.value)}
+                />
               </PinInput>
             </HStack>
           </Center>

@@ -3,17 +3,56 @@ import {
   Button,
   Flex,
   FormControl,
+  FormErrorMessage,
   FormLabel,
   Heading,
-  //   Input,
   Stack,
   useColorModeValue,
 } from '@chakra-ui/react';
 import PasswordBar from '../components/PasswordBar/PasswordBar';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { fetchBackend } from '../fetch'; // Import the fetchBackend function
 
 const ResetPassword = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordMatchError, setPasswordMatchError] = useState(false); // New state variable
+  const location = useLocation();
+  const email = location.state?.email || '';
+  const navigate = useNavigate();
+
+  const handleSubmit = () => {
+    console.log(email);
+    if (password === confirmPassword) {
+      const requestBody = {
+        email,
+        new_password: password,
+      };
+
+      fetchBackend(
+        '/reset/account',
+        'POST',
+        requestBody,
+        null,
+        onSuccess,
+        onFailure
+      );
+    } else {
+      setPasswordMatchError(true); // Set the password match error to true
+    }
+  };
+
+  const onSuccess = () => {
+    console.log('Password reset successful');
+    // Perform any necessary actions after successful password reset
+    navigate('/login'); // Redirect to the login page
+  };
+
+  const onFailure = () => {
+    console.error('Password reset failed');
+    // Perform any necessary actions after failed password reset
+  };
+
   return (
     <Flex
       minH={'100vh'}
@@ -42,12 +81,21 @@ const ResetPassword = () => {
             onChange={e => setPassword(e.target.value)}
           />
         </FormControl>
-        <FormControl id="confirm-password" isRequired>
+        <FormControl
+          id="confirm-password"
+          isRequired
+          isInvalid={passwordMatchError}
+        >
           <FormLabel>Confirm Password</FormLabel>
           <PasswordBar
             value={confirmPassword}
             onChange={e => setConfirmPassword(e.target.value)}
           />
+          {passwordMatchError && (
+            <FormErrorMessage>
+              Password and Confirm Password do not match
+            </FormErrorMessage>
+          )}
         </FormControl>
         <Stack spacing={6}>
           <Button
@@ -56,6 +104,7 @@ const ResetPassword = () => {
             _hover={{
               bg: 'blue.500',
             }}
+            onClick={handleSubmit}
           >
             Submit
           </Button>

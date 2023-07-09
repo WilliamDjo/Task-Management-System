@@ -51,19 +51,20 @@ const Login = () => {
         credentials,
         null,
         async data => {
-          const { token, sys_admin } = data;
+          const { Token, sys_admin } = data;
 
           // Store the token and isAdmin status in localStorage
-          if (!token) {
+          if (!Token) {
             setLoginError(true);
             setLoginSuccess(false);
             console.error('Login failed token');
-            console.log(token);
+            console.log(data);
+            console.log(Token);
           } else {
             setSysAdmin(sys_admin);
-            localStorage.setItem('token', token);
+            localStorage.setItem('token', Token);
             console.log('Login successful');
-            console.log(token);
+            console.log(Token);
             if (sys_admin) {
               navigate('/admin');
             } else {

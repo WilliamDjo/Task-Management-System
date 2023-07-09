@@ -17,7 +17,7 @@ import {
   // Route,
   useNavigate,
 } from 'react-router-dom';
-// import { fetchBackend } from '../fetch';
+import { fetchBackend } from '../fetch';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -30,8 +30,30 @@ const ForgotPassword = () => {
   // const [passwordChanged, setPasswordChanged] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = () => {
-    navigate('/verifyemail', { state: { email } });
+  const handleSubmit = async () => {
+    try {
+      await fetchBackend(
+        '/reset/password',
+        'POST',
+        { email },
+        null,
+        async data => {
+          const { Success } = data;
+          if (Success) {
+            navigate('/verifyemail', { state: { email } });
+          } else {
+            // Handle error if needed
+            console.error('Reset password request failed');
+          }
+        },
+        () => {
+          // Handle error if needed
+          console.error('An error occurred while resetting the password');
+        }
+      );
+    } catch (error) {
+      console.error('An error occurred while resetting the password', error);
+    }
   };
 
   // const handleSubmit = async () => {
