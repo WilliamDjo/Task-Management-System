@@ -17,6 +17,7 @@ import ChangeEmail from './pages/ChangeEmail';
 import VerifyEmail from './pages/VerifyEmail';
 import ResetPassword from './pages/ResetPassword';
 import Connections from './pages/Connections';
+import ConnectionsBar from './components/ConnectionsBar';
 
 const App = () => {
   return (
@@ -36,6 +37,9 @@ const App = () => {
           </Route>
           <Route path="connections" element={<Outlet />}>
             <Route index element={<Connections />} />
+            <Route path="my" element={<ConnectionsBar myConnections />} />
+            <Route path="add" element={<ConnectionsBar addConnections />} />
+            <Route path="pending" element={<ConnectionsBar pendingConnections />} />
           </Route>
 
           <Route path="*" element={<PageNotFound />} />
