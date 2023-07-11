@@ -16,6 +16,7 @@ import ForgotPassword from './pages/ForgotPassword';
 import ChangeEmail from './pages/ChangeEmail';
 import VerifyEmail from './pages/VerifyEmail';
 import ResetPassword from './pages/ResetPassword';
+import Connections from './pages/Connections';
 
 const App = () => {
   return (
@@ -32,6 +33,9 @@ const App = () => {
           </Route>
           <Route path="admin" element={<Outlet />}>
             <Route index element={<AdminDashboard />} />
+          </Route>
+          <Route path="connections" element={<Outlet />}>
+            <Route index element={<Connections />} />
           </Route>
 
           <Route path="*" element={<PageNotFound />} />
