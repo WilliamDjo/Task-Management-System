@@ -14,6 +14,7 @@ import PageNotFound from './pages/PageNotFound';
 import CantLogin from './pages/CantLogin';
 import ForgotPassword from './pages/ForgotPassword';
 import ChangeEmail from './pages/ChangeEmail';
+import Connections from './pages/Connections';
 
 function App () {
   return (
@@ -30,6 +31,9 @@ function App () {
           </Route>
           <Route path="admin" element={<Outlet />}>
             <Route index element={<AdminDashboard />} />
+          </Route>
+          <Route path="connections" element={<Outlet />}>
+            <Route index element={<Connections />} />
           </Route>
 
           <Route path="*" element={<PageNotFound />} />
