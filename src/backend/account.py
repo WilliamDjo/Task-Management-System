@@ -416,7 +416,7 @@ def update_notificiation_set(bool_val, token):
     new_dict = {"notifications": bool_val}
 
     result = db.updateUserProfile(email, new_dict)
-    return {"Success": False, "Message": "Notifications updated"}
+    return {"Success": True, "Message": "Notifications updated"}
 
 
 def getAccountInfo(token):
@@ -494,7 +494,7 @@ def admin_delete_acc(token, email_to_delete):
     remove_active_user(email_to_delete)
     result = db.deleteUser(email_to_delete)
 
-    return {"Success": False, "Message": "User deleted"}
+    return {"Success": True, "Message": "User deleted"}
 
 
 def reset_password(email):

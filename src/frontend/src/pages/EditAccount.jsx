@@ -49,13 +49,15 @@ const EditAccount = () => {
   };
 
   const handleSubmitEmail = () => {
-    const successEmail = () => {
+    const successEmail = (data) => {
       toast({
         title: 'Email successfully changed.',
         status: 'success',
         duration: 5000,
         isClosable: true,
       });
+
+      localStorage.setItem('token', data.Token);
     }
 
     if (email === confirmEmail) {
