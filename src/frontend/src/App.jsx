@@ -15,6 +15,7 @@ import CantLogin from './pages/CantLogin';
 import ForgotPassword from './pages/ForgotPassword';
 import ChangeEmail from './pages/ChangeEmail';
 import Connections from './pages/Connections';
+import ConnectionsBar from './components/ConnectionsBar';
 
 function App () {
   return (
@@ -34,6 +35,9 @@ function App () {
           </Route>
           <Route path="connections" element={<Outlet />}>
             <Route index element={<Connections />} />
+            <Route path="my" element={<ConnectionsBar myConnections />} />
+            <Route path="add" element={<ConnectionsBar addConnections />} />
+            <Route path="pending" element={<ConnectionsBar pendingConnections />} />
           </Route>
 
           <Route path="*" element={<PageNotFound />} />
