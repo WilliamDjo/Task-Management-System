@@ -4,7 +4,6 @@ import {
   Flex,
   Heading,
   Link,
-  Text,
 } from '@chakra-ui/react';
 import React from 'react';
 import { Link as RouteLink } from 'react-router-dom';
@@ -17,24 +16,18 @@ const Connections = () => {
       <Flex h='100%' flexFlow='column'>
         <NavigationBar />
         <Box bg='blue.50' w='full'>
-          <Heading>Connections</Heading>
         </Box>
-        <Flex flex={1} bg='blue.50' justifyContent='center'>
+        <Heading>Connections</Heading>
+        <Flex flex={1} bg='white' justifyContent='center'>
           <Box color='black' padding='2' fontSize='xl' fontWeight='bold' width='xl'>
-            <Center boxShadow='lg' padding='1' rounded='full' m='3'>
-              <Text>
-                <Link as={RouteLink} to="/connections/my">My Connections</Link>
-              </Text>
+            <Center bg='blue.50' padding='1' rounded='full' m='3'>
+              <Link as={RouteLink} to="/connections/my">My Connections</Link>
             </Center>
-            <Center boxShadow='lg' padding='1' rounded='full' m='3'>
-              <Text>
-                <Link as={RouteLink} to="/connections/add">Add Connection</Link>
-              </Text>
+            <Center bg='blue.50' padding='1' rounded='full' m='3'>
+              <Link as={RouteLink} to="/connections/add">Add Connection</Link>
             </Center>
-            <Center boxShadow='lg' padding='1' rounded='full' m='3'>
-              <Text>
-                <Link as={RouteLink} to="/connections/pending">Pending Connections</Link>
-              </Text>
+            <Center bg='blue.50' padding='1' rounded='full' m='3'>
+              <Link as={RouteLink} to="/connections/pending">Pending Connections</Link>
             </Center>
           </Box>
         </Flex>

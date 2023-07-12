@@ -16,7 +16,7 @@ const ConnectionsBar = (props) => {
     <Box minH='100vh' h='100vh'>
       <Flex h='100%' flexFlow='column'>
         <NavigationBar />
-        <Show breakpoint='(min-width: 800px)'>
+        <Show above='sm'>
           <Flex flex={1}>
             <Box flex={3} bg='blue.50' color='black' padding='2' fontSize='xl' fontWeight='bold'>
               <Box bg={ props.myConnections ? 'blue.200' : '' } padding='1' paddingLeft='3' rounded='full'>
@@ -40,8 +40,10 @@ const ConnectionsBar = (props) => {
             </Box>
           </Flex>
         </Show>
-        <Show breakpoint='(max-width: 800px)'>
-          {props.children}
+        <Show below='sm'>
+          <Box padding='2'>
+            {props.children}
+          </Box>
         </Show>
       </Flex>
     </Box>
