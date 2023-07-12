@@ -39,34 +39,6 @@ const Register = () => {
   const [passwordMismatchError, setPasswordMismatchError] = useState(false);
   const navigate = useNavigate();
 
-  // const [showPassword, setShowPassword] = useState(false);
-  // const handleRegister = async () => {
-  //   try {
-  //     const response = await fetch('/signup', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({
-  //         first_name,
-  //         last_name,
-  //         username,
-  //         email,
-  //         password,
-  //       }),
-  //     });
-
-  //     if (response.ok) {
-  //       // Login successful, perform necessary actions
-  //       console.log('Register successful');
-  //     } else {
-  //       // Login failed, handle the error
-  //       console.error('Register failed');
-  //     }
-  //   } catch (error) {
-  //     console.error('An error occurred while logging in', error);
-  //   }
-  // };
   const handleRegister = async () => {
     if (password !== confirmPassword) {
       // Password and Confirm Password mismatch
