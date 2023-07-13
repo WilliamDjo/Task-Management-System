@@ -17,6 +17,8 @@ import ChangeEmail from './pages/ChangeEmail';
 import Connections from './pages/Connections';
 import ConnectionsBar from './components/ConnectionsBar';
 import AddConnection from './pages/AddConnection';
+import MyConnections from './pages/MyConnections';
+import ConnectionProfile from './pages/ConnectionProfile';
 
 function App () {
   return (
@@ -36,7 +38,10 @@ function App () {
           </Route>
           <Route path="connections" element={<Outlet />}>
             <Route index element={<Connections />} />
-            <Route path="my" element={<ConnectionsBar myConnections />} />
+            <Route path="my" element={<Outlet />}>
+              <Route index element={<MyConnections />} />
+              <Route path=":email" element={<ConnectionProfile />} />
+            </Route>
             <Route path="add" element={<AddConnection />} />
             <Route path="pending" element={<ConnectionsBar pendingConnections />} />
           </Route>
