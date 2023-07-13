@@ -1,60 +1,36 @@
-import { ArrowBackIcon } from '@chakra-ui/icons';
-import {
-  Box,
-  Flex,
-  Hide,
-  Link,
-  Show,
-  Text,
-} from '@chakra-ui/react';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Link as RouteLink } from 'react-router-dom';
 
-import NavigationBar from './NavigationBar';
+import SideBar from './SideBar';
 
 const ConnectionsBar = (props) => {
+  const back = {
+    screenName: 'Connections',
+    link: '/connections',
+  };
+
+  const tabs = [
+    {
+      screenName: 'My Connections',
+      link: '/connections/my',
+      active: props.myConnections
+    }, {
+      screenName: 'Add Connections',
+      link: '/connections/add',
+      active: props.addConnections
+    }, {
+      screenName: 'Pending Connections',
+      link: '/connections/pending',
+      active: props.pendingConnections
+    },
+  ]
   return (
-    <Box minH='100vh' h='100vh'>
-      <Flex h='100%' flexFlow='column'>
-        <NavigationBar />
-        <Hide below='md'>
-          <Flex flex={1}>
-            <Box flex={3} bg='blue.50' color='black' padding='2' fontSize='xl' fontWeight='bold'>
-              <Box bg={ props.myConnections ? 'blue.200' : '' } padding='1' paddingLeft='3' rounded='full'>
-                <Text>
-                  <Link as={RouteLink} to="/connections/my">My Connections</Link>
-                </Text>
-              </Box>
-              <Box bg={ props.addConnections ? 'blue.200' : '' } padding='1' paddingLeft='3' rounded='full'>
-                <Text>
-                  <Link as={RouteLink} to="/connections/add">Add Connections</Link>
-                </Text>
-              </Box>
-              <Box bg={ props.pendingConnections ? 'blue.200' : '' } padding='1' paddingLeft='3' rounded='full'>
-                <Text>
-                  <Link as={RouteLink} to="/connections/pending">Pending Connections</Link>
-                </Text>
-              </Box>
-            </Box>
-            <Box flex={9} padding='2'>
-              {props.children}
-            </Box>
-          </Flex>
-        </Hide>
-        <Show below='md'>
-          <Box padding='2'>
-            <Link as={RouteLink} to='/connections'>
-              <Flex align='center'>
-                <ArrowBackIcon/>
-                Back to Connections
-              </Flex>
-            </Link>
-            {props.children}
-          </Box>
-        </Show>
-      </Flex>
-    </Box>
+    <SideBar
+      back={back}
+      tabs={tabs}
+    >
+      {props.children}
+    </SideBar>
   );
 }
 

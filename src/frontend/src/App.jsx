@@ -19,6 +19,7 @@ import ConnectionsBar from './components/ConnectionsBar';
 import AddConnection from './pages/AddConnection';
 import MyConnections from './pages/MyConnections';
 import ConnectionProfile from './pages/ConnectionProfile';
+import MyProfile from './pages/MyProfile';
 
 function App () {
   return (
@@ -31,6 +32,7 @@ function App () {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="profile" element={<Outlet />}>
             <Route index element={<Profile />} />
+            <Route path="my" element={<MyProfile />} />
             <Route path="edit" element={<EditAccount />} />
           </Route>
           <Route path="admin" element={<Outlet />}>
