@@ -15,11 +15,11 @@ import CantLogin from './pages/CantLogin';
 import ForgotPassword from './pages/ForgotPassword';
 import ChangeEmail from './pages/ChangeEmail';
 import Connections from './pages/Connections';
-import ConnectionsBar from './components/ConnectionsBar';
 import AddConnection from './pages/AddConnection';
 import MyConnections from './pages/MyConnections';
 import ConnectionProfile from './pages/ConnectionProfile';
 import MyProfile from './pages/MyProfile';
+import PendingConnections from './pages/PendingConnections';
 
 function App () {
   return (
@@ -45,7 +45,7 @@ function App () {
               <Route path=":email" element={<ConnectionProfile />} />
             </Route>
             <Route path="add" element={<AddConnection />} />
-            <Route path="pending" element={<ConnectionsBar pendingConnections />} />
+            <Route path="pending" element={<PendingConnections />} />
           </Route>
 
           <Route path="*" element={<PageNotFound />} />
