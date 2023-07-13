@@ -1,6 +1,8 @@
+import { ArrowBackIcon } from '@chakra-ui/icons';
 import {
   Box,
   Flex,
+  Hide,
   Link,
   Show,
   Text,
@@ -16,7 +18,7 @@ const ConnectionsBar = (props) => {
     <Box minH='100vh' h='100vh'>
       <Flex h='100%' flexFlow='column'>
         <NavigationBar />
-        <Show above='sm'>
+        <Hide below='md'>
           <Flex flex={1}>
             <Box flex={3} bg='blue.50' color='black' padding='2' fontSize='xl' fontWeight='bold'>
               <Box bg={ props.myConnections ? 'blue.200' : '' } padding='1' paddingLeft='3' rounded='full'>
@@ -39,9 +41,15 @@ const ConnectionsBar = (props) => {
               {props.children}
             </Box>
           </Flex>
-        </Show>
-        <Show below='sm'>
+        </Hide>
+        <Show below='md'>
           <Box padding='2'>
+            <Link as={RouteLink} to='/connections'>
+              <Flex align='center'>
+                <ArrowBackIcon/>
+                Back to Connections
+              </Flex>
+            </Link>
             {props.children}
           </Box>
         </Show>
