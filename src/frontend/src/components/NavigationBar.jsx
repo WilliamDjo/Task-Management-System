@@ -1,5 +1,13 @@
-import { Box, Flex, Heading, Spacer, Text, Tooltip, useToast } from '@chakra-ui/react';
-import { ChatIcon, SettingsIcon } from '@chakra-ui/icons'
+import {
+  Box,
+  Flex,
+  Heading,
+  Spacer,
+  Text,
+  Tooltip,
+  useToast,
+} from '@chakra-ui/react';
+import { ChatIcon, SettingsIcon } from '@chakra-ui/icons';
 import React from 'react';
 import { Link as RouteLink, useNavigate } from 'react-router-dom';
 import { fetchBackend } from '../fetch';
@@ -19,39 +27,48 @@ const NavigationBar = () => {
       });
       localStorage.removeItem('token');
       navigate('/');
-    }
+    };
 
     const failLogout = () => {
       localStorage.removeItem('token');
       navigate('/');
-    }
+    };
     const token = localStorage.getItem('token');
-    fetchBackend('/logout', 'POST', { token }, toast, successLogout, failLogout);
-  }
+    fetchBackend(
+      '/logout',
+      'POST',
+      { token },
+      toast,
+      successLogout,
+      failLogout
+    );
+  };
 
   return (
-    <Box bg='black' color='blue.50'>
-      <Flex alignItems='center'>
+    <Box bg="black" color="blue.50">
+      <Flex alignItems="center">
         <RouteLink to="/dashboard">
-          <Heading _hover={hoverStyle} size='md'>TaskMaster</Heading>
+          <Heading _hover={hoverStyle} size="md">
+            TaskMaster
+          </Heading>
         </RouteLink>
         <Spacer />
         <RouteLink to="/connections">
-          <Tooltip label='Connections'>
-            <ChatIcon m='1' _hover={hoverStyle} />
+          <Tooltip label="Connections">
+            <ChatIcon m="1" _hover={hoverStyle} />
           </Tooltip>
         </RouteLink>
         <RouteLink to="/profile">
-          <Tooltip label='Profile'>
-            <SettingsIcon m='1' _hover={hoverStyle} />
+          <Tooltip label="Profile">
+            <SettingsIcon m="1" _hover={hoverStyle} />
           </Tooltip>
         </RouteLink>
-        <Text m='1' _hover={hoverStyle} onClick={handleLogout}>
+        <Text m="1" _hover={hoverStyle} onClick={handleLogout}>
           Logout
         </Text>
       </Flex>
     </Box>
   );
-}
+};
 
 export default NavigationBar;
