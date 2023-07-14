@@ -3,19 +3,21 @@ from json.tool import main
 import sys
 import os
 import re
-from turtle import title, update
 from account import is_email_valid
+from backend.account import getAccountInfo
+from backend.tokens import check_jwt_token
 
 
 parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_folder)
 
 from database import db_tasks
-import tokens
+from tokens import active_tokens
 from datetime import datetime
-from account import is_email_valid
+from account import is_email_valid, active_users
 from database.db import checkUser
 from database.db import clear_collection
+
 
 '''
 Validity 
@@ -47,9 +49,24 @@ def is_description_valid(description: str):
         return False
     return True
 
-def is_deadline_valid(dt):
+def is_deadline_valid(deadline):
     current_datetime = datetime.now()
-    return dt < current_datetime
+    try:
+        dt = datetime.strptime(deadline, "%Y-%m-%d")
+        return dt.date() < current_datetime.date()
+    except ValueError:
+        return False
+
+
+def is_label_valid(label:str):
+
+    if len(label)  == 0:
+        return False
+    
+    if len(label) > 20:
+        return False
+
+    return True 
 
 #TODO: Ensure given assignee email is present in connections
 def is_assignee_valid(assignee: str):
@@ -71,6 +88,18 @@ Create tasks
 '''  
 def create_task(data: dict):
 
+    token = data["token"]
+
+    #Verify account login - check the token
+    token_result = check_jwt_token(token)
+    if not token_result['Success']:
+        return {
+            "Success": False, 
+            "Message": "No user logged in"
+        }
+
+    #Get Task Master Details
+    user = getAccountInfo(token)
     task_title = data["title"]
 
     if not is_title_valid(task_title):
@@ -79,7 +108,6 @@ def create_task(data: dict):
             "Message": "Invalid Title Format, needs to be > 2 and  < 100"        
         }
     
-
     task_description  = data["description"]
 
     if not is_description_valid(task_description):
@@ -87,7 +115,6 @@ def create_task(data: dict):
             "Success": False,
             "Message": "Invalid Description, too long"        
         }
-
 
     task_deadline = data["deadline"]
     task_deadline_dt = None
@@ -104,7 +131,6 @@ def create_task(data: dict):
     except ValueError:
         pass
 
-
     #If progress is not set, default to not started
     task_progress = data["progress"]
 
@@ -116,14 +142,6 @@ def create_task(data: dict):
         return {
             "Success": False,
             "Message": "Error in data recieved (Progress state not valid"
-        }
-
-    task_assignee  = data["assignee"]
-
-    if not is_assignee_valid(task_assignee):
-        return {
-            "Success": False,
-            "Message": "Assignee email does not exist"
         }
 
     task_cost = data["cost_per_hr"]
@@ -173,22 +191,25 @@ def create_task(data: dict):
         }
 
     
-    task_master = data["task_master"]
+    # task_master = user['email']
 
     task_labels = data["labels"]
+    valid_labels = [label for label in task_labels if is_label_valid(label)]
+            
 
     new_dict = {
+        
         "title" : task_title,
         "description": task_description,
         "deadline": task_deadline_dt,
         "progress": task_progress,
-        "assignee": task_assignee,
+        "assignee": "",
         "cost_per_hr": task_cost,
         "estimation_spent_hrs": task_estimate,
         "actual_time_hr": task_actual,
         "priority": task_priority,
-        "task_master": task_master,
-        "labels": task_labels,
+        "task_master": "aks@email.com",
+        "labels": valid_labels,
     }
 
     result = db_tasks.addNewTask(new_dict)
@@ -206,7 +227,7 @@ def update_task_title( task_id: str, title: str):
             "Message": "Invalid Title Format, needs to be > 2 and  < 100"        
         }
 
-    db_tasks.updateTaskInfo(task_id, {"title": title})
+    return db_tasks.updateTaskInfo(task_id, {"title": title})
 
 def update_task_desc(task_id: str, description: str):
     
@@ -216,7 +237,7 @@ def update_task_desc(task_id: str, description: str):
             "Message": "Invalid Description, too long"        
         }
 
-    db_tasks.updateTaskInfo(task_id,  {"description": description})
+    return db_tasks.updateTaskInfo(task_id,  {"description": description})
 
 def update_task_progress(task_id:str, progress: str):
     
@@ -226,7 +247,7 @@ def update_task_progress(task_id:str, progress: str):
             "Message": "Invalid Progress status"        
         }
 
-    db_tasks.updateTaskInfo(task_id,  {"progress": progress})
+    return db_tasks.updateTaskInfo(task_id,  {"progress": progress})
 
 def update_task_assignee(task_id: str, email: str):
     
@@ -235,56 +256,81 @@ def update_task_assignee(task_id: str, email: str):
             "Success": False,
             "Message": "Invalid assignee"        
         }
-    
-    db_tasks.updateTaskInfo(task_id,  {"assignee": email})
+    #TODO call email notif
+    return db_tasks.updateTaskInfo(task_id,  {"assignee": email})
 
+def update_cost(task_id: str, new_cost: int):
+    
+    if new_cost < 0:
+        return {
+            "Success": False, 
+            "Message": "Cost/hr cannot be negative"
+        }
+    
+    return db_tasks.updateTaskInfo(task_id,  {"cost_per_hr": new_cost})
+
+def update_estimate(task_id: str, new_estimate: int):
+    
+    if new_estimate < 0:
+        return {
+            "Success": False, 
+            "Message": "Estimate cannot be negative"
+        }
+    
+    return db_tasks.updateTaskInfo(task_id,  {"estimation_spent_hrs": new_estimate})
+
+def update_actual(task_id: str, new_actual: int):
+    
+    if new_actual < 0:
+        return {
+            "Success": False, 
+            "Message": "Cannot be negative"
+        }
+    
+    return db_tasks.updateTaskInfo(task_id,  {"actual_time_hr": new_actual})
+
+def update_priority(task_id: str, new_priority: int):
+    pass
+    #TODO: confirm the priorty ranks
 
 '''
 Delete
 '''
-
 def delete_task(task_id:str):
-    db_tasks.deleteTask(task_id)
+    return db_tasks.deleteTask(task_id)
 
-if __name__ == "__main__":
+'''
+Assignee 
+'''
+def assign_task(task_id:str, assignee_email:str):
 
-    clear_collection("task_system")
-    db_tasks.reset_counter()
+    is_assignee_valid(assignee_email)
 
-    deadline_task = "2023/03/12"
+    #TODO: check if assignee workload permits
 
-    task_info = {
-        "title": "Dummy Task",
-        "description": "This is a dummy task for testing",
-        "deadline": deadline_task,
-        "progress": "In Progress",
-        "assignee": "admin@example.com",
-        "cost_per_hr": 25,
-        "estimation_spent_hrs": 10,
-        "actual_time_hr": 6,
-        "priority": 3,
-        "task_master": "a",
-        "labels": ["Testing", "Dummy"],
-    }
+    #TODO: send email
+
+    update_task_assignee(task_id, assignee_email)
 
 
 
-    new_task_info = {
-        "title": "updated task",
-    }
+'''
+LABELS
+'''
 
-    new_task_description = {
-        "description": "updates desc"
-    }
+def get_labels(task_id: str):
+
+    dict = db_tasks.getTaskFromID(task_id)
+    labels = dict["labels"]
+
+    return labels
+
+def add_label(task_id:str, new_label: str):
+
+    curr_labels = get_labels(task_id)
+    curr_labels.append(new_label)
+    db_tasks.updateTaskInfo(task_id, {"labels": curr_labels})
     
-    task = create_task(task_info)
-    update_task_title(task["task_id"], new_task_info["title"])
-    update_task_desc(task["task_id"], new_task_description["description"])
-
-
-    delete_task(task['task_id'])
-
-
 
 
 

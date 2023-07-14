@@ -1,7 +1,10 @@
+from crypt import methods
+from datetime import date
 from flask import Flask, request, jsonify
 import sys
 import os
 import account
+from backend.task_sys import create_task
 
 """ Accessing Other Files"""
 parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -37,7 +40,6 @@ def login():
     # return the log in success details
     return jsonify(login_success)
 
-
 @app.route("/logout", methods=["POST"])
 def logout():
     # Request
@@ -46,7 +48,6 @@ def logout():
     # return the logout details
     return jsonify(logout_success)
 
-
 @app.route("/update/username", methods=["PUT"])
 def update_useranme():
     token = request.json["token"]
@@ -54,11 +55,9 @@ def update_useranme():
     update_status = account.update_username(new_username, token)
     return jsonify(update_status)
 
-
 """
 Update email wrapper function
 """
-
 
 @app.route("/update/email", methods=["PUT"])
 def update_email():
@@ -68,11 +67,9 @@ def update_email():
 
     return jsonify(update_status)
 
-
 """
 Update password
 """
-
 
 @app.route("/update/password", methods=["PUT"])
 def update_password():
@@ -82,10 +79,7 @@ def update_password():
 
     return jsonify(update_status)
 
-
 """Update notificitons Set true"""
-
-
 @app.route("/update/notifications", methods=["PUT"])
 def server_update_notifications_true():
     token = request.json["token"]
@@ -93,20 +87,17 @@ def server_update_notifications_true():
     update_status = account.update_notificiation_set(value, token)
     return jsonify(update_status)
 
-
 @app.route("/getuserprofile", methods=["POST"])
 def getuserprofile():
     token = request.json["token"]
     user_profile_info = account.getAccountInfo(token)
     return jsonify(user_profile_info)
 
-
 @app.route("/getallusers", methods=["POST"])
 def getallusers():
     token = request.json["token"]
     users = account.getAllAccounts(token)
     return jsonify(users)
-
 
 @app.route("/admin/reset", methods=["PUT"])
 def server_admin_reset_password():
@@ -117,7 +108,6 @@ def server_admin_reset_password():
     result = account.admin_reset_pw(token, new_password, email_to_reset)
     return jsonify(result)
 
-
 @app.route("/admin/delete", methods=["DELETE"])
 def server_admin_delete_email():
     token = request.json["token"]
@@ -125,7 +115,6 @@ def server_admin_delete_email():
 
     result = account.admin_delete_acc(token, email_to_delete)
     return jsonify(result)
-
 
 @app.route("/reset/password", methods=["PUT"])
 def reset_password():
@@ -135,16 +124,28 @@ def reset_password():
     result = account.reset_password(email, username, password)
     return jsonify(result)
 
+'''
+Task based
+'''
+@app.route("/task/create", methods=["POST"])
+def server_create_task():
+    data = request.json
+    result = create_task(data)
+    return jsonify(result)
+
 
 if __name__ == "__main__":
     
     
-    test_first = "adam"
-    test_last = "driver"
-    test_password = "Password123!"
-    test_email = "adam@test.com"
-    test_username = "adam_user"
+    # test_first = "adam"
+    # test_last = "driver"
+    # test_password = "Password123!"
+    # test_email = "adam@test.com"
+    # test_username = "adam_user"
 
-    account.account_register(test_first, test_last, test_username, test_email, test_password, sys_admin=True)
+    # account.account_register(test_first, test_last, test_username, test_email, test_password, sys_admin=True)
     app.run()
     server_register()
+
+
+

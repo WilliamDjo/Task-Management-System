@@ -8,25 +8,16 @@ import os
 import sys
 import re
 
-
-
-
-
-
 """
 TESTING: DELETE
 """
 
-
 from datetime import date, datetime
 from database.db import getDB
-
 
 """
 Returns the the entire collection
 """
-
-
 def getTaskInfoCollection(db: Database) -> Collection:
    return db["task_system"]
 

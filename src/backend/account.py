@@ -2,7 +2,6 @@ import hashlib
 import sys
 import os
 import re
-from tkinter import N
 
 parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_folder)
@@ -299,11 +298,9 @@ def update_password_account(new_password, token):
     result = db.updateUserInfo(email, new_user_dict)
     return result
 
-
 """
 Update email on backened
 """
-
 
 def update_email_account(new_email, token):
     global active_users
@@ -367,7 +364,7 @@ def getAccountInfo(token):
     email = valid_jwt["Data"]["email"]
     userInformation = db.getSingleUserInformation(email)
 
-    return {"Success": True, "Message": "Account info retrieved"}
+    return {"Success": True, "Message": "Account info retrieved", "data": userInformation}
 
 
 def getAllAccounts(token):
