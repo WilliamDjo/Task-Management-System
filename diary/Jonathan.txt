@@ -12,3 +12,9 @@ Setup frontend to get started for our project. Worked on the frontend screen for
 
 Week 5
 Finished the screen for admin control. Added the implemented backend routes to admin control, logout and profile, update profile screens. Attended the retro for demo 1.
+
+Week 6
+Met at uni to discuss data structures and routes for sprint 2's tasks and connections.
+
+Week 7
+Working on frontend for connections, pending connections, adding connections and connections profiles. Moved some components into their own files, for reusable code.
