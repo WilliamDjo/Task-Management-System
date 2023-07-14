@@ -1,6 +1,20 @@
 import React from 'react';
 import ConnectionsBar from '../components/ConnectionsBar';
-import { Box, Button, ButtonGroup, Card, CardBody, Center, Heading, LinkBox, LinkOverlay, SimpleGrid, Spinner, Text, useToast } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  ButtonGroup,
+  Card,
+  CardBody,
+  Center,
+  Heading,
+  LinkBox,
+  LinkOverlay,
+  SimpleGrid,
+  Spinner,
+  Text,
+  useToast
+} from '@chakra-ui/react';
 import { fetchBackend } from '../fetch';
 import { Link as RouteLink } from 'react-router-dom';
 

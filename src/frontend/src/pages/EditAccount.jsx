@@ -3,6 +3,7 @@ import {
   AspectRatio,
   Box,
   Button,
+  ButtonGroup,
   Card,
   CardBody,
   Divider,
@@ -27,8 +28,23 @@ const EditAccount = () => {
   const [username, setUsername] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [confirmPassword, setConfirmPassword] = React.useState('');
+  const [emailNotifications, setEmailNotifications] = React.useState(false);
+
+  const [emailLoading, setEmailLoading] = React.useState(false);
+  const [usernameLoading, setUsernameLoading] = React.useState(false);
+  const [passwordLoading, setPasswordLoading] = React.useState(false);
+  const [emailNotificationsLoading, setEmailNotificationsLoading] = React.useState(true);
 
   const toast = useToast();
+
+  React.useEffect(() => {
+    const successGetEmailNotifications = (data) => {
+      setEmailNotifications(data.Data.emailNotifications);
+      setEmailNotificationsLoading(false);
+    }
+    const token = localStorage.getItem('token');
+    fetchBackend('/getuserprofile', 'POST', { token }, toast, successGetEmailNotifications);
+  }, []);
 
   const handleSubmitName = () => {
     const successUsername = () => {
@@ -38,8 +54,10 @@ const EditAccount = () => {
         duration: 5000,
         isClosable: true,
       });
+      setUsernameLoading(false);
     }
 
+    setUsernameLoading(true);
     const token = localStorage.getItem('token');
     const body = {
       token,
@@ -58,6 +76,7 @@ const EditAccount = () => {
       });
 
       localStorage.setItem('token', data.Token);
+      setEmailLoading(false);
     }
 
     if (email === confirmEmail) {
@@ -66,6 +85,7 @@ const EditAccount = () => {
         token,
         email
       }
+      setEmailLoading(true);
       fetchBackend('/update/email', 'PUT', body, toast, successEmail);
     } else {
       toast({
@@ -85,6 +105,7 @@ const EditAccount = () => {
         duration: 5000,
         isClosable: true,
       });
+      setPasswordLoading(false);
     }
 
     if (password === confirmPassword) {
@@ -93,6 +114,7 @@ const EditAccount = () => {
         token,
         password
       }
+      setPasswordLoading(true);
       fetchBackend('/update/password', 'PUT', body, toast, successPassword);
     } else {
       toast({
@@ -103,6 +125,29 @@ const EditAccount = () => {
       });
     }
   };
+
+  const handleEmailNotifications = (value) => {
+    const successEmailNotifications = () => {
+      setEmailNotifications(value);
+      toast({
+        title: value
+          ? 'Email notifications turned on.'
+          : 'Email notifications turned off.',
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
+      setEmailNotificationsLoading(false);
+    }
+
+    setEmailNotificationsLoading(true);
+    const token = localStorage.getItem('token');
+    const body = {
+      token,
+      value
+    }
+    fetchBackend('/update/notifications', 'PUT', body, toast, successEmailNotifications);
+  }
 
   const handleSubmitImage = () => {
     // Not yet fully implemented
@@ -128,6 +173,12 @@ const EditAccount = () => {
                     placeholder="User Name"
                     value={username}
                     onChange={event => setUsername(event.target.value)}
+                    onKeyDown={event => {
+                      if (event.key === 'Enter') {
+                        handleSubmitName();
+                        event.target.blur();
+                      }
+                    }}
                   />
                 </FormControl>
               </Box>
@@ -137,6 +188,7 @@ const EditAccount = () => {
                 color={'white'}
                 _hover={{ bg: 'blue.500' }}
                 onClick={handleSubmitName}
+                isLoading={usernameLoading}
               >
                 Submit
               </Button>
@@ -149,6 +201,12 @@ const EditAccount = () => {
                     type="email"
                     value={email}
                     onChange={event => setEmail(event.target.value)}
+                    onKeyDown={event => {
+                      if (event.key === 'Enter') {
+                        handleSubmitEmail();
+                        event.target.blur();
+                      }
+                    }}
                   />
                 </FormControl>
               </Box>
@@ -159,6 +217,12 @@ const EditAccount = () => {
                     type="email"
                     value={confirmEmail}
                     onChange={event => setConfirmEmail(event.target.value)}
+                    onKeyDown={event => {
+                      if (event.key === 'Enter') {
+                        handleSubmitEmail();
+                        event.target.blur();
+                      }
+                    }}
                   />
                 </FormControl>
               </Box>
@@ -168,6 +232,7 @@ const EditAccount = () => {
                 color={'white'}
                 _hover={{ bg: 'blue.500' }}
                 onClick={handleSubmitEmail}
+                isLoading={emailLoading}
               >
                 Submit
               </Button>
@@ -178,6 +243,12 @@ const EditAccount = () => {
                   <PasswordBar
                     value={password}
                     onChange={event => setPassword(event.target.value)}
+                    onKeyDown={event => {
+                      if (event.key === 'Enter') {
+                        handleSubmitPassword();
+                        event.target.blur();
+                      }
+                    }}
                   />
                 </FormControl>
               </Box>
@@ -187,6 +258,12 @@ const EditAccount = () => {
                   <PasswordBar
                     value={confirmPassword}
                     onChange={event => setConfirmPassword(event.target.value)}
+                    onKeyDown={event => {
+                      if (event.key === 'Enter') {
+                        handleSubmitPassword();
+                        event.target.blur();
+                      }
+                    }}
                   />
                 </FormControl>
               </Box>
@@ -196,9 +273,42 @@ const EditAccount = () => {
                 color={'white'}
                 _hover={{ bg: 'blue.500' }}
                 onClick={handleSubmitPassword}
+                isLoading={passwordLoading}
               >
                 Submit
               </Button>
+              <Divider />
+              <Box>
+                <FormControl>
+                  <FormLabel>Email Notifications:</FormLabel>
+                </FormControl>
+                <ButtonGroup w='full' isAttached>
+                  <Button
+                  loadingText="Off"
+                  bg={'blue.400'}
+                  color={'white'}
+                  _hover={{ bg: 'blue.500' }}
+                  onClick={() => handleEmailNotifications(false)}
+                  w='full'
+                  isDisabled={!emailNotifications}
+                  isLoading={emailNotificationsLoading}
+                >
+                  Off
+                </Button>
+                <Button
+                  loadingText="On"
+                  bg={'blue.400'}
+                  color={'white'}
+                  _hover={{ bg: 'blue.500' }}
+                  onClick={() => handleEmailNotifications(true)}
+                  w='full'
+                  isDisabled={emailNotifications}
+                  isLoading={emailNotificationsLoading}
+                >
+                  On
+                </Button>
+                </ButtonGroup>
+              </Box>
               <Divider />
               <Box>
                 <FormControl>

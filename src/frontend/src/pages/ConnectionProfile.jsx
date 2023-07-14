@@ -1,5 +1,18 @@
 import React from 'react';
-import { AspectRatio, Box, Card, CardBody, CardHeader, Center, Flex, Heading, Image, Spinner, Text, useToast } from '@chakra-ui/react';
+import {
+  AspectRatio,
+  Box,
+  Card,
+  CardBody,
+  CardHeader,
+  Center,
+  Flex,
+  Heading,
+  Image,
+  Spinner,
+  Text,
+  useToast
+} from '@chakra-ui/react';
 
 import { useParams } from 'react-router-dom';
 
