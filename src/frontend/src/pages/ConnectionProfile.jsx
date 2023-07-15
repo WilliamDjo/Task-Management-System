@@ -1,16 +1,8 @@
 import React from 'react';
 import {
-  AspectRatio,
   Box,
-  Card,
-  CardBody,
-  CardHeader,
   Center,
-  Flex,
-  Heading,
-  Image,
   Spinner,
-  Text,
   useToast
 } from '@chakra-ui/react';
 
@@ -18,7 +10,7 @@ import { useParams } from 'react-router-dom';
 
 import ConnectionsBar from '../components/ConnectionsBar';
 import { fetchBackend } from '../fetch';
-import logo from '../logo.svg';
+import ProfileCard from '../components/ProfileCard';
 
 const ConnectionProfile = () => {
   const [name, setName] = React.useState('Name');
@@ -29,6 +21,13 @@ const ConnectionProfile = () => {
   const { email } = useParams();
 
   const toast = useToast();
+
+  const info = [
+    {
+      title: 'Organisation',
+      attribute: organisation
+    }
+  ]
 
   React.useEffect(() => {
     const successGetConnectionProfile = (data) => {
@@ -43,25 +42,12 @@ const ConnectionProfile = () => {
 
   const connectionProfileLoaded = () => {
     return (
-      <Card>
-        <CardHeader>
-          <Heading fontSize="lg">{name}</Heading>
-        </CardHeader>
-        <CardBody>
-          <Flex>
-            <Box>
-              <AspectRatio ratio={1} minW="150px">
-                <Image src={logo} borderRadius="full"></Image>
-              </AspectRatio>
-            </Box>
-            <Box padding="10px">
-              <Text>User Name: {username}</Text>
-              <Text>Email: {email}</Text>
-              <Text>Organisation: {organisation}</Text>
-            </Box>
-          </Flex>
-        </CardBody>
-      </Card>
+      <ProfileCard
+        name={name}
+        username={username}
+        email={email}
+        info={info}
+      />
     );
   }
 

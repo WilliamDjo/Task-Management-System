@@ -20,6 +20,7 @@ import MyConnections from './pages/MyConnections';
 import ConnectionProfile from './pages/ConnectionProfile';
 import MyProfile from './pages/MyProfile';
 import PendingConnections from './pages/PendingConnections';
+import PendingProfile from './pages/PendingProfile';
 
 function App () {
   return (
@@ -45,7 +46,10 @@ function App () {
               <Route path=":email" element={<ConnectionProfile />} />
             </Route>
             <Route path="add" element={<AddConnection />} />
-            <Route path="pending" element={<PendingConnections />} />
+            <Route path="pending" element={<Outlet />}>
+              <Route index element={<PendingConnections />} />
+              <Route path=":email" element={<PendingProfile />} />
+            </Route>
           </Route>
 
           <Route path="*" element={<PageNotFound />} />

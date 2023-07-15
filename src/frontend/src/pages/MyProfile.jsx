@@ -35,7 +35,7 @@ const MyProfile = () => {
       attribute: organisation
     }, {
       title: 'Email Notifications',
-      attribute: emailNotifications
+      attribute: emailNotifications ? 'On' : 'Off'
     }
   ]
 

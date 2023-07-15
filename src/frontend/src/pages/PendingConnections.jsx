@@ -62,7 +62,7 @@ const PendingConnections = () => {
       email,
       value
     }
-    fetchBackend('/user/respondconnection', 'POST', body, toast, successRespondConnection, successRespondConnection);
+    fetchBackend('/user/respondconnection', 'POST', body, toast, successRespondConnection);
   }
 
   const pendingConnectionsLoaded = () => {
