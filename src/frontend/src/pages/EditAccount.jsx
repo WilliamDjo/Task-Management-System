@@ -57,13 +57,17 @@ const EditAccount = () => {
       setUsernameLoading(false);
     }
 
+    const failUsername = () => {
+      setUsernameLoading(false);
+    }
+
     setUsernameLoading(true);
     const token = localStorage.getItem('token');
     const body = {
       token,
       username
     }
-    fetchBackend('/update/username', 'PUT', body, toast, successUsername);
+    fetchBackend('/update/username', 'PUT', body, toast, successUsername, failUsername);
   };
 
   const handleSubmitEmail = () => {
@@ -79,6 +83,10 @@ const EditAccount = () => {
       setEmailLoading(false);
     }
 
+    const failEmail = () => {
+      setEmailLoading(false);
+    }
+
     if (email === confirmEmail) {
       const token = localStorage.getItem('token');
       const body = {
@@ -86,7 +94,7 @@ const EditAccount = () => {
         email
       }
       setEmailLoading(true);
-      fetchBackend('/update/email', 'PUT', body, toast, successEmail);
+      fetchBackend('/update/email', 'PUT', body, toast, successEmail, failEmail);
     } else {
       toast({
         title: 'Email must match confirm email to change.',
@@ -108,6 +116,10 @@ const EditAccount = () => {
       setPasswordLoading(false);
     }
 
+    const failPassword = () => {
+      setPasswordLoading(false);
+    }
+
     if (password === confirmPassword) {
       const token = localStorage.getItem('token');
       const body = {
@@ -115,7 +127,7 @@ const EditAccount = () => {
         password
       }
       setPasswordLoading(true);
-      fetchBackend('/update/password', 'PUT', body, toast, successPassword);
+      fetchBackend('/update/password', 'PUT', body, toast, successPassword, failPassword);
     } else {
       toast({
         title: 'Password must match confirm password to change.',
