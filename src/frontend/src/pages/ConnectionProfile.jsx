@@ -16,7 +16,6 @@ import {
   Tr,
   useToast
 } from '@chakra-ui/react';
-
 import { useParams } from 'react-router-dom';
 
 import ConnectionsBar from '../components/ConnectionsBar';
@@ -26,7 +25,7 @@ import ProfileCard from '../components/ProfileCard';
 const ConnectionProfile = () => {
   const [name, setName] = React.useState('Name');
   const [username, setUsername] = React.useState('username');
-  const [organisation, setOrganisation] = React.useState('Example Company');
+  const [organization, setOrganization] = React.useState('Example Company');
   const [loaded, setLoaded] = React.useState(false);
   const [tasks, setTasks] = React.useState([
     {
@@ -42,16 +41,16 @@ const ConnectionProfile = () => {
 
   const info = [
     {
-      title: 'Organisation',
-      attribute: organisation
+      title: 'Organization',
+      attribute: organization
     }
   ]
 
   React.useEffect(() => {
     const successGetConnectionProfile = (data) => {
-      setName(data.Data.name);
+      setName(`${data.Data.first_name} ${data.Data.last_name}`);
       setUsername(data.Data.username);
-      setOrganisation(data.Data.organisation);
+      setOrganization(data.Data.organization);
       setTasks(data.Data.tasks);
       setLoaded(true);
     }

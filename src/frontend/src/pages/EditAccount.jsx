@@ -16,8 +16,8 @@ import {
   Stack,
   useToast,
 } from '@chakra-ui/react';
-import logo from '../logo.svg';
 
+import logo from '../logo.svg';
 import ProfileBar from '../components/ProfileBar';
 import PasswordBar from '../components/PasswordBar/PasswordBar';
 import { fetchBackend } from '../fetch';

@@ -15,8 +15,9 @@ import {
   Text,
   useToast
 } from '@chakra-ui/react';
-import { fetchBackend } from '../fetch';
 import { Link as RouteLink } from 'react-router-dom';
+
+import { fetchBackend } from '../fetch';
 
 const PendingConnections = () => {
   const [connections, setConnections] = React.useState([

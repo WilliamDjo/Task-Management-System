@@ -16,7 +16,7 @@ const MyProfile = () => {
   const [username, setUsername] = React.useState('username');
   const [email, setEmail] = React.useState('email@example.com');
   const [connections, setConnections] = React.useState(1);
-  const [organisation, setOrganisation] = React.useState('Example Company');
+  const [organization, setOrganization] = React.useState('Example Company');
   const [emailNotifications, setEmailNotifications] = React.useState(true);
 
   const [loaded, setLoaded] = React.useState(false);
@@ -31,8 +31,8 @@ const MyProfile = () => {
       title: 'Connections',
       attribute: connections
     }, {
-      title: 'Organisation',
-      attribute: organisation
+      title: 'Organization',
+      attribute: organization
     }, {
       title: 'Email Notifications',
       attribute: emailNotifications ? 'On' : 'Off'
@@ -46,8 +46,9 @@ const MyProfile = () => {
       setConnections(data.Data.connections);
       setName(`${data.Data.first_name} ${data.Data.last_name}`);
       setUsername(data.Data.username);
-      setOrganisation(data.Data.organisation);
+      setOrganization(data.Data.organization);
       setLoaded(true);
+      console.log(data)
     }
     const token = localStorage.getItem('token');
     fetchBackend('/getuserprofile', 'POST', { token }, toast, successGetProfile);
