@@ -23,12 +23,14 @@ const PendingConnections = () => {
   const [connections, setConnections] = React.useState([
     {
       username: 'Jonathan',
-      name: 'Jonathan Sinani',
+      first_name: 'Jonathan',
+      last_name: 'Sinani',
       email: 'jonathan@jonathan.com'
     },
     {
       username: 'Jonathan2',
-      name: 'Jonathan2 Sinani',
+      first_name: 'Jonathan2',
+      last_name: 'Sinani',
       email: 'jonathan2@jonathan.com'
     }
   ]);
@@ -76,7 +78,7 @@ const PendingConnections = () => {
                 <CardBody>
                   <Heading fontSize="lg">
                     <LinkOverlay as={RouteLink} to={`/connections/pending/${connection.email}`}>
-                    {connection.name}
+                    {connection.first_name} {connection.last_name}
                     </LinkOverlay>
                   </Heading>
                   <Text>{connection.username}</Text>

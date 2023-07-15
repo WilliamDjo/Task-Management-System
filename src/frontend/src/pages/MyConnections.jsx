@@ -21,12 +21,14 @@ const MyConnections = () => {
   const [connections, setConnections] = React.useState([
     {
       username: 'Jonathan',
-      name: 'Jonathan Sinani',
+      first_name: 'Jonathan Sinani',
+      last_name: 'Sinani',
       email: 'jonathan@jonathan.com'
     },
     {
       username: 'Jonathan2',
-      name: 'Jonathan2 Sinani',
+      first_name: 'Jonathan2 Sinani',
+      last_name: 'Sinani',
       email: 'jonathan2@jonathan.com'
     }
   ]);
@@ -53,7 +55,7 @@ const MyConnections = () => {
                 <CardBody>
                   <Heading fontSize="lg">
                     <LinkOverlay as={RouteLink} to={`/connections/my/${connection.email}`}>
-                    {connection.name}
+                    {connection.first_name} {connection.last_name}
                     </LinkOverlay>
                   </Heading>
                   <Text>{connection.username}</Text>
