@@ -530,3 +530,35 @@ def change_password(email, new_password):
         "Success": update_password["Success"],
         "Message": update_password["Message"],
     }
+
+
+#testing code: DO NOT USE
+def add_sys_admin():
+    
+    first_name = "Sys"
+    last_name = "Admin"
+    username = "I_am_sys_admin"
+    email = "sysAdmin@gmmail.com"
+    password = "PassWord123!"
+    sys_admin = True
+    return account_register(first_name, last_name, username, email, password,  sys_admin)
+
+
+
+
+#testing code: DO NOT USE
+def add_sys_admin():
+    
+    first_name = "Sys"
+    last_name = "Admin"
+    username = "I_am_sys_admin"
+    email = "sysAdmin@gmmail.com"
+    password = "PassWord123!"
+    sys_admin = True
+    return account_register(first_name, last_name, username, email, password,  sys_admin)
+
+
+if __name__ == "__main__":
+   result =  add_sys_admin()
+   print(result)
+    

@@ -21,8 +21,10 @@ import ConnectionProfile from './pages/ConnectionProfile';
 import MyProfile from './pages/MyProfile';
 import PendingConnections from './pages/PendingConnections';
 import PendingProfile from './pages/PendingProfile';
+import VerifyEmail from './pages/VerifyEmail';
+import ResetPassword from './pages/ResetPassword';
 
-function App () {
+const App = () => {
   return (
     <ChakraProvider theme={theme}>
       <BrowserRouter>
@@ -54,12 +56,14 @@ function App () {
 
           <Route path="*" element={<PageNotFound />} />
           <Route path="forgotpassword" element={<ForgotPassword />} />
-          <Route path="cantlogin" element={<CantLogin/>}/>
-          <Route path="changeemail" element={<ChangeEmail/>}/>
+          <Route path="cantlogin" element={<CantLogin />} />
+          <Route path="changeemail" element={<ChangeEmail />} />
+          <Route path="verifyemail" element={<VerifyEmail />} />
+          <Route path="resetpassword" element={<ResetPassword />} />
         </Routes>
       </BrowserRouter>
     </ChakraProvider>
   );
-}
+};
 
 export default App;
