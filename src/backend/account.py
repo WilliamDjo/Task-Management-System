@@ -280,7 +280,7 @@ def account_login(email, password):
     # Return token
     login_token = tokens.generate_jwt_token(email)
 
-    active_users[email] = login_token  # Make a function for this HERE
+    active_users[email] = login_token 
 
     return {
         "Success": True,
@@ -360,11 +360,9 @@ def update_password_account(new_password, token):
     result = db.updateUserInfo(email, new_user_dict)
     return {"Success": result["Success"], "Message": result["Message"]}
 
-
 """
 Update email on backened
 """
-
 
 def update_email_account(new_email, token):
     global active_users
