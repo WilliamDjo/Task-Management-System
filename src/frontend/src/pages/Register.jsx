@@ -24,7 +24,7 @@ import {
   useNavigate,
 } from 'react-router-dom';
 import PasswordBar from '../components/PasswordBar/PasswordBar';
-// import { fetchBackend } from '../fetch';
+import { fetchBackend } from '../fetch';
 
 const Register = () => {
   const [email, setEmail] = useState('');
@@ -39,34 +39,6 @@ const Register = () => {
   const [passwordMismatchError, setPasswordMismatchError] = useState(false);
   const navigate = useNavigate();
 
-  // const [showPassword, setShowPassword] = useState(false);
-  // const handleRegister = async () => {
-  //   try {
-  //     const response = await fetch('/signup', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({
-  //         first_name,
-  //         last_name,
-  //         username,
-  //         email,
-  //         password,
-  //       }),
-  //     });
-
-  //     if (response.ok) {
-  //       // Login successful, perform necessary actions
-  //       console.log('Register successful');
-  //     } else {
-  //       // Login failed, handle the error
-  //       console.error('Register failed');
-  //     }
-  //   } catch (error) {
-  //     console.error('An error occurred while logging in', error);
-  //   }
-  // };
   const handleRegister = async () => {
     if (password !== confirmPassword) {
       // Password and Confirm Password mismatch
@@ -74,68 +46,52 @@ const Register = () => {
       setRegistrationError(false);
       setRegistrationSuccess(false);
       console.error('Password and Confirm Password mismatch');
-    }
-    // // Get existing user accounts from local storage
-    // const existingAccounts =
-    //   JSON.parse(localStorage.getItem('userAccounts')) || [];
+    } else {
+      // Create user object
+      const newUser = {
+        email,
+        password,
+        first_name,
+        last_name,
+        username,
+        sys_admin,
+      };
 
-    // // Check if user already exists
-    // const userExists = existingAccounts.some(
-    //   user => user.email === email || user.username === username
-    // );
-    // Create user object
-    const newUser = {
-      email,
-      password,
-      first_name,
-      last_name,
-      username,
-      sys_admin,
-    };
-    // // Add the new user to existing user accounts
-    // const updatedAccounts = [...existingAccounts, newUser];
+      try {
+        await fetchBackend(
+          '/signup',
+          'POST',
+          newUser,
+          null,
+          async data => {
+            const { token, sys_admin } = data;
 
-    // // Save the updated user accounts to local storage
-    // localStorage.setItem('userAccounts', JSON.stringify(updatedAccounts));
+            // Store the token in localStorage or sessionStorage
+            localStorage.setItem('token', token);
+            // Store the sys_admin value in state
+            setSysAdmin(sys_admin);
 
-    // console.log('User account saved to local storage');
-    try {
-      const response = await fetch('http://127.0.0.1:5000/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newUser),
-      });
+            console.log('User account created and token received');
+            // Redirect the user based on the sys_admin value
+            if (sys_admin) {
+              navigate('/admin');
+            } else {
+              navigate('/dashboard');
+            }
 
-      if (response.ok) {
-        // Registration successful, receive the token from the backend
-        const data = await response.json();
-        const { token, sys_admin } = data;
-
-        // Store the token in localStorage or sessionStorage
-        localStorage.setItem('token', token);
-        // Store the sys_admin value in state
-        setSysAdmin(sys_admin);
-
-        console.log('User account created and token received');
-        // Redirect the user based on the sys_admin value
-        if (sys_admin) {
-          navigate('/admin');
-        } else {
-          navigate('/dashboard');
-        }
-
-        // Redirect the user to the login page
-        // You can use a router library like react-router-dom for navigation
-        // Example:
-        // history.push('/login');
-      } else {
-        // Registration failed
-        console.error('Registration failed');
+            // Redirect the user to the login page
+            // You can use a router library like react-router-dom for navigation
+            // Example:
+            // history.push('/login');
+          },
+          () => {
+            // Registration failed
+            console.error('Registration failed');
+          }
+        );
+      } catch (error) {
+        console.error('Error registering user', error);
       }
-    } catch (error) {
-      console.error('Error registering user', error);
     }
   };
 

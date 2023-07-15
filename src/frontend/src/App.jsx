@@ -14,8 +14,10 @@ import PageNotFound from './pages/PageNotFound';
 import CantLogin from './pages/CantLogin';
 import ForgotPassword from './pages/ForgotPassword';
 import ChangeEmail from './pages/ChangeEmail';
+import VerifyEmail from './pages/VerifyEmail';
+import ResetPassword from './pages/ResetPassword';
 
-function App () {
+const App = () => {
   return (
     <ChakraProvider theme={theme}>
       <BrowserRouter>
@@ -34,12 +36,14 @@ function App () {
 
           <Route path="*" element={<PageNotFound />} />
           <Route path="forgotpassword" element={<ForgotPassword />} />
-          <Route path="cantlogin" element={<CantLogin/>}/>
-          <Route path="changeemail" element={<ChangeEmail/>}/>
+          <Route path="cantlogin" element={<CantLogin />} />
+          <Route path="changeemail" element={<ChangeEmail />} />
+          <Route path="verifyemail" element={<VerifyEmail />} />
+          <Route path="resetpassword" element={<ResetPassword />} />
         </Routes>
       </BrowserRouter>
     </ChakraProvider>
   );
-}
+};
 
 export default App;
