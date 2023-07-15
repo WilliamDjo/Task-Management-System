@@ -741,5 +741,6 @@ class UpdateNotifsTests(unittest.TestCase):
         response_data = json.loads(response.data)
         self.assertEqual(response_data['Success'], True)
 
+
 if __name__ == '__main__':
     unittest.main()

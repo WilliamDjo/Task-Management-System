@@ -1,3 +1,4 @@
+from email.message import Message
 import hashlib
 from json.tool import main
 import sys
@@ -183,17 +184,24 @@ def create_task(data: dict):
 
     task_priority = data["priority"]
     task_priority = int(task_priority)
-    #TODO: Check priority handling
+
     if task_priority < 1 or task_priority > 3:
         return {
             "Success": False,
             "Message": "The priority is ranked on 3"
         }
-
     
-    # task_master = user['email']
+    task_master = user['Data']['email']
 
     task_labels = data["labels"]
+
+    if (len(task_labels) > 5):
+        return {
+            "Success": False,
+            "Message": "Too many lables: limited to 5 per task"
+        }
+
+
     valid_labels = [label for label in task_labels if is_label_valid(label)]
             
 
@@ -208,7 +216,7 @@ def create_task(data: dict):
         "estimation_spent_hrs": task_estimate,
         "actual_time_hr": task_actual,
         "priority": task_priority,
-        "task_master": "aks@email.com",
+        "task_master": task_master,
         "labels": valid_labels,
     }
 
@@ -290,8 +298,84 @@ def update_actual(task_id: str, new_actual: int):
     return db_tasks.updateTaskInfo(task_id,  {"actual_time_hr": new_actual})
 
 def update_priority(task_id: str, new_priority: int):
-    pass
-    #TODO: confirm the priorty ranks
+    
+    if new_priority < 1 or new_priority > 3:
+        
+        return {
+            "Success": False, 
+            "Message": "Priority is randked on 3, update failed"        
+        }
+
+    return db_tasks.updateTaskInfo(task_id,  {"priority": new_priority})
+    
+def update_details(task_id: str, new_data: dict):
+
+    #title 
+    if not is_title_valid(new_data['title']):
+        return {
+            "Success": False,
+            "Message": "Invalid Title Format, needs to be > 2 and  < 100"        
+        }
+
+    #description
+    if not is_description_valid(new_data['description']):
+        return {
+            "Success": False,
+            "Message": "Invalid Description, too long"        
+        }
+
+    #deadline #TODO
+
+    #Progress
+    if not is_progress_status(new_data['progress']):
+        return {
+            "Success": False,
+            "Message": "Invalid Progress status"        
+        }
+    
+    #Assignee TODO
+    # if not is_assignee_valid(new_data['assignee']):
+    #     return {
+    #         "Success": False,
+    #         "Message": "Invalid assignee"        
+    #     }
+    # #TODO call email notif
+
+    #cost_pr_hr
+    if new_data['cost_per_hr'] < 0:
+        return {
+            "Success": False, 
+            "Message": "Cost/hr cannot be negative"
+        }
+    
+    #Estimate
+    if new_data['estimation_spent_hrs'] < 0:
+        return {
+            "Success": False, 
+            "Message": "estimation_spent_hrs cannot be negative"
+        }
+
+    
+    #Actual Time
+    if new_data['actual_time_hr'] < 0:
+        return {
+            "Success": False, 
+            "Message": "actual_time_hr cannot be negative"
+        }
+
+    #Priority
+    if new_data['priority'] < 1 or new_data['priority'] > 3:
+        
+        return {
+            "Success": False, 
+            "Message": "Priority is randked on 3, update failed"        
+        }
+
+    #labels: TODO
+
+
+    return db_tasks.updateTaskInfo(task_id, new_data)
+
 
 '''
 Delete
@@ -311,8 +395,6 @@ def assign_task(task_id:str, assignee_email:str):
     #TODO: send email
 
     update_task_assignee(task_id, assignee_email)
-
-
 
 '''
 LABELS

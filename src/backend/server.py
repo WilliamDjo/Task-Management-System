@@ -4,7 +4,7 @@ from flask import Flask, request, jsonify
 import sys
 import os
 import account
-from backend.task_sys import create_task
+from backend.task_sys import create_task, update_details, update_task_title
 from flask_cors import CORS
 
 
@@ -208,6 +208,13 @@ Task based
 def server_create_task():
     data = request.json
     result = create_task(data)
+    return jsonify(result)
+
+
+@app.route("/task/update/<task_id>", methods=["PUT"])
+def server_update_task(task_id):
+    data = request.json
+    result = update_details(task_id, data)
     return jsonify(result)
 
 

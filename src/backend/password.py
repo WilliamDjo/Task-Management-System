@@ -52,6 +52,7 @@ def check_otp(email, otp):
 
 
 def expire_otp(email):
+    global reset_otps
     reset_otps = [item for item in reset_otps if item.get("email") != email]
 
 
