@@ -55,7 +55,6 @@ def clear_db():
 
 class CreateTaskTestCase(unittest.TestCase):
     
-    
     def test_create_task_with_valid_data(self):
         clear_db()
         token = test_regiser()
