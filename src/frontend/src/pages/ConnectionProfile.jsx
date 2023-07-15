@@ -27,7 +27,7 @@ const ConnectionProfile = () => {
   const [name, setName] = React.useState('Name');
   const [username, setUsername] = React.useState('username');
   const [organisation, setOrganisation] = React.useState('Example Company');
-  const [loaded, setLoaded] = React.useState(true);
+  const [loaded, setLoaded] = React.useState(false);
   const [tasks, setTasks] = React.useState([
     {
       id: 100,
@@ -112,7 +112,7 @@ const ConnectionProfile = () => {
     <ConnectionsBar myConnections>
       <Box>
         {loaded ? connectionProfileLoaded() : <Center><Spinner /></Center>}
-        {loaded ? connectionAssignedTaskListLoaded() : <Center><Spinner /></Center>}
+        {loaded && connectionAssignedTaskListLoaded()}
       </Box>
     </ConnectionsBar>
   );

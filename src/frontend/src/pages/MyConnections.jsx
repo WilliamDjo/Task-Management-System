@@ -30,7 +30,7 @@ const MyConnections = () => {
       email: 'jonathan2@jonathan.com'
     }
   ]);
-  const [loaded, setLoaded] = React.useState(true);
+  const [loaded, setLoaded] = React.useState(false);
 
   const toast = useToast();
 

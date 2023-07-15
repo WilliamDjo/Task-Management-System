@@ -18,7 +18,7 @@ const PendingProfile = () => {
   const [name, setName] = React.useState('Name');
   const [username, setUsername] = React.useState('username');
   const [organisation, setOrganisation] = React.useState('Example Company');
-  const [loaded, setLoaded] = React.useState(true);
+  const [loaded, setLoaded] = React.useState(false);
 
   const { email } = useParams();
   const navigate = useNavigate();
