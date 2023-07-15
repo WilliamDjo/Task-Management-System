@@ -1,8 +1,19 @@
 import React from 'react';
 import {
   Box,
+  Card,
+  CardBody,
   Center,
+  Heading,
+  Hide,
   Spinner,
+  Table,
+  TableContainer,
+  Tbody,
+  Td,
+  Th,
+  Thead,
+  Tr,
   useToast
 } from '@chakra-ui/react';
 
@@ -17,6 +28,13 @@ const ConnectionProfile = () => {
   const [username, setUsername] = React.useState('username');
   const [organisation, setOrganisation] = React.useState('Example Company');
   const [loaded, setLoaded] = React.useState(true);
+  const [tasks, setTasks] = React.useState([
+    {
+      id: 100,
+      title: 'Task',
+      deadline: '2023-07-15 09:00:00 AM'
+    }
+  ]);
 
   const { email } = useParams();
 
@@ -34,6 +52,7 @@ const ConnectionProfile = () => {
       setName(data.Data.name);
       setUsername(data.Data.username);
       setOrganisation(data.Data.organisation);
+      setTasks(data.Data.tasks);
       setLoaded(true);
     }
     const token = localStorage.getItem('token');
@@ -51,10 +70,49 @@ const ConnectionProfile = () => {
     );
   }
 
+  const connectionAssignedTaskListLoaded = () => {
+    return (
+      <Card mt='4'>
+        <CardBody>
+          <Heading fontSize='lg' textTransform='uppercase'>
+            Assigned Task List
+          </Heading>
+          <TableContainer>
+            <Table variant='simple'>
+              <Thead>
+                <Tr>
+                  <Hide below='sm'>
+                    <Th>ID</Th>
+                  </Hide>
+                  <Th>Title</Th>
+                  <Th isNumeric>Deadline</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {tasks.map((task, index) => {
+                  return (
+                    <Tr key={index}>
+                      <Hide below='sm'>
+                        <Td>{task.id}</Td>
+                      </Hide>
+                      <Td>{task.title}</Td>
+                      <Td isNumeric>{task.deadline}</Td>
+                    </Tr>
+                  );
+                })}
+              </Tbody>
+            </Table>
+          </TableContainer>
+        </CardBody>
+      </Card>
+    )
+  }
+
   return (
     <ConnectionsBar myConnections>
       <Box>
         {loaded ? connectionProfileLoaded() : <Center><Spinner /></Center>}
+        {loaded ? connectionAssignedTaskListLoaded() : <Center><Spinner /></Center>}
       </Box>
     </ConnectionsBar>
   );
