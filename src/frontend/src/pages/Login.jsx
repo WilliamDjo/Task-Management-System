@@ -25,6 +25,7 @@ import {
 } from 'react-router-dom';
 // import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import PasswordBar from '../components/PasswordBar/PasswordBar';
+import { fetchBackend } from '../fetch';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -44,35 +45,40 @@ const Login = () => {
     };
 
     try {
-      const response = await fetch('http://127.0.0.1:5000/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      await fetchBackend(
+        '/login',
+        'POST',
+        credentials,
+        null,
+        async data => {
+          const { Token, sys_admin } = data;
+
+          // Store the token and isAdmin status in localStorage
+          if (!Token) {
+            setLoginError(true);
+            setLoginSuccess(false);
+            console.error('Login failed token');
+            console.log(data);
+            console.log(Token);
+          } else {
+            setSysAdmin(sys_admin);
+            localStorage.setItem('token', Token);
+            console.log('Login successful');
+            console.log(Token);
+            if (sys_admin) {
+              navigate('/admin');
+            } else {
+              navigate('/dashboard');
+            }
+          }
         },
-        body: JSON.stringify(credentials),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        // eslint-disable-next-line camelcase
-        const { token, sys_admin } = data;
-
-        // Store the token and isAdmin status in localStorage
-        localStorage.setItem('token', token);
-        setSysAdmin(sys_admin);
-
-        console.log('Login successful');
-        if (sys_admin) {
-          navigate('/admin');
-        } else {
-          navigate('/dashboard');
+        () => {
+          // Login failed, handle the error
+          setLoginError(true);
+          setLoginSuccess(false);
+          console.error('Login failed');
         }
-      } else {
-        // Login failed, handle the error
-        setLoginError(true);
-        setLoginSuccess(false);
-        console.error('Login failed');
-      }
+      );
     } catch (error) {
       console.error('An error occurred while logging in', error);
     }
