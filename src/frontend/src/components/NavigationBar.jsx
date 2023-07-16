@@ -1,7 +1,22 @@
-import { Box, Flex, Heading, Spacer, Text, Tooltip, useToast } from '@chakra-ui/react';
-import { ChatIcon, SettingsIcon } from '@chakra-ui/icons'
+import {
+  Box,
+  Flex,
+  Heading,
+  Spacer,
+  Text,
+  Tooltip,
+  useToast
+} from '@chakra-ui/react';
+import {
+  ChatIcon,
+  SettingsIcon
+} from '@chakra-ui/icons'
 import React from 'react';
-import { Link as RouteLink, useNavigate } from 'react-router-dom';
+import {
+  Link as RouteLink,
+  useNavigate
+} from 'react-router-dom';
+
 import { fetchBackend } from '../fetch';
 
 const NavigationBar = () => {

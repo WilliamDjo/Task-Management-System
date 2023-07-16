@@ -14,7 +14,12 @@ export const fetchBackend = async (route, method, body, toast, onSuccess, onFail
 
   // Only adds a body to the options if it is provided.
   if (!isNone(body)) {
-    options.body = JSON.stringify(body);
+    if ('token' in body) {
+      options.headers.Authorization = `Bearer ${body.token}`;
+    }
+    if (method !== 'GET') {
+      options.body = JSON.stringify(body);
+    }
   }
 
   const response = await fetch(`http://127.0.0.1:5000${route}`, options);
