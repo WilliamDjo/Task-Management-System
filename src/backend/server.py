@@ -5,7 +5,7 @@ from flask import Flask, request, jsonify
 import sys
 import os
 import account
-from backend.task_sys import create_task, delete_task, update_details, update_task_title
+from backend.task_sys import create_task, delete_task, get_all_tasks, get_task_details, update_details, update_task_title
 from flask_cors import CORS
 
 
@@ -223,8 +223,20 @@ def server_delete_task(task_id):
     result = delete_task(token, task_id)
     return jsonify(result)
 
-
 @app.route("/task/get", methods=["GET"])
 def server_get_task_details():
-    data = request.json
-    token = data['token']
+    task_id = request.headers.get('task_id')
+    token = request.headers.get('token')
+
+    result = get_task_details(token, task_id)
+
+    return jsonify(result)
+
+
+@app.route("/task/getAll", methods=["GET"])
+def server_get_all():
+    token = request.headers.get('token')
+    result = get_all_tasks(token)
+    return jsonify(result)
+
+

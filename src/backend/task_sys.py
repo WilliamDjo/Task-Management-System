@@ -522,7 +522,6 @@ def add_label(task_id:str, new_label: str):
     curr_labels.append(new_label)
     db_tasks.updateTaskInfo(task_id, {"labels": curr_labels})
     
-
 def get_task_details(token:str, task_id:str):
 
     #check token
@@ -533,13 +532,21 @@ def get_task_details(token:str, task_id:str):
             "Message": "No user logged in"
         }
 
-    
 
     return db_tasks.getTaskFromID(task_id)
 
+def get_all_tasks(token:str):
 
+    #check token
+    token_result = check_jwt_token(token)
+    if not token_result['Success']:
+        return {
+            "Success": False, 
+            "Message": "No user logged in"
+        }
 
-
+    return db_tasks.getAllTasks()
+    
 
 
 

@@ -25,7 +25,6 @@ def getTaskInfoCollection(db: Database) -> Collection:
 Adds a new task to the task system
 """
 
-
 def addNewTask(data: dict) -> dict:
    db = getDB()
 
@@ -68,7 +67,6 @@ def addNewTask(data: dict) -> dict:
   
    return {"Success": True, "Task_id": task_id }
 
-
 def getTaskFromID(task_id: str) -> dict:
    db = getDB()
 
@@ -86,7 +84,6 @@ def getTaskFromID(task_id: str) -> dict:
 
 
    return {"Success": True, "Message": "Task Found", "Data": task}
-
 
 def updateTaskInfo(task_id: str, data: dict) -> dict:
     # Get the database
@@ -108,7 +105,6 @@ def updateTaskInfo(task_id: str, data: dict) -> dict:
     result = TaskSystemCollection.update_one({"id": task_id}, {"$set": data})
    
     return {"Success": True, "Message": "Update successfull"}
-
 
 def deleteTask(task_id: str) -> dict:
    # Get the database
@@ -135,7 +131,6 @@ def deleteTask(task_id: str) -> dict:
    # Return a dictionary indicating success
    return {"Success": True, "Message": "Task deleted successfully"}
 
-
 def getAllTasks() -> dict:
    # Get the database
    db = getDB()
@@ -149,7 +144,11 @@ def getAllTasks() -> dict:
    data = json.loads(json_util.dumps(task_infos))
 
 
-   return data
+   return {
+
+       "Success": True,
+       "Data": data
+   }
 
 
 """
