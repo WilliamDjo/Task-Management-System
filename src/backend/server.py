@@ -241,6 +241,31 @@ def server_delete_task(task_id):
     return jsonify(result)
 
 
+"""
+Connections based
+"""
+
+
+@app.route("/connections/pendingconnections", methods=["GET"])
+def get_pending_connections():
+    return
+
+
+@app.route("/connections/userconnections", methods=["GET"])
+def get_all_connections():
+    return
+
+
+@app.route("/connections/respond", methods=["POST"])
+def respond_to_connections():
+    return
+
+
+@app.route("/connections/request", methods=["POST"])
+def send_connection_request():
+    return
+
+
 if __name__ == "__main__":
     # test_first = "adam"
     # test_last = "driver"
