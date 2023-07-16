@@ -98,7 +98,7 @@ def isValidUser(email: str, password: str) -> dict:
     # Check if the provided password matches the stored password
     if user["password"] == password:
         # If it matches, return a dictionary indicating success
-        return {"Success": True, "User": user}
+        return {"Success": True, "User": user, "Message":"Password matches"}
     else:
         # If it does not match, return a dictionary indicating failure
         return {"Success": False, "Message": "Incorrect password or email"}
@@ -113,9 +113,9 @@ def checkUser(email: str) -> dict:
     # Attempt to retrieve the user with the given email
     user = UserInfoCollection.find_one({"email": email})
 
-    # If no user was found, return a dictionary indicating failure
+    # If no user was found, return a dictionary indicating failure TODO
     if user is None:
-        return {"Success": True, "Message": ""}
+        return {"Success": True, "Message": "New User"}
     else:
         return {"Success": False, "Message": "User already exists", "Data": user}
 

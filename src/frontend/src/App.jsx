@@ -14,13 +14,15 @@ import PageNotFound from './pages/PageNotFound';
 import CantLogin from './pages/CantLogin';
 import ForgotPassword from './pages/ForgotPassword';
 import ChangeEmail from './pages/ChangeEmail';
+import VerifyEmail from './pages/VerifyEmail';
+import ResetPassword from './pages/ResetPassword';
 import Connections from './pages/Connections';
 import ConnectionsBar from './components/ConnectionsBar';
 import AddConnection from './pages/AddConnection';
 import MyConnections from './pages/MyConnections';
 import ConnectionProfile from './pages/ConnectionProfile';
 
-function App () {
+const App = () => {
   return (
     <ChakraProvider theme={theme}>
       <BrowserRouter>
@@ -43,17 +45,22 @@ function App () {
               <Route path=":email" element={<ConnectionProfile />} />
             </Route>
             <Route path="add" element={<AddConnection />} />
-            <Route path="pending" element={<ConnectionsBar pendingConnections />} />
+            <Route
+              path="pending"
+              element={<ConnectionsBar pendingConnections />}
+            />
           </Route>
 
           <Route path="*" element={<PageNotFound />} />
           <Route path="forgotpassword" element={<ForgotPassword />} />
-          <Route path="cantlogin" element={<CantLogin/>}/>
-          <Route path="changeemail" element={<ChangeEmail/>}/>
+          <Route path="cantlogin" element={<CantLogin />} />
+          <Route path="changeemail" element={<ChangeEmail />} />
+          <Route path="verifyemail" element={<VerifyEmail />} />
+          <Route path="resetpassword" element={<ResetPassword />} />
         </Routes>
       </BrowserRouter>
     </ChakraProvider>
   );
-}
+};
 
 export default App;
