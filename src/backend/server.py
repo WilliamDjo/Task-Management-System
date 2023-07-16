@@ -53,6 +53,7 @@ def login():
     }
     return jsonify(to_return)
 
+
 @app.route("/logout", methods=["POST"])
 def logout():
     # Request
@@ -63,6 +64,7 @@ def logout():
         "Message": status["Message"],
     }
     return jsonify(to_return)
+
 
 @app.route("/update/username", methods=["PUT"])
 def update_useranme():
@@ -75,9 +77,11 @@ def update_useranme():
     }
     return jsonify(to_return)
 
+
 """
 Update email wrapper function
 """
+
 
 @app.route("/update/email", methods=["PUT"])
 def update_email():
@@ -91,9 +95,11 @@ def update_email():
     }
     return jsonify(to_return)
 
+
 """
 Update password
 """
+
 
 @app.route("/update/password", methods=["PUT"])
 def update_password():
@@ -106,7 +112,10 @@ def update_password():
     }
     return jsonify(to_return)
 
+
 """Update notificitons Set true"""
+
+
 @app.route("/update/notifications", methods=["PUT"])
 def server_update_notifications_true():
     token = request.json["token"]
@@ -117,6 +126,7 @@ def server_update_notifications_true():
         "Message": status["Message"],
     }
     return jsonify(to_return)
+
 
 @app.route("/getuserprofile", methods=["POST"])
 def getuserprofile():
@@ -130,6 +140,7 @@ def getuserprofile():
     }
     return jsonify(to_return)
 
+
 @app.route("/getallusers", methods=["POST"])
 def getallusers():
     token = request.json["token"]
@@ -140,6 +151,7 @@ def getallusers():
         "Data": status["Data"],
     }
     return jsonify(to_return)
+
 
 @app.route("/admin/reset", methods=["PUT"])
 def server_admin_reset_password():
@@ -154,6 +166,7 @@ def server_admin_reset_password():
     }
     return jsonify(to_return)
 
+
 @app.route("/admin/delete", methods=["DELETE"])
 def server_admin_delete_email():
     token = request.json["token"]
@@ -165,6 +178,7 @@ def server_admin_delete_email():
         "Message": status["Message"],
     }
     return jsonify(to_return)
+
 
 @app.route("/reset/password", methods=["PUT"])
 def reset_password():
@@ -201,9 +215,12 @@ def reset_account():
     }
     return jsonify(to_return)
 
-'''
+
+"""
 Task based
-'''
+"""
+
+
 @app.route("/task/create", methods=["POST"])
 def server_create_task():
     data = request.json
@@ -218,16 +235,13 @@ def server_update_task(task_id):
     return jsonify(result)
 
 
-@app.route("/task/delete/<task_id>", methods=['DELETE'])
+@app.route("/task/delete/<task_id>", methods=["DELETE"])
 def server_delete_task(task_id):
-
     result = delete_task(task_id)
     return jsonify(result)
 
 
 if __name__ == "__main__":
-    
-    
     # test_first = "adam"
     # test_last = "driver"
     # test_password = "Password123!"
