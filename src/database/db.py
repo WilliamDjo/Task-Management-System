@@ -66,7 +66,12 @@ def addNewUser(data: dict) -> dict:
         "notifications": False,
         "image": Binary(bytes(0)),
         "organization_name": "",
-        "connections": 1,
+        "connectionCount": 1,
+        "connections": {
+            "connections": [],
+            "connectionRequests": [],
+            "connectionReceived": [],
+        },
     }
 
     # Loop over the keys in the input data
@@ -288,6 +293,204 @@ def getAllUserInformation() -> list:
     merged_data = json.loads(json_util.dumps(merged_data))
 
     return merged_data
+
+
+# email -> the user sending the request
+# userConnection -> the user receiving the request
+def addNewConnection(email: str, userConnection: str) -> dict:
+    # Get the database
+    db = getDB()
+
+    # Get the collection object for 'UserInfo' from the database
+    UserInfoCollection = getUserInfoCollection(db)
+
+    # Attempt to retrieve the user with the given old email
+    userInfo_A = UserInfoCollection.find_one({"email": email})
+    userInfo_B = UserInfoCollection.find_one({"email": userConnection})
+
+    # If no user was found, return a dictionary indicating failure
+    if userInfo_A is None or userInfo_B is None:
+        return {"Success": False, "Message": "No user found with the given email"}
+
+    id_A = userInfo_A["_id"]
+    id_B = userInfo_B["_id"]
+
+    UserProfileCollection = getUserProfileCollection(db)
+
+    userProfile_A = UserProfileCollection.find_one({"_id": id_A})
+    userProfile_B = UserProfileCollection.find_one({"_id": id_B})
+
+    if userProfile_A is None or userProfile_B is None:
+        return {"Success": False, "Message": "No user found with the given email"}
+
+    # Check if user B's email already exists in user A's connectionRequests or connectionReceived
+    if (
+        userConnection in userProfile_A["connectionRequests"]
+        or userConnection in userProfile_A["connectionReceived"]
+    ):
+        return {
+            "Success": False,
+            "Message": "User already exists in connectionRequests or connectionReceived",
+        }
+
+    # Check if user A's email already exists in user B's connectionRequests or connectionReceived
+    if (
+        email in userProfile_B["connectionRequests"]
+        or email in userProfile_B["connectionReceived"]
+    ):
+        return {
+            "Success": False,
+            "Message": "User already exists in connectionRequests or connectionReceived",
+        }
+
+    # If no such user exists, add the connection
+    UserProfileCollection.update_one(
+        {"_id": id_A}, {"$addToSet": {"connectionRequests": userConnection}}
+    )
+    UserProfileCollection.update_one(
+        {"_id": id_B}, {"$addToSet": {"connectionReceived": email}}
+    )
+
+    return {"Success": True, "Message": "Connection added successfully"}
+
+
+def updateConnection(email: str, userConnection: str, accepted: bool) -> dict:
+    # Get the database
+    db = getDB()
+
+    # Get the collection object for 'UserInfo' from the database
+    UserInfoCollection = getUserInfoCollection(db)
+
+    # Attempt to retrieve the user with the given email
+    userInfo_A = UserInfoCollection.find_one({"email": email})
+    userInfo_B = UserInfoCollection.find_one({"email": userConnection})
+
+    # If no user was found, return a dictionary indicating failure
+    if userInfo_A is None or userInfo_B is None:
+        return {"Success": False, "Message": "No user found with the given email"}
+
+    id_A = userInfo_A["_id"]
+    id_B = userInfo_B["_id"]
+
+    UserProfileCollection = getUserProfileCollection(db)
+
+    userProfile_A = UserProfileCollection.find_one({"_id": id_A})
+    userProfile_B = UserProfileCollection.find_one({"_id": id_B})
+
+    if userProfile_A is None or userProfile_B is None:
+        return {"Success": False, "Message": "No user found with the given email"}
+
+    # Check if user B's email exists in user A's connectionRequests or connectionReceived
+    if (
+        userConnection not in userProfile_A["connections"]["connectionRequests"]
+        and userConnection not in userProfile_A["connections"]["connectionReceived"]
+    ):
+        return {
+            "Success": False,
+            "Message": "User not found in connectionRequests or connectionReceived",
+        }
+
+    # Check if user A's email exists in user B's connectionRequests or connectionReceived
+    if (
+        email not in userProfile_B["connections"]["connectionRequests"]
+        and email not in userProfile_B["connections"]["connectionReceived"]
+    ):
+        return {
+            "Success": False,
+            "Message": "User not found in connectionRequests or connectionReceived",
+        }
+
+    if accepted:
+        # If the connection is accepted, move user B from connectionRequests or connectionReceived of user A to connections
+        if userConnection in userProfile_A["connections"]["connectionRequests"]:
+            UserProfileCollection.update_one(
+                {"_id": id_A},
+                {"$pull": {"connections.connectionRequests": userConnection}},
+            )
+        else:
+            UserProfileCollection.update_one(
+                {"_id": id_A},
+                {"$pull": {"connections.connectionReceived": userConnection}},
+            )
+        UserProfileCollection.update_one(
+            {"_id": id_A},
+            {
+                "$addToSet": {"connections.connections": userConnection},
+                "$inc": {"connectionCount": 1},
+            },
+        )
+
+        # Do the same for user B
+        if email in userProfile_B["connections"]["connectionRequests"]:
+            UserProfileCollection.update_one(
+                {"_id": id_B}, {"$pull": {"connections.connectionRequests": email}}
+            )
+        else:
+            UserProfileCollection.update_one(
+                {"_id": id_B}, {"$pull": {"connections.connectionReceived": email}}
+            )
+        UserProfileCollection.update_one(
+            {"_id": id_B},
+            {
+                "$addToSet": {"connections.connections": email},
+                "$inc": {"connectionCount": 1},
+            },
+        )
+    else:
+        # If the connection is not accepted, remove user B from connectionRequests or connectionReceived of user A
+        if userConnection in userProfile_A["connections"]["connectionRequests"]:
+            UserProfileCollection.update_one(
+                {"_id": id_A},
+                {"$pull": {"connections.connectionRequests": userConnection}},
+            )
+        else:
+            UserProfileCollection.update_one(
+                {"_id": id_A},
+                {"$pull": {"connections.connectionReceived": userConnection}},
+            )
+
+        # Do the same for user B
+        if email in userProfile_B["connections"]["connectionRequests"]:
+            UserProfileCollection.update_one(
+                {"_id": id_B}, {"$pull": {"connections.connectionRequests": email}}
+            )
+        else:
+            UserProfileCollection.update_one(
+                {"_id": id_B}, {"$pull": {"connections.connectionReceived": email}}
+            )
+
+    return {"Success": True, "Message": "Connection updated successfully"}
+
+
+def getUserConnections(email: str) -> dict:
+    # Get the database
+    db = getDB()
+
+    # Get the collection object for 'UserInfo' from the database
+    UserInfoCollection = getUserInfoCollection(db)
+
+    # Attempt to retrieve the user with the given email
+    userInfo = UserInfoCollection.find_one({"email": email})
+
+    # If no user was found, return a dictionary indicating failure
+    if userInfo is None:
+        return {"Success": False, "Message": "No user found with the given email"}
+
+    id = userInfo["_id"]
+
+    UserProfileCollection = getUserProfileCollection(db)
+
+    userProfile = UserProfileCollection.find_one({"_id": id})
+
+    if userProfile is None:
+        return {"Success": False, "Message": "No user found with the given email"}
+
+    # Return the user's connections
+    return {
+        "Success": True,
+        "Message": "User connections retrieved successfully",
+        "Connections": userProfile["connections"],
+    }
 
 
 # FOR TESTING ONLY

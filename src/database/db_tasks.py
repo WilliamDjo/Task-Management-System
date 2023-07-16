@@ -13,7 +13,7 @@ TESTING: DELETE
 """
 
 from datetime import date, datetime
-from database.db import getDB, clear_collection
+from db import getDB, clear_collection
 
 """
 Returns the the entire collection
