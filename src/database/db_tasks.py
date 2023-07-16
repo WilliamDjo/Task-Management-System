@@ -186,7 +186,6 @@ def get_next_task_id() -> str:
 
    return formatted_id
 
-
 def reset_counter():
    db = getDB()
    sequence_collection = db['sequence_collection']
@@ -198,7 +197,6 @@ def reset_counter():
        {'_id': sequence_name},
        {'$set': {'seq_value': 0}}
    )
-
 
 if __name__ == "__main__":
   
