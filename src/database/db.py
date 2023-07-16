@@ -543,6 +543,42 @@ def getUserConnections(email: str) -> dict:
     }
 
 
+def checkConnection(email_A: str, email_B: str) -> dict:
+    # Get the database
+    db = getDB()
+
+    # Get the collection object for 'UserInfo' from the database
+    UserInfoCollection = getUserInfoCollection(db)
+
+    # Attempt to retrieve the user with the given old email
+    userInfo_A = UserInfoCollection.find_one({"email": email_A})
+    userInfo_B = UserInfoCollection.find_one({"email": email_B})
+
+    # If no user was found, return a dictionary indicating failure
+    if userInfo_A is None or userInfo_B is None:
+        return {"Success": False, "Message": "No user found with the given email"}
+
+    id_A = userInfo_A["_id"]
+    id_B = userInfo_B["_id"]
+
+    UserProfileCollection = getUserProfileCollection(db)
+
+    userProfile_A = UserProfileCollection.find_one({"_id": id_A})
+    userProfile_B = UserProfileCollection.find_one({"_id": id_B})
+
+    if userProfile_A is None or userProfile_B is None:
+        return {"Success": False, "Message": "No user found with the given email"}
+
+    # Check if user B's email exists in user A's connections and vice versa
+    if (
+        email_B in userProfile_A["connections"]["connections"]
+        and email_A in userProfile_B["connections"]["connections"]
+    ):
+        return {"Success": True, "Message": "Users are connected"}
+    else:
+        return {"Success": False, "Message": "Users are not connected"}
+
+
 # FOR TESTING ONLY
 def clear_collection(collection_name: str) -> dict:
     # Get the database
