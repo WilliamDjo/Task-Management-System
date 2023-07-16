@@ -462,6 +462,56 @@ def updateConnection(email: str, userConnection: str, accepted: bool) -> dict:
     return {"Success": True, "Message": "Connection updated successfully"}
 
 
+def removeConnection(email: str, userConnection: str) -> dict:
+    # Get the database
+    db = getDB()
+
+    # Get the collection object for 'UserInfo' from the database
+    UserInfoCollection = getUserInfoCollection(db)
+
+    # Attempt to retrieve the user with the given old email
+    userInfo_A = UserInfoCollection.find_one({"email": email})
+    userInfo_B = UserInfoCollection.find_one({"email": userConnection})
+
+    # If no user was found, return a dictionary indicating failure
+    if userInfo_A is None or userInfo_B is None:
+        return {"Success": False, "Message": "No user found with the given email"}
+
+    id_A = userInfo_A["_id"]
+    id_B = userInfo_B["_id"]
+
+    UserProfileCollection = getUserProfileCollection(db)
+
+    userProfile_A = UserProfileCollection.find_one({"_id": id_A})
+    userProfile_B = UserProfileCollection.find_one({"_id": id_B})
+
+    if userProfile_A is None or userProfile_B is None:
+        return {"Success": False, "Message": "No user found with the given email"}
+
+    # Check if user B's email exists in user A's connections
+    if userConnection not in userProfile_A["connections"]["connections"]:
+        return {"Success": False, "Message": "User not found in connections"}
+
+    # Check if user A's email exists in user B's connections
+    if email not in userProfile_B["connections"]["connections"]:
+        return {"Success": False, "Message": "User not found in connections"}
+
+    # If such user exists, remove the connection
+    UserProfileCollection.update_one(
+        {"_id": id_A},
+        {
+            "$pull": {"connections.connections": userConnection},
+            "$inc": {"connectionCount": -1},
+        },
+    )
+    UserProfileCollection.update_one(
+        {"_id": id_B},
+        {"$pull": {"connections.connections": email}, "$inc": {"connectionCount": -1}},
+    )
+
+    return {"Success": True, "Message": "Connection removed successfully"}
+
+
 def getUserConnections(email: str) -> dict:
     # Get the database
     db = getDB()
