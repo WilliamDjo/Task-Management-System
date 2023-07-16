@@ -45,13 +45,14 @@ def create_task_for_test():
         "deadline": "2023-31-07",
         "progress": "Not Started",
         "cost_per_hr": 10,
+        "assignee": "",
         "estimation_spent_hrs": 0,
         "actual_time_hr": 0,
         "priority": 2,
         "labels": ["Label1", "Label2"]
     }
     result = task_sys.create_task(data)
-    return result['task_id']
+    return result['Task_id']
 
 def clear_db():
     clear_collection('user_info')
@@ -66,13 +67,13 @@ class CreateTaskTestCase(unittest.TestCase):
         token = test_regiser()
 
         data = {
-            
             "token": token,
             "title": "Task Title",
             "description": "Task Description",
             "deadline": "2023-31-07",
             "progress": "Not Started",
             "cost_per_hr": 10,
+            "assignee": "",
             "estimation_spent_hrs": 0,
             "actual_time_hr": 0,
             "priority": 2,
@@ -154,12 +155,12 @@ class TaskSystemTests(unittest.TestCase):
             "deadline": "2023-31-07",
             "progress": "Not Started",
             "cost_per_hr": 10,
+            "assignee": "",
             "estimation_spent_hrs": 0,
             "actual_time_hr": 0,
             "priority": 2,
             "labels": ["Label1", "Label2"]
         }
-
         task_create_response = self.app.post('/task/create', data=json.dumps(task_data),  content_type='application/json')
         task_response_data = json.loads(task_create_response.data)
 
@@ -177,6 +178,7 @@ class TaskSystemTests(unittest.TestCase):
             "deadline": "2023-31-07",
             "progress": "Not Started",
             "cost_per_hr": 10,
+            "assignee": "",
             "estimation_spent_hrs": 0,
             "actual_time_hr": 0,
             "priority": 2,
@@ -185,8 +187,7 @@ class TaskSystemTests(unittest.TestCase):
 
         task_create_response = self.app.post('/task/create', data=json.dumps(task_data),  content_type='application/json')
         task_response_data = json.loads(task_create_response.data)
-        task_id = task_response_data['task_id']
-
+        task_id = task_response_data['Task_id']
 
         new_task_data = {
             "token": token,
@@ -207,6 +208,42 @@ class TaskSystemTests(unittest.TestCase):
         task_update_response_data = json.loads(task_update_response.data)
 
         assert(task_update_response_data['Success'] == True)
+
+class TaskDeleteTests(unittest.TestCase):
+    
+    def setUp(self):
+        self.app = app.test_client()
+        self.app.testing = True
+
+    def details_setup(self):
+
+        clear_db()
+        register_data = {
+            'first_name': 'John',
+            'last_name' : 'Doe',
+            'username': 'johndoe',
+            'email': 'john@example.com',
+            'password': 'Password123!',
+            'sys_admin': False
+        }
+
+        response = self.app.post('/signup', data=json.dumps(register_data), content_type='application/json')
+        response_data = json.loads(response.data)
+        token = response_data['Token']
+
+        return token
+    
+    def test_delete(self):
+        clear_db()
+        task_id = create_task_for_test()
+
+        del_str = '/task/delete/' + str(task_id)
+        task_del_response = self.app.delete(del_str, content_type='application/json')
+        task_del_response_data = json.loads(task_del_response.data)
+        assert(task_del_response_data['Success'] == True)
+
+
+
 
 
     

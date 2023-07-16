@@ -1,6 +1,7 @@
 from email.message import Message
 import hashlib
 from json.tool import main
+from pickle import NONE
 import sys
 import os
 import re
@@ -58,7 +59,6 @@ def is_deadline_valid(deadline):
     except ValueError:
         return False
 
-
 def is_label_valid(label:str):
 
     if len(label)  == 0:
@@ -90,7 +90,6 @@ Create tasks
 def create_task(data: dict):
 
     token = data["token"]
-
     #Verify account login - check the token
     token_result = check_jwt_token(token)
     if not token_result['Success']:
@@ -201,17 +200,27 @@ def create_task(data: dict):
             "Message": "Too many lables: limited to 5 per task"
         }
 
+    task_assignee = data["assignee"]
 
+    #If assigned to none, default to task master
+    if task_assignee == "":
+        task_assignee = task_master
+
+    # if not is_assignee_valid(task_assignee):
+    #     return {
+    #         "Success": False,
+    #         "Message": "Assignee is not valid"
+    #     }
+    
     valid_labels = [label for label in task_labels if is_label_valid(label)]
             
-
     new_dict = {
         
         "title" : task_title,
         "description": task_description,
         "deadline": task_deadline_dt,
         "progress": task_progress,
-        "assignee": "",
+        "assignee": task_assignee,
         "cost_per_hr": task_cost,
         "estimation_spent_hrs": task_estimate,
         "actual_time_hr": task_actual,

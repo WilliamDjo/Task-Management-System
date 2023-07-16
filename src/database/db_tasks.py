@@ -70,7 +70,7 @@ def addNewTask(data: dict) -> dict:
 
    # Return the inserted task information
   
-   return {"Success": True, "task_id": task_id }
+   return {"Success": True, "Task_id": task_id }
 
 
 def getTaskFromID(task_id: str) -> dict:
