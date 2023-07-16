@@ -59,7 +59,6 @@ def clear_db():
     clear_collection('task_system')
     clear_collection('sequence_collection')
 
-
 class CreateTaskTestCase(unittest.TestCase):
     
     def test_create_task_with_valid_data(self):
