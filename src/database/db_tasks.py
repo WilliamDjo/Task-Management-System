@@ -21,7 +21,6 @@ Returns the the entire collection
 def getTaskInfoCollection(db: Database) -> Collection:
    return db["task_system"]
 
-
 """
 Adds a new task to the task system
 """
@@ -54,13 +53,10 @@ def addNewTask(data: dict) -> dict:
        "labels": [],
    }
 
-
-   # Loop over the keys in the input data
    for key in data:
-       # If the key exists in task_info, update its value
-       if key in task_info:
-           task_info[key] = data[key]
-
+    # Check if the key exists in both task_info and data dictionaries
+    if key in task_info and key in data:
+        task_info[key] = data[key]
 
    # task
    insert_result = TaskSystemCollection.insert_one(task_info)
@@ -93,23 +89,25 @@ def getTaskFromID(task_id: str) -> dict:
 
 
 def updateTaskInfo(task_id: str, data: dict) -> dict:
-   # Get the database
-   db = getDB()
+    # Get the database
+    db = getDB()
 
 
-   # Get the collection object for 'UserInfo' from the database
-   TaskSystemCollection = getTaskInfoCollection(db)
+    # Get the collection object for 'UserInfo' from the database
+    TaskSystemCollection = getTaskInfoCollection(db)
+
+    task = TaskSystemCollection.find_one({"id": task_id})
 
 
-   task = TaskSystemCollection.find_one({"id": task_id})
-
-
-   if task is None:
+    if task is None:
        return {"Success": False, "Message": "No task found with given id"}
+    
+    if "token" in data:
+        del data["token"]
 
-
-   result = TaskSystemCollection.update_one({"id": task_id}, {"$set": data})
-   return {"Success": True, "Message": "Update successfull"}
+    result = TaskSystemCollection.update_one({"id": task_id}, {"$set": data})
+   
+    return {"Success": True, "Message": "Update successfull"}
 
 
 def deleteTask(task_id: str) -> dict:
