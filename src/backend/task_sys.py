@@ -7,8 +7,12 @@ import os
 import re
 from account import is_email_valid
 from backend.account import getAccountInfo
+from backend.password import send_email
 from backend.tokens import check_jwt_token
-
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import ssl
 
 parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_folder)
@@ -399,11 +403,86 @@ def assign_task(task_id:str, assignee_email:str):
 
     is_assignee_valid(assignee_email)
 
-    #TODO: check if assignee workload permits
-
     #TODO: send email
 
+
+
     update_task_assignee(task_id, assignee_email)
+
+def send_task_notification(assignee_email, task_title):
+    
+    sender_email = "zombies3900w11a@gmx.com"
+    sender_password = "wEvZ28Xm9b3uviN"
+
+    subject = "New Task Assignment"
+
+    message = f"""
+        <html>
+            <head>
+                <style>
+                    body {{
+                        font-family: Arial, sans-serif;
+                    }}
+                    .container {{
+                        width: 400px;
+                        margin: 0 auto;
+                        padding: 20px;
+                        border: 1px solid #ccc;
+                        border-radius: 5px;
+                        background-color: #f9f9f9;
+                    }}
+                    h1 {{
+                        text-align: center;
+                        color: #333;
+                    }}
+                    p {{
+                        text-align: center;
+                    }}
+                    .button {{
+                        display: inline-block;
+                        padding: 10px 20px;
+                        background-color: #007bff;
+                        color: #fff;
+                        text-decoration: none;
+                        border-radius: 4px;
+                        margin-top: 20px;
+                    }}
+                    .button:hover {{
+                        background-color: #0056b3;
+                    }}
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <h1>New Task Assignment</h1>
+                    <p>Hello,</p>
+                    <p>You have been assigned a new task: <strong>{task_title}</strong>.</p>
+                    <p>Please click the button below to access your task details:</p>
+                    <p><a class="button" href="https://yourwebsite.com/tasks">View Task</a></p>
+                </div>
+            </body>
+        </html>
+    """
+
+    msg = MIMEMultipart()
+    msg["From"] = sender_email
+    msg["To"] = assignee_email
+    msg["Subject"] = subject
+    msg.attach(MIMEText(message, "html"))
+
+    smtp_server = "mail.gmx.com"
+    smtp_port = 587
+
+    try:
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        server.starttls()
+        server.login(sender_email, sender_password)  # Corrected variable name
+        server.sendmail(sender_email, assignee_email, msg.as_string())
+        server.quit()
+        print("Email sent successfully!")
+
+    except Exception as e:
+        print(f"Error: {e}")
 
 '''
 LABELS
