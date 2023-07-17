@@ -17,11 +17,13 @@ import ChangeEmail from './pages/ChangeEmail';
 import VerifyEmail from './pages/VerifyEmail';
 import ResetPassword from './pages/ResetPassword';
 import Connections from './pages/Connections';
-import ConnectionsBar from './components/ConnectionsBar';
 import AddConnection from './pages/AddConnection';
 import MyConnections from './pages/MyConnections';
 import ConnectionProfile from './pages/ConnectionProfile';
 import SearchEverything from './pages/SearchEverything';
+import MyProfile from './pages/MyProfile';
+import PendingConnections from './pages/PendingConnections';
+import PendingProfile from './pages/PendingProfile';
 
 const App = () => {
   return (
@@ -34,6 +36,7 @@ const App = () => {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="profile" element={<Outlet />}>
             <Route index element={<Profile />} />
+            <Route path="my" element={<MyProfile />} />
             <Route path="edit" element={<EditAccount />} />
           </Route>
           <Route path="admin" element={<Outlet />}>
@@ -46,10 +49,10 @@ const App = () => {
               <Route path=":email" element={<ConnectionProfile />} />
             </Route>
             <Route path="add" element={<AddConnection />} />
-            <Route
-              path="pending"
-              element={<ConnectionsBar pendingConnections />}
-            />
+            <Route path="pending" element={<Outlet />}>
+              <Route index element={<PendingConnections />} />
+              <Route path=":email" element={<PendingProfile />} />
+            </Route>
           </Route>
 
           <Route path="*" element={<PageNotFound />} />

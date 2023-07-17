@@ -1,16 +1,14 @@
 import {
   Box,
+  Card,
+  CardBody,
   Center,
   Heading,
-  Link,
+  LinkBox,
+  LinkOverlay,
+  SimpleGrid,
   Spinner,
-  Table,
-  TableContainer,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
+  Text,
   useToast
 } from '@chakra-ui/react';
 import React from 'react';
@@ -23,16 +21,18 @@ const MyConnections = () => {
   const [connections, setConnections] = React.useState([
     {
       username: 'Jonathan',
-      name: 'Jonathan Sinani',
+      first_name: 'Jonathan Sinani',
+      last_name: 'Sinani',
       email: 'jonathan@jonathan.com'
     },
     {
       username: 'Jonathan2',
-      name: 'Jonathan2 Sinani',
+      first_name: 'Jonathan2 Sinani',
+      last_name: 'Sinani',
       email: 'jonathan2@jonathan.com'
     }
   ]);
-  const [loaded, setLoaded] = React.useState(true);
+  const [loaded, setLoaded] = React.useState(false);
 
   const toast = useToast();
 
@@ -47,34 +47,25 @@ const MyConnections = () => {
 
   const myConnectionsLoaded = () => {
     return (
-      <TableContainer>
-        <Table variant='simple'>
-          <Thead>
-            <Tr>
-              <Th>User</Th>
-              <Th>Full Name</Th>
-              <Th>Email</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {connections.map((connection, index) => {
-              return (
-                <Tr key={index}>
-                  <Td>
-                    <Link as={RouteLink} to={`/connections/my/${connection.email}`}>{connection.username}</Link>
-                  </Td>
-                  <Td>
-                    <Link as={RouteLink} to={`/connections/my/${connection.email}`}>{connection.name}</Link>
-                  </Td>
-                  <Td>
-                    <Link as={RouteLink} to={`/connections/my/${connection.email}`}>{connection.email}</Link>
-                  </Td>
-                </Tr>
-              );
-            })}
-          </Tbody>
-        </Table>
-      </TableContainer>
+      <SimpleGrid spacing='4' columns={[1, 2]}>
+        {connections.map((connection, index) => {
+          return (
+            <LinkBox key={index}>
+              <Card>
+                <CardBody>
+                  <Heading fontSize="lg">
+                    <LinkOverlay as={RouteLink} to={`/connections/my/${connection.email}`}>
+                    {connection.first_name} {connection.last_name}
+                    </LinkOverlay>
+                  </Heading>
+                  <Text>{connection.username}</Text>
+                  <Text>{connection.email}</Text>
+                </CardBody>
+              </Card>
+            </LinkBox>
+          );
+        })}
+      </SimpleGrid>
     );
   }
 

@@ -10,6 +10,7 @@ import {
 import { ChatIcon, SettingsIcon, Search2Icon } from '@chakra-ui/icons';
 import React from 'react';
 import { Link as RouteLink, useNavigate } from 'react-router-dom';
+
 import { fetchBackend } from '../fetch';
 
 const NavigationBar = () => {
