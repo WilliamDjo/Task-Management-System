@@ -38,8 +38,8 @@ import { fetchBackend, isNone } from '../fetch';
 import { Link as RouteLink, useNavigate } from 'react-router-dom';
 
 const AdminDashboard = () => {
-  const [selectedUser, setSelectedUser] = React.useState();
-  const [selectedUserEmail, setSelectedUserEmail] = React.useState();
+  const [selectedUser, setSelectedUser] = React.useState('n/a');
+  const [selectedUserEmail, setSelectedUserEmail] = React.useState('n/a');
 
   const [newPassword, setNewPassword] = React.useState('');
   const [confirmNewPassword, setConfirmNewPassword] = React.useState('');
@@ -50,31 +50,31 @@ const AdminDashboard = () => {
     {
       first_name: 'Akshay',
       last_name: 'Akshay',
-      username: 'Akshay',
+      user: 'Akshay',
       email: 'akshay@taskmaster.com',
     },
     {
       first_name: 'Cameron',
       last_name: 'Cameron',
-      username: 'Cameron',
+      user: 'Cameron',
       email: 'cameron@taskmaster.com',
     },
     {
       first_name: 'Sanyam',
       last_name: 'Sanyam',
-      username: 'Sanyam',
+      user: 'Sanyam',
       email: 'sanyam@taskmaster.com',
     },
     {
       first_name: 'William',
       last_name: 'William',
-      username: 'William',
+      user: 'William',
       email: 'william@taskmaster.com',
     },
     {
       first_name: 'Jonathan',
       last_name: 'Jonathan',
-      username: 'Jonathan',
+      user: 'Jonathan',
       email: 'jonathan@taskmaster.com',
     },
   ]);
@@ -187,6 +187,7 @@ const AdminDashboard = () => {
     fetchBackend('/admin/reset', 'PUT', body, toast, successAdminPasswordReset);
   };
 
+
   const adminCards = () => {
     return (
       <SimpleGrid columns={[1, 2, 3, 4, 5]} spacing="3" m="3">
@@ -199,7 +200,7 @@ const AdminDashboard = () => {
                     {user.first_name} {user.last_name}
                   </LinkOverlay>
                 </Heading>
-                <Text>{user.username}</Text>
+                <Text>{user.user}</Text>
                 <Text>{user.email}</Text>
                 <ButtonGroup size="sm" isAttached>
                 <Button
@@ -207,7 +208,7 @@ const AdminDashboard = () => {
                   color={'white'}
                   _hover={{ bg: 'red.500' }}
                   onClick={() =>
-                    handleDeleteButton(user.username, user.email)
+                    handleDeleteButton(user.user, user.email)
                   }
                 >
                   Delete
@@ -216,7 +217,7 @@ const AdminDashboard = () => {
                   bg={'blue.400'}
                   color={'white'}
                   _hover={{ bg: 'blue.500' }}
-                  onClick={() => handleResetButton(user.username, user.email)}
+                  onClick={() => handleResetButton(user.user, user.email)}
                 >
                   Reset Password
                 </Button>
