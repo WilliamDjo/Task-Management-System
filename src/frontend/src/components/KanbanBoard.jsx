@@ -258,8 +258,9 @@ const KanbanBoard = () => {
     //   onOpen();
     // }
     // Call the backend function to get the task details
+    // Call the backend function to get the task details
     fetchBackend(
-      `/task/get/${taskId}`, // Use the appropriate route to fetch task details based on the ID
+      '/task/get',
       'GET',
       null,
       toast,
