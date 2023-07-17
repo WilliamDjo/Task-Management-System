@@ -323,6 +323,13 @@ def update_priority(task_id: str, new_priority: int):
     
 def update_details(task_id: str, new_data: dict):
 
+    token_result = check_jwt_token(new_data['token'])
+    if not token_result['Success']:
+        return {
+            "Success": False, 
+            "Message": "No user logged in"
+        }
+
     #title 
     if not is_title_valid(new_data['title']):
         return {
@@ -389,17 +396,31 @@ def update_details(task_id: str, new_data: dict):
 
     return db_tasks.updateTaskInfo(task_id, new_data)
 
-
 '''
 Delete
 '''
-def delete_task(task_id:str):
+def delete_task(token:str, task_id:str):
+
+    token_result = check_jwt_token(token)
+    if not token_result['Success']:
+        return {
+            "Success": False, 
+            "Message": "No user logged in"
+        }
+    
     return db_tasks.deleteTask(task_id)
 
 '''
 Assignee 
 '''
-def assign_task(task_id:str, assignee_email:str):
+def assign_task(token:str,task_id:str, assignee_email:str):
+
+    token_result = check_jwt_token(token)
+    if not token_result['Success']:
+        return {
+            "Success": False, 
+            "Message": "No user logged in"
+        }
 
     is_assignee_valid(assignee_email)
 
@@ -501,13 +522,31 @@ def add_label(task_id:str, new_label: str):
     curr_labels.append(new_label)
     db_tasks.updateTaskInfo(task_id, {"labels": curr_labels})
     
+def get_task_details(token:str, task_id:str):
+
+    #check token
+    token_result = check_jwt_token(token)
+    if not token_result['Success']:
+        return {
+            "Success": False, 
+            "Message": "No user logged in"
+        }
 
 
+    return db_tasks.getTaskFromID(task_id)
 
+def get_all_tasks(token:str):
 
+    #check token
+    token_result = check_jwt_token(token)
+    if not token_result['Success']:
+        return {
+            "Success": False, 
+            "Message": "No user logged in"
+        }
 
-
-
+    return db_tasks.getAllTasks()
+    
 
 
 

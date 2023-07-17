@@ -1,5 +1,3 @@
-import imp
-from optparse import check_choice
 import unittest
 import sys
 import os

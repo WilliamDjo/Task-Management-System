@@ -1,10 +1,11 @@
 from crypt import methods
 from datetime import date
+from urllib import response
 from flask import Flask, request, jsonify
 import sys
 import os
 import account
-from backend.task_sys import create_task, delete_task, update_details, update_task_title
+from backend.task_sys import create_task, delete_task, get_all_tasks, get_task_details, update_details, update_task_title
 from flask_cors import CORS
 
 
@@ -177,7 +178,6 @@ def reset_password():
     }
     return jsonify(to_return)
 
-
 @app.route("/reset/otp", methods=["POST"])
 def check_otp():
     email = request.json["email"]
@@ -188,7 +188,6 @@ def check_otp():
         "Message": status["Message"],
     }
     return jsonify(to_return)
-
 
 @app.route("/reset/account", methods=["POST"])
 def reset_account():
@@ -210,29 +209,34 @@ def server_create_task():
     result = create_task(data)
     return jsonify(result)
 
-
+#TODO: maybe not send in URL?
 @app.route("/task/update/<task_id>", methods=["PUT"])
 def server_update_task(task_id):
     data = request.json
     result = update_details(task_id, data)
     return jsonify(result)
 
-
 @app.route("/task/delete/<task_id>", methods=['DELETE'])
 def server_delete_task(task_id):
+    data = request.json
+    token = data["token"]
+    result = delete_task(token, task_id)
+    return jsonify(result)
 
-    result = delete_task(task_id)
+@app.route("/task/get", methods=["GET"])
+def server_get_task_details():
+    task_id = request.headers.get('task_id')
+    token = request.headers.get('token')
+
+    result = get_task_details(token, task_id)
+
     return jsonify(result)
 
 
-if __name__ == "__main__":
-    
-    
-    # test_first = "adam"
-    # test_last = "driver"
-    # test_password = "Password123!"
-    # test_email = "adam@test.com"
-    # test_username = "adam_user"
+@app.route("/task/getAll", methods=["GET"])
+def server_get_all():
+    token = request.headers.get('token')
+    result = get_all_tasks(token)
+    return jsonify(result)
 
-    # account.account_register(test_first, test_last, test_username, test_email, test_password, sys_admin=True)
-    app.run()
+
