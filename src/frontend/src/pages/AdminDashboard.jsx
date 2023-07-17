@@ -187,7 +187,6 @@ const AdminDashboard = () => {
     fetchBackend('/admin/reset', 'PUT', body, toast, successAdminPasswordReset);
   };
 
-
   const adminCards = () => {
     return (
       <SimpleGrid columns={[1, 2, 3, 4, 5]} spacing="3" m="3">
