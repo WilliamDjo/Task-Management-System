@@ -9,10 +9,15 @@ import {
   Box,
   Button,
   ButtonGroup,
+  Card,
+  CardBody,
+  Center,
   Flex,
   FormControl,
   FormLabel,
   Heading,
+  LinkBox,
+  LinkOverlay,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -21,6 +26,7 @@ import {
   ModalHeader,
   ModalOverlay,
   SimpleGrid,
+  Spinner,
   Stack,
   Text,
   useDisclosure,
@@ -28,7 +34,8 @@ import {
 } from '@chakra-ui/react';
 import NavigationBar from '../components/NavigationBar';
 import PasswordBar from '../components/PasswordBar/PasswordBar';
-import { fetchBackend } from '../fetch';
+import { fetchBackend, isNone } from '../fetch';
+import { Link as RouteLink, useNavigate } from 'react-router-dom';
 
 const AdminDashboard = () => {
   const [selectedUser, setSelectedUser] = React.useState();
@@ -37,24 +44,36 @@ const AdminDashboard = () => {
   const [newPassword, setNewPassword] = React.useState('');
   const [confirmNewPassword, setConfirmNewPassword] = React.useState('');
 
+  const [loaded, setLoaded] = React.useState(false);
+
   const [users, setUsers] = React.useState([
     {
+      first_name: 'Akshay',
+      last_name: 'Akshay',
       username: 'Akshay',
       email: 'akshay@taskmaster.com',
     },
     {
+      first_name: 'Cameron',
+      last_name: 'Cameron',
       username: 'Cameron',
       email: 'cameron@taskmaster.com',
     },
     {
+      first_name: 'Sanyam',
+      last_name: 'Sanyam',
       username: 'Sanyam',
       email: 'sanyam@taskmaster.com',
     },
     {
+      first_name: 'William',
+      last_name: 'William',
       username: 'William',
       email: 'william@taskmaster.com',
     },
     {
+      first_name: 'Jonathan',
+      last_name: 'Jonathan',
       username: 'Jonathan',
       email: 'jonathan@taskmaster.com',
     },
@@ -72,6 +91,8 @@ const AdminDashboard = () => {
   } = useDisclosure();
   const toast = useToast();
 
+  const navigate = useNavigate();
+
   React.useEffect(() => {
     const successGetAllUsers = (data) => {
       // Ensuring that the admin cannot delete their own account.
@@ -79,11 +100,23 @@ const AdminDashboard = () => {
         const myEmail = myData.Data.email;
         const users = data.Data.filter((user) => user.email !== myEmail);
         setUsers(users);
+        setLoaded(true);
+        localStorage.setItem('admin', true);
       }
       fetchBackend('/getuserprofile', 'POST', { token }, null, successGetMyUser);
     }
+
+    const failGetAllUsers = () => {
+      // If it fails, then redirects if there is a token, redirects to dashboard, otherwise redirects to home screen.
+      if (isNone(localStorage.getItem('token'))) {
+        navigate('/');
+        localStorage.removeItem('admin')
+      } else {
+        navigate('/dashboard');
+      }
+    }
     const token = localStorage.getItem('token');
-    fetchBackend('/getallusers', 'POST', { token }, toast, successGetAllUsers);
+    fetchBackend('/getallusers', 'POST', { token }, toast, successGetAllUsers, failGetAllUsers);
   }, []);
 
   const handleDeleteButton = (user, email) => {
@@ -154,40 +187,54 @@ const AdminDashboard = () => {
     fetchBackend('/admin/reset', 'PUT', body, toast, successAdminPasswordReset);
   };
 
+  const adminCards = () => {
+    return (
+      <SimpleGrid columns={[1, 2, 3, 4, 5]} spacing="3" m="3">
+        {users.map((user, index) => {
+          return (
+            <LinkBox as={Card} key={index}>
+              <CardBody>
+                <Heading fontSize="lg">
+                  <LinkOverlay as={RouteLink} to={`/connections/my/${user.email}`}>
+                    {user.first_name} {user.last_name}
+                  </LinkOverlay>
+                </Heading>
+                <Text>{user.username}</Text>
+                <Text>{user.email}</Text>
+                <ButtonGroup size="sm" isAttached>
+                <Button
+                  bg={'red.400'}
+                  color={'white'}
+                  _hover={{ bg: 'red.500' }}
+                  onClick={() =>
+                    handleDeleteButton(user.username, user.email)
+                  }
+                >
+                  Delete
+                </Button>
+                <Button
+                  bg={'blue.400'}
+                  color={'white'}
+                  _hover={{ bg: 'blue.500' }}
+                  onClick={() => handleResetButton(user.username, user.email)}
+                >
+                  Reset Password
+                </Button>
+              </ButtonGroup>
+              </CardBody>
+            </LinkBox>
+          );
+        })}
+      </SimpleGrid>
+    );
+  }
+
   return (
     <Box minH="100vh" h="100vh">
       <Flex h="100%" flexFlow="column">
         <NavigationBar />
-        <Heading>Admin Dashboard</Heading>
-        <SimpleGrid columns={[1, 2, 3, 4, 5]} spacing="3" m="3">
-          {users.map((user, index) => {
-            return (
-              <Box bg="blue.50" key={index} borderRadius="xl" p="2">
-                <Text as="b">{user.email}</Text>
-                <ButtonGroup size="sm" isAttached>
-                  <Button
-                    bg={'red.400'}
-                    color={'white'}
-                    _hover={{ bg: 'red.500' }}
-                    onClick={() =>
-                      handleDeleteButton(user.user, user.email)
-                    }
-                  >
-                    Delete
-                  </Button>
-                  <Button
-                    bg={'blue.400'}
-                    color={'white'}
-                    _hover={{ bg: 'blue.500' }}
-                    onClick={() => handleResetButton(user.user, user.email)}
-                  >
-                    Reset Password
-                  </Button>
-                </ButtonGroup>
-              </Box>
-            );
-          })}
-        </SimpleGrid>
+        <Heading>User Controls</Heading>
+        {loaded ? adminCards() : <Center><Spinner /></Center>}
       </Flex>
       <AlertDialog isOpen={isAlertOpen} onClose={onAlertClose}>
         <AlertDialogOverlay>

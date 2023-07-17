@@ -9,7 +9,9 @@ import {
 } from '@chakra-ui/react';
 import {
   ChatIcon,
-  SettingsIcon
+  SettingsIcon,
+  UnlockIcon,
+  CopyIcon
 } from '@chakra-ui/icons'
 import React from 'react';
 import {
@@ -17,12 +19,12 @@ import {
   useNavigate
 } from 'react-router-dom';
 
-import { fetchBackend } from '../fetch';
+import { fetchBackend, isNone } from '../fetch';
 
 const NavigationBar = () => {
   const toast = useToast();
   const navigate = useNavigate();
-  const hoverStyle = { color: 'blue.200' };
+  const hoverStyle = { color: 'blue.200', cursor: 'pointer' };
 
   const handleLogout = () => {
     const successLogout = () => {
@@ -33,15 +35,24 @@ const NavigationBar = () => {
         isClosable: true,
       });
       localStorage.removeItem('token');
+      localStorage.removeItem('admin');
       navigate('/');
     }
 
     const failLogout = () => {
       localStorage.removeItem('token');
+      localStorage.removeItem('admin');
       navigate('/');
     }
     const token = localStorage.getItem('token');
     fetchBackend('/logout', 'POST', { token }, toast, successLogout, failLogout);
+  }
+
+  const isAdmin = () => {
+    if (!isNone(localStorage.getItem('admin')) && localStorage.getItem('admin') === 'true') {
+      return true
+    }
+    return false
   }
 
   return (
@@ -51,6 +62,20 @@ const NavigationBar = () => {
           <Heading _hover={hoverStyle} size='md'>TaskMaster</Heading>
         </RouteLink>
         <Spacer />
+        {
+          isAdmin() && <RouteLink to="/dashboard">
+            <Tooltip label='Task Controls'>
+              <CopyIcon m='1' _hover={hoverStyle} />
+            </Tooltip>
+          </RouteLink>
+        }
+        {
+          isAdmin() && <RouteLink to="/admin">
+            <Tooltip label='User Controls'>
+              <UnlockIcon m='1' _hover={hoverStyle} />
+            </Tooltip>
+          </RouteLink>
+        }
         <RouteLink to="/connections">
           <Tooltip label='Connections'>
             <ChatIcon m='1' _hover={hoverStyle} />

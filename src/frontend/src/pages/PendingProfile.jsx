@@ -39,7 +39,7 @@ const PendingProfile = () => {
       setLoaded(true);
     }
     const token = localStorage.getItem('token');
-    fetchBackend(`/user/getconnection/${email}/false`, 'GET', { token }, toast, successGetConnectionProfile);
+    fetchBackend(`/user/getconnection/${email}`, 'GET', { token }, toast, successGetConnectionProfile);
   }, [])
 
   const handleRespondConnection = (email, value) => {
