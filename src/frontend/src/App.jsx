@@ -21,6 +21,7 @@ import ConnectionsBar from './components/ConnectionsBar';
 import AddConnection from './pages/AddConnection';
 import MyConnections from './pages/MyConnections';
 import ConnectionProfile from './pages/ConnectionProfile';
+import SearchEverything from './pages/SearchEverything';
 
 const App = () => {
   return (
@@ -57,6 +58,7 @@ const App = () => {
           <Route path="changeemail" element={<ChangeEmail />} />
           <Route path="verifyemail" element={<VerifyEmail />} />
           <Route path="resetpassword" element={<ResetPassword />} />
+          <Route path="searcheverything" element={<SearchEverything />} />
         </Routes>
       </BrowserRouter>
     </ChakraProvider>

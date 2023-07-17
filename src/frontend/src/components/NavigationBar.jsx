@@ -7,7 +7,7 @@ import {
   Tooltip,
   useToast,
 } from '@chakra-ui/react';
-import { ChatIcon, SettingsIcon } from '@chakra-ui/icons';
+import { ChatIcon, SettingsIcon, Search2Icon } from '@chakra-ui/icons';
 import React from 'react';
 import { Link as RouteLink, useNavigate } from 'react-router-dom';
 import { fetchBackend } from '../fetch';
@@ -61,6 +61,11 @@ const NavigationBar = () => {
         <RouteLink to="/profile">
           <Tooltip label="Profile">
             <SettingsIcon m="1" _hover={hoverStyle} />
+          </Tooltip>
+        </RouteLink>
+        <RouteLink to="/searcheverything">
+          <Tooltip label="Search">
+            <Search2Icon m="1" _hover={hoverStyle} />
           </Tooltip>
         </RouteLink>
         <Text m="1" _hover={hoverStyle} onClick={handleLogout}>
