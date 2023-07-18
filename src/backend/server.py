@@ -189,7 +189,7 @@ def server_update_notifications_true():
     return jsonify(to_return)
 
 
-@app.route("/getuserprofile", methods=["POST"])
+@app.route("/getuserprofile", methods=["GET", "POST"])
 def getuserprofile():
     token = ""
 
@@ -202,6 +202,7 @@ def getuserprofile():
         # You can use this token to perform your operations.
     else:
         return {"Success": False, "Message": "No token provided"}, 401
+    print(token)
     status = account.getAccountInfo(token)
 
     to_return = {
