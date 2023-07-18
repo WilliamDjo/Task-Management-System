@@ -33,7 +33,7 @@ const Register = () => {
   const [first_name, setFirstName] = useState('');
   const [last_name, setLastName] = useState('');
   const [username, setUsername] = useState('');
-  const [sys_admin, setSysAdmin] = useState(false);
+  const [Sys_admin, setSysAdmin] = useState(false);
   const [registrationError, setRegistrationError] = useState(false);
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const [passwordMismatchError, setPasswordMismatchError] = useState(false);
@@ -54,7 +54,7 @@ const Register = () => {
         first_name,
         last_name,
         username,
-        sys_admin,
+        Sys_admin,
       };
 
       try {
@@ -64,16 +64,16 @@ const Register = () => {
           newUser,
           null,
           async data => {
-            const { token, sys_admin } = data;
+            const { Token, Sys_admin } = data;
 
             // Store the token in localStorage or sessionStorage
-            localStorage.setItem('token', token);
-            // Store the sys_admin value in state
-            setSysAdmin(sys_admin);
+            localStorage.setItem('token', Token);
+            // Store the Sys_admin value in state
+            setSysAdmin(Sys_admin);
 
             console.log('User account created and token received');
-            // Redirect the user based on the sys_admin value
-            if (sys_admin) {
+            // Redirect the user based on the Sys_admin value
+            if (Sys_admin) {
               navigate('/admin');
             } else {
               navigate('/dashboard');

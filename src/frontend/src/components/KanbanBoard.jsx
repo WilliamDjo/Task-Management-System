@@ -68,12 +68,21 @@ const KanbanBoard = () => {
   // Function to fetch user's profile from the backend
   const fetchUserProfile = async () => {
     try {
+      // Retrieve the token from the localStorage
+      const token = localStorage.getItem('token');
+
+      if (!token) {
+        console.error('User token not found in localStorage.');
+        return;
+      }
+
       const response = await fetchBackend(
         '/getuserprofile',
         'POST',
-        { token: 'YOUR_USER_TOKEN' },
+        { token },
         toast
       );
+
       if (response.Success) {
         const { first_name, last_name } = response.Data;
         setUserFullName(`${first_name} ${last_name}`);
