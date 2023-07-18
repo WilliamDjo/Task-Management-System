@@ -315,7 +315,6 @@ class LoginTests(unittest.TestCase):
         response_data = json.loads(response.data)
         self.assertEqual(response_data['Success'], False)
 
-
 class LogoutTests(unittest.TestCase):
 
     def setUp(self):
@@ -374,7 +373,6 @@ class LogoutTests(unittest.TestCase):
         # Assert the response contains an error message
         response_data = json.loads(response.data)
         self.assertEqual(response_data['Success'], False)
-
 
 class UpdateUsernameTests(unittest.TestCase):
     def setUp(self):
@@ -483,7 +481,6 @@ class UpdateUsernameTests(unittest.TestCase):
         response_data = json.loads(response.data)
         self.assertEqual(response_data['Success'], False)
 
-
 class UpdateEmailTests(unittest.TestCase):
     def setUp(self):
         self.app = app.test_client()
@@ -590,7 +587,6 @@ class UpdateEmailTests(unittest.TestCase):
         # Assert the response contains a success message
         response_data = json.loads(response.data)
         self.assertEqual(response_data['Success'], False)
-
 
 class UpdatePasswordTests(unittest.TestCase):
     def setUp(self):

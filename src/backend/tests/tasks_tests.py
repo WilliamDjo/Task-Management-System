@@ -7,6 +7,7 @@ from urllib import response
 from flask import Flask, json
 
 
+
 parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_folder)
 
@@ -17,6 +18,9 @@ from database.db_tasks import getTasksAssigned, getTasksGiven
 from tokens import active_tokens
 from server import app
 from backend.task_sys import get_tasks_given_by
+from backend.account import getAccountInfo
+from backend.connections import AddConnection, respondToConnection
+
 
 
 def test_regiser():
@@ -24,6 +28,19 @@ def test_regiser():
     last_name = "Doe"
     username = "johndoe"
     email = "johndoe@example.com"
+    password = "Password123!"
+    sys_admin = False
+    result = account_register(
+        first_name, last_name, username, email, password, sys_admin
+    )
+    return result["token"]
+
+
+def test_regiser_aks():
+    first_name = "John"
+    last_name = "Doe"
+    username = "johndoe"
+    email = "akshayvalluruaus@gmail.com"
     password = "Password123!"
     sys_admin = False
     result = account_register(
@@ -41,7 +58,7 @@ def test_login():
 
 
 def create_task_for_test():
-    clear_db()
+
     token = test_regiser()
     data = {
         "token": token,
@@ -50,13 +67,15 @@ def create_task_for_test():
         "deadline": "2023-31-07",
         "progress": "Not Started",
         "cost_per_hr": 10,
-        "assignee": "",
+        "assignee": "akshayvalluruaus@gmail.com",
         "estimation_spent_hrs": 0,
         "actual_time_hr": 0,
         "priority": 2,
         "labels": ["Label1", "Label2"],
     }
     result = task_sys.create_task(data)
+    print("\n\n\n\n")
+    print(result)
     return result["Task_id"]
 
 
@@ -323,37 +342,112 @@ def clear_db():
 #         assert(result['Success'] == True)
 
 
+# class TaskDetailsTest(unittest.TestCase):
+#     def setUp(self):
+#         self.app = app.test_client()
+#         self.app.testing = True
+
+#     def details_setup(self):
+#         clear_db()
+#         register_data = {
+#             "first_name": "John",
+#             "last_name": "Doe",
+#             "username": "johndoe",
+#             "email": "john@example.com",
+#             "password": "Password123!",
+#             "sys_admin": False,
+#         }
+
+#         response = self.app.post(
+#             "/signup", data=json.dumps(register_data), content_type="application/json"
+#         )
+#         response_data = json.loads(response.data)
+#         token = response_data["Token"]
+
+#         return token
+
+#     def test_details(self):
+#         token = test_regiser()
+#         token_2  = test_regiser_aks()
+
+#         task_id = create_task_for_test()
+#         result = get_tasks_given_by(token, "johndoe@example.com")
+#         print(result)
+
+
+
 class TaskDetailsTest(unittest.TestCase):
+
     def setUp(self):
         self.app = app.test_client()
         self.app.testing = True
 
-    def details_setup(self):
+   
+    #Register one user
+    def tes(self):
+
         clear_db()
-        register_data = {
-            "first_name": "John",
-            "last_name": "Doe",
-            "username": "johndoe",
-            "email": "john@example.com",
-            "password": "Password123!",
-            "sys_admin": False,
-        }
-
-        response = self.app.post(
-            "/signup", data=json.dumps(register_data), content_type="application/json"
+        
+        first_name = "user_1"
+        last_name = "Doe"
+        username = "johndoe"
+        email = "user@example.com"
+        password = "Password123!"
+        sys_admin = False
+        result = account_register(
+            first_name, last_name, username, email, password, sys_admin
         )
-        response_data = json.loads(response.data)
-        token = response_data["Token"]
 
-        return token
-
-    def test_details(self):
-        token = test_regiser()
-        task_id = create_task_for_test()
-        task_id_2 = create_task_for_test()
-        result = get_tasks_given_by(token, "johndoe@example.com")
-        print(result)
+        token = result['token']
 
 
+        user_info = getAccountInfo(token)
+        print(user_info)
+
+        print("alala")
+
+
+
+
+
+        
 if __name__ == "__main__":
-    unittest.main()
+    clear_db()
+        
+    first_name = "user"
+    last_name = "Doe"
+    username = "johndoe"
+    email = "user@example.com"
+    password = "Password123!"
+    sys_admin = False
+    result = account_register(
+        first_name, last_name, username, email, password, sys_admin
+    )
+
+    token = result['token']
+
+    first_name = "usertwo"
+    last_name = "Dane"
+    username = "johndoe"
+    email_two = "akshayvalluruaus@gamil.com"
+    password = "Password123!"
+    sys_admin = False
+    result_2 = account_register(
+        first_name, last_name, username, email_two, password, sys_admin
+    )
+
+    print(result_2)
+
+    token_2 = result_2['token']
+
+
+    user_info = getAccountInfo(token)
+    # print(user_info)
+
+    # user_info_2 = getAccountInfo(token_2)
+    # print(user_info_2['data']['email'])
+
+    print(AddConnection(token, email_two))
+    # respondToConnection(token_2, email, True)
+
+    # print("alala")
