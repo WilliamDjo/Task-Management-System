@@ -1,6 +1,3 @@
-from datetime import date
-from unittest import result
-from urllib import response
 from flask import Flask, request, jsonify
 import sys
 import os
@@ -13,7 +10,6 @@ from backend.task_sys import (
     get_task_details,
     get_tasks_given_by,
     update_details,
-    update_task_title,
 )
 from flask_cors import CORS
 import connections
@@ -24,7 +20,8 @@ sys.path.append(parent_folder)
 
 """Flask Set up"""
 app = Flask(__name__)
-CORS(app)
+
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 
 @app.route("/signup", methods=["POST"])
@@ -210,6 +207,7 @@ def getuserprofile():
         "Message": status["Message"],
         "Data": status["Data"],
     }
+    print(to_return)
     return jsonify(to_return)
 
 
@@ -327,9 +325,9 @@ def server_create_task():
     result = create_task(token, data)
     return jsonify(result)
 
+
 @app.route("/task/update/<task_id>", methods=["PUT"])
 def server_update_task(task_id):
-
     auth_header = request.headers.get("Authorization")
     token = ""
     if auth_header:
@@ -338,7 +336,6 @@ def server_update_task(task_id):
             return {"Success": False, "Message": "Invalid token format"}, 400
         else:
             return {"Success": False, "Message": "No token provided"}, 401
-
 
     data = request.json
     result = update_details(token, task_id, data)

@@ -26,9 +26,9 @@ def getPendingConnections(token):
     email = valid_jwt["Data"]["email"]
 
     connections = db.getUserConnections(email)
-
     pendingConnections = (
-        connections["connectionRequests"] + connections["connectionReceived"]
+        connections["Connections"]["connectionRequests"]
+        + connections["Connections"]["connectionReceived"]
     )
 
     to_return = []
@@ -42,6 +42,7 @@ def getPendingConnections(token):
                 "username": userInfo["user"],
             }
         )
+    print(to_return)
     return {
         "Success": True,
         "Message": "Pending Connections Retrieved",
