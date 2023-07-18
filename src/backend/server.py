@@ -6,7 +6,7 @@ import os
 import account
 from backend.task_sys import create_task, delete_task, update_details, update_task_title
 from flask_cors import CORS
-
+import connections
 
 """ Accessing Other Files"""
 parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -246,24 +246,62 @@ Connections based
 """
 
 
-@app.route("/connections/pendingconnections", methods=["GET"])
-def get_pending_connections():
-    return
+@app.route("user/connections", methods=["GET"])
+def get_user_connections():
+    token = request.json["token"]
+    status = connections.getUserConnections(token)
+    to_return = {
+        "Success": status["Success"],
+        "Message": status["Message"],
+    }
+    return jsonify(to_return)
 
 
-@app.route("/connections/userconnections", methods=["GET"])
-def get_all_connections():
-    return
+@app.route("user/pendingconnections", methods=["GET"])
+def get_user_pending_connections():
+    token = request.json["token"]
+    status = connections.getPendingConnections(token)
+    to_return = {
+        "Success": status["Success"],
+        "Message": status["Message"],
+    }
+    return jsonify(to_return)
 
 
-@app.route("/connections/respond", methods=["POST"])
-def respond_to_connections():
-    return
+@app.route("user/respondconnection/<email>", methods=["POST"])
+def respond_to_connection(email):
+    token = request.json["token"]
+    accepted = request.json["accepted"]
+    status = connections.respondToConnection(token, email, accepted)
+    to_return = {
+        "Success": status["Success"],
+        "Message": status["Message"],
+    }
+    return jsonify(to_return)
 
 
-@app.route("/connections/request", methods=["POST"])
-def send_connection_request():
-    return
+@app.route("user/addconnection/<email>", methods=["POST"])
+def initiate_connection(email):
+    token = request.json["token"]
+    status = connections.AddConnection(token, email)
+    to_return = {
+        "Success": status["Success"],
+        "Message": status["Message"],
+    }
+    return jsonify(to_return)
+
+
+@app.route("user/getconnection/<email>", methods=["GET"])
+def get_specific_connection(email):
+    token = request.json["token"]
+    status = connections.getConnections(token, email)
+    to_return = {
+        "Success": status["Success"],
+        "Message": status["Message"],
+        "Data": status["Data"],
+        "Tasks": status["Tasks"],
+    }
+    return jsonify(to_return)
 
 
 if __name__ == "__main__":

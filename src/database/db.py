@@ -251,6 +251,7 @@ def getSingleUserInformation(email: str) -> dict:
         "last_name": userInfo["last_name"],
         "email": userInfo["email"],
         "username": userInfo["user"],
+        "SystemAdmin": userInfo["SystemAdmin"],
         "emailNotifications": userProfile["notifications"],
         "organization": userProfile["organization_name"],
         "connections": userProfile["connections"],
