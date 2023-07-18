@@ -8,6 +8,7 @@ from flask import Flask, json
 
 
 
+
 parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_folder)
 
@@ -20,6 +21,7 @@ from server import app
 from backend.task_sys import get_tasks_given_by
 from backend.account import getAccountInfo
 from backend.connections import AddConnection, respondToConnection
+from backend.server import login
 
 
 
@@ -412,42 +414,5 @@ class TaskDetailsTest(unittest.TestCase):
 
         
 if __name__ == "__main__":
-    clear_db()
         
-    first_name = "user"
-    last_name = "Doe"
-    username = "johndoe"
-    email = "user@example.com"
-    password = "Password123!"
-    sys_admin = False
-    result = account_register(
-        first_name, last_name, username, email, password, sys_admin
-    )
-
-    token = result['token']
-
-    first_name = "usertwo"
-    last_name = "Dane"
-    username = "johndoe"
-    email_two = "akshayvalluruaus@gamil.com"
-    password = "Password123!"
-    sys_admin = False
-    result_2 = account_register(
-        first_name, last_name, username, email_two, password, sys_admin
-    )
-
-    print(result_2)
-
-    token_2 = result_2['token']
-
-
-    user_info = getAccountInfo(token)
-    # print(user_info)
-
-    # user_info_2 = getAccountInfo(token_2)
-    # print(user_info_2['data']['email'])
-
-    print(AddConnection(token, email_two))
-    # respondToConnection(token_2, email, True)
-
-    # print("alala")
+   
