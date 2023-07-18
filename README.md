@@ -54,6 +54,9 @@ follow any prompts from the rebase
 | /user/addconnection/      | token, email(to add)                                        | Success, Message                               | POST              |
 | /user/getconnection/      | token, email(to see profile), connection(boolean)           | Success,Message, Data( _connection_)           | GET               |
 | /search                   | token, search_token                                         | Success,Message,(List of _task_)               | GET               |
+| /task/create              | token, task data                                            | Success, Task Id                               | POST              |
+| /task/update/<task_id>    | token, task_id (in URL), updated task data (in body)        | Success, Message                               | PUT               |
+| /task/delete/<task_id>    | token, task_id (in URL), updated task data (in body)        | Success, Message                               | DELETE            |
 
 # Data Structures
 

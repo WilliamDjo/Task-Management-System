@@ -1,10 +1,11 @@
-from crypt import methods
 from datetime import date
+from unittest import result
+from urllib import response
 from flask import Flask, request, jsonify
 import sys
 import os
 import account
-from backend.task_sys import create_task, delete_task, update_details, update_task_title
+from backend.task_sys import create_task, delete_task, get_all_tasks, get_all_tasks_assigned_to, get_task_details, get_tasks_given_by, update_details, update_task_title
 from flask_cors import CORS
 import connections
 
@@ -35,7 +36,6 @@ def server_register():
         "Sys_admin": status["sys_admin"],
     }
     return jsonify(to_return)
-
 
 @app.route("/login", methods=["POST"])
 def login():
@@ -191,7 +191,6 @@ def reset_password():
     }
     return jsonify(to_return)
 
-
 @app.route("/reset/otp", methods=["POST"])
 def check_otp():
     email = request.json["email"]
@@ -202,7 +201,6 @@ def check_otp():
         "Message": status["Message"],
     }
     return jsonify(to_return)
-
 
 @app.route("/reset/account", methods=["POST"])
 def reset_account():
@@ -227,7 +225,7 @@ def server_create_task():
     result = create_task(data)
     return jsonify(result)
 
-
+#TODO: maybe not send in URL?
 @app.route("/task/update/<task_id>", methods=["PUT"])
 def server_update_task(task_id):
     data = request.json
@@ -235,11 +233,48 @@ def server_update_task(task_id):
     return jsonify(result)
 
 
-@app.route("/task/delete/<task_id>", methods=["DELETE"])
+@app.route("/task/delete/<task_id>", methods=['DELETE'])
 def server_delete_task(task_id):
-    result = delete_task(task_id)
+    data = request.json
+    token = data["token"]
+    result = delete_task(token, task_id)
     return jsonify(result)
 
+@app.route("/task/get", methods=["GET"])
+def server_get_task_details():
+    task_id = request.headers.get('task_id')
+    token = request.headers.get('token')
+
+    result = get_task_details(token, task_id)
+
+    return jsonify(result)
+
+
+@app.route("/task/getAll", methods=["GET"])
+def server_get_all():
+    token = request.headers.get('token')
+    result = get_all_tasks(token)
+    return jsonify(result)
+
+
+@app.route("/task/getAllAssignedTo", methods=["GET"])
+def server_get_all_tasks():
+    token = request.headers.get('token')
+    email = request.headers.get('email')
+
+    result = get_all_tasks_assigned_to(token, email)
+
+    return jsonify(result)
+
+
+@app.route("/task/getTasksGivenBy", methods=["GET"])
+def server_get_all_tasks():
+    token = request.headers.get('token')
+    email = request.headers.get('email')
+
+    result = get_tasks_given_by(token, email)
+
+    return jsonify(result)
 
 """
 Connections based
@@ -304,12 +339,6 @@ def get_specific_connection(email):
     return jsonify(to_return)
 
 
-if __name__ == "__main__":
-    # test_first = "adam"
-    # test_last = "driver"
-    # test_password = "Password123!"
-    # test_email = "adam@test.com"
-    # test_username = "adam_user"
 
-    # account.account_register(test_first, test_last, test_username, test_email, test_password, sys_admin=True)
+if __name__ == '__main__':
     app.run()
