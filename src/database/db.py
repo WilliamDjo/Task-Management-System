@@ -1,4 +1,5 @@
 from re import X
+import re
 from pymongo import MongoClient
 from pymongo.database import Database
 from pymongo.collection import Collection
@@ -326,8 +327,8 @@ def addNewConnection(email: str, userConnection: str) -> dict:
 
     # Check if user B's email already exists in user A's connectionRequests or connectionReceived
     if (
-        userConnection in userProfile_A["connectionRequests"]
-        or userConnection in userProfile_A["connectionReceived"]
+        userConnection in userProfile_A["connections"]["connectionRequests"]
+        or userConnection in userProfile_A["connections"]["connectionReceived"]
     ):
         return {
             "Success": False,
@@ -336,8 +337,8 @@ def addNewConnection(email: str, userConnection: str) -> dict:
 
     # Check if user A's email already exists in user B's connectionRequests or connectionReceived
     if (
-        email in userProfile_B["connectionRequests"]
-        or email in userProfile_B["connectionReceived"]
+        email in userProfile_B["connections"]["connectionRequests"]
+        or email in userProfile_B["connections"]["connectionReceived"]
     ):
         return {
             "Success": False,
@@ -346,10 +347,10 @@ def addNewConnection(email: str, userConnection: str) -> dict:
 
     # If no such user exists, add the connection
     UserProfileCollection.update_one(
-        {"_id": id_A}, {"$addToSet": {"connectionRequests": userConnection}}
+        {"_id": id_A}, {"$addToSet": {"connections.connectionRequests": userConnection}}
     )
     UserProfileCollection.update_one(
-        {"_id": id_B}, {"$addToSet": {"connectionReceived": email}}
+        {"_id": id_B}, {"$addToSet": {"connections.connectionReceived": email}}
     )
 
     return {"Success": True, "Message": "Connection added successfully"}
@@ -578,6 +579,41 @@ def checkConnection(email_A: str, email_B: str) -> dict:
         return {"Success": True, "Message": "Users are connected"}
     else:
         return {"Success": False, "Message": "Users are not connected"}
+
+
+def searchUser(search_string: str) -> list:
+    # Establish a database connection and get the database object
+    db = getDB()
+
+    # Get the collection object for 'UserInfo' from the database
+    UserInfoCollection = getUserInfoCollection(db)
+
+    # Define the list of fields you want to search within
+    search_fields = ["user", "email", "first_name", "last_name"]
+
+    # Construct the query
+    query = [
+        {
+            "$match": {
+                "$or": [
+                    {
+                        "$expr": {
+                            "$regexMatch": {
+                                "input": f"${field}",
+                                "regex": search_string,
+                            }
+                        }
+                    }
+                    for field in search_fields
+                ]
+            }
+        }
+    ]
+
+    # Perform the search
+    results = list(UserInfoCollection.aggregate(query))
+
+    return results
 
 
 # FOR TESTING ONLY

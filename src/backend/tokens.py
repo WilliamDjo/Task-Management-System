@@ -34,7 +34,7 @@ def check_jwt_token(token):
         # Handle other exceptions
         print(f"Error occurred while decoding token: {e}")
 
-    return {"Success": True, "Data": None}
+    return {"Success": False, "Data": None}
 
 
 if __name__ == "__main__":
