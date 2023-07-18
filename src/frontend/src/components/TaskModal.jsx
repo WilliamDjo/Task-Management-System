@@ -164,8 +164,11 @@ const TaskModal = props => {
                 <option value="">Select Assignee</option>
                 <option value={userFullName}>{userFullName}</option>
                 {connections.map(connection => (
-                  <option key={connection.id} value={connection.name}>
-                    {connection.name}
+                  <option
+                    key={connection.username}
+                    value={connection.first_name}
+                  >
+                    {connection.first_name}
                   </option>
                 ))}
               </Select>
