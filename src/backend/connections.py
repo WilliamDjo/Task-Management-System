@@ -60,19 +60,20 @@ def getUserConnections(token):
 
     connections = db.getUserConnections(email)
 
-    connections = connections["connections"]
+    connections = connections["Connections"]
 
     to_return = []
     for i in connections:
         userInfo = db.getSingleUserInformation(i)
-        to_return.append(
-            {
-                "first_name": userInfo["first_name"],
-                "last_name": userInfo["last_name"],
-                "email": userInfo["email"],
-                "username": userInfo["user"],
-            }
-        )
+        if userInfo["Success"]:
+            to_return.append(
+                {
+                    "first_name": userInfo["first_name"],
+                    "last_name": userInfo["last_name"],
+                    "email": userInfo["email"],
+                    "username": userInfo["user"],
+                }
+            )
     return {"Success": True, "Message": "Connections Retrieved", "Data": to_return}
 
 
