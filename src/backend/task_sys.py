@@ -141,7 +141,6 @@ def create_task(data: dict):
     if task_progress is None:
         task_progress = "Not Started"
 
-    #TODO: debug code to ensure consistency
     if task_progress not in ["Not Started", "In Progress", "Blocked", "Completed"]:
         return {
             "Success": False,
@@ -546,10 +545,3 @@ def get_all_tasks(token:str):
         }
 
     return db_tasks.getAllTasks()
-    
-
-
-
-
-
-

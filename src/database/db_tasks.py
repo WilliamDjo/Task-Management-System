@@ -150,11 +150,9 @@ def getAllTasks() -> dict:
        "Data": data
    }
 
-
 """
 Helper function to generate IDs
 """
-
 
 def get_next_task_id() -> str:
 

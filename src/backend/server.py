@@ -1,4 +1,3 @@
-from crypt import methods
 from datetime import date
 from urllib import response
 from flask import Flask, request, jsonify
@@ -36,7 +35,6 @@ def server_register():
         "Sys_admin": status["sys_admin"],
     }
     return jsonify(to_return)
-
 
 @app.route("/login", methods=["POST"])
 def login():
@@ -240,3 +238,5 @@ def server_get_all():
     return jsonify(result)
 
 
+if __name__ == '__main__':
+    app.run()
