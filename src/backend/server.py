@@ -1,10 +1,11 @@
 from datetime import date
+from unittest import result
 from urllib import response
 from flask import Flask, request, jsonify
 import sys
 import os
 import account
-from backend.task_sys import create_task, delete_task, get_all_tasks, get_task_details, update_details, update_task_title
+from backend.task_sys import create_task, delete_task, get_all_tasks, get_all_tasks_assigned_to, get_task_details, get_tasks_given_by, update_details, update_task_title
 from flask_cors import CORS
 
 
@@ -235,6 +236,27 @@ def server_get_task_details():
 def server_get_all():
     token = request.headers.get('token')
     result = get_all_tasks(token)
+    return jsonify(result)
+
+
+
+@app.route("/task/getAllAssignedTo", methods=["GET"])
+def server_get_all_tasks():
+    token = request.headers.get('token')
+    email = request.headers.get('email')
+
+    result = get_all_tasks_assigned_to(token, email)
+
+    return jsonify(result)
+
+
+@app.route("/task/getTasksGivenBy", methods=["GET"])
+def server_get_all_tasks():
+    token = request.headers.get('token')
+    email = request.headers.get('email')
+
+    result = get_tasks_given_by(token, email)
+
     return jsonify(result)
 
 

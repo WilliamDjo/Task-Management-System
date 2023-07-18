@@ -21,7 +21,7 @@ from database import db_tasks
 from tokens import active_tokens
 from datetime import datetime
 from account import is_email_valid, active_users
-from database.db import checkUser
+from database.db import checkUser, getSingleUserInformation, isValidUser
 from database.db import clear_collection
 
 
@@ -533,6 +533,52 @@ def get_task_details(token:str, task_id:str):
 
 
     return db_tasks.getTaskFromID(task_id)
+
+
+def get_all_tasks_assigned_to(token:str, email:str):
+
+    #check token
+    token_result = check_jwt_token(token)
+    if not token_result['Success']:
+        return {
+            "Success": False, 
+            "Message": "No user logged in"
+        }
+    
+    #check if email exists
+    db_result = getSingleUserInformation(email)
+
+    if not (db_result['Success']):
+        return {
+            "Success": False, 
+            "Message": "Email Does not exist"
+        }
+
+    return db_tasks.getTasksAssigned(email)
+
+
+
+def get_tasks_given_by(token:str, email:str):
+
+    #check token
+    token_result = check_jwt_token(token)
+    if not token_result['Success']:
+        return {
+            "Success": False, 
+            "Message": "No user logged in"
+        }
+    
+    #check if email exists
+    db_result = getSingleUserInformation(email)
+
+    if not (db_result['Success']):
+        return {
+            "Success": False, 
+            "Message": "Email Does not exist"
+        }
+
+    return db_tasks.getTasksGiven(email)
+
 
 def get_all_tasks(token:str):
 

@@ -111,7 +111,7 @@ def deleteTask(task_id: str) -> dict:
    db = getDB()
 
 
-   # Get the collection object for 'UserInfo' from the database
+   # Get the collection object database
    TaskSystemCollection = getTaskInfoCollection(db)
 
 
@@ -127,28 +127,74 @@ def deleteTask(task_id: str) -> dict:
    # If a user was found, delete the user
    TaskSystemCollection.delete_one({"id": task_id})
 
-
    # Return a dictionary indicating success
    return {"Success": True, "Message": "Task deleted successfully"}
 
 def getAllTasks() -> dict:
-   # Get the database
-   db = getDB()
+    # Get the database
+    db = getDB()
+
+    TaskSystemCollection = getTaskInfoCollection(db)
+    # Get the collection object for 'UserInfo' from the database
+    task_infos = TaskSystemCollection.find()
+    data = json.loads(json_util.dumps(task_infos))
 
 
-   # Get the collection object for 'UserInfo' from the database
-   TaskSystemCollection = getTaskInfoCollection(db)
-
-
-   task_infos = TaskSystemCollection.find()
-   data = json.loads(json_util.dumps(task_infos))
-
-
-   return {
-
-       "Success": True,
-       "Data": data
+    return {
+        "Success": True,
+        "Data": data
    }
+
+#Return all tasks given out by the master
+def getTasksGiven(task_master) -> dict:
+
+    db = getDB()
+    TaskSystemCollection = getTaskInfoCollection(db)
+    task_infos = TaskSystemCollection.find({"task_master": task_master})
+
+    tasks_given = []
+    for task_info in task_infos:
+        tasks_given.append(task_info)
+
+
+    if len(tasks_given) == 0:
+        return {
+        "Success": False,
+        "Data": tasks_given,
+        "Message": "No tasks given out by task master"
+        }
+    return {
+        "Success": True,
+        "Data": tasks_given,
+        "Message": "Successfully Retuerned"
+    }
+
+#Return all tasks assigned to an assignee
+def getTasksAssigned(task_assignee) -> dict:
+
+    db = getDB()
+    TaskSystemCollection = getTaskInfoCollection(db)
+    task_infos = TaskSystemCollection.find({"assignee": task_assignee})
+
+    tasks_given = []
+    for task_info in task_infos:
+        tasks_given.append(task_info)
+
+
+    if len(tasks_given) == 0:
+        return {
+        "Success": False,
+        "Data": tasks_given,
+        "Message": "No tasks given to by task assignee"
+        }
+    return {
+        "Success": True,
+        "Data": tasks_given,
+        "Message": "Successfully Returned"
+    }
+
+
+
 
 """
 Helper function to generate IDs
@@ -195,48 +241,3 @@ def reset_counter():
        {'_id': sequence_name},
        {'$set': {'seq_value': 0}}
    )
-
-if __name__ == "__main__":
-  
-   clear_collection("task_system")
-
-
-   deadline_task = datetime(2023, 3, 12)
-
-
-   task_info = {
-       "title": "Dummy Task",
-       "description": "This is a dummy task for testing",
-       "deadline": deadline_task,
-       "progress": "In Progress",
-       "assignee": "John Doe",
-       "cost_per_hr": 25,
-       "estimation_spent_hrs": 10,
-       "actual_time_hr": 6,
-       "priority": "High",
-       "task_master": "a",
-       "labels": ["Testing", "Dummy"],
-   }
-
-
-   deadline_task_test = datetime(2020, 3, 12)
-
-
-   updated_dict = {
-       "title": "Dummy Task",
-       "description": "This is a dummy task for testing",
-       "deadline": deadline_task_test,
-       "progress": "In Progress",
-       "assignee": "jane Doe",
-       "cost_per_hr": 25,
-       "estimation_spent_hrs": 10,
-       "actual_time_hr": 6,
-       "task_master": "b",
-       "labels": ["Testing", "Dummy"],
-   }
-
-
-   addNewTask(task_info)
-   addNewTask(task_info)
-
-
