@@ -4,8 +4,8 @@ import React, { useState, useEffect } from 'react';
 import {
   Box,
   Flex,
-  Grid,
-  GridItem,
+  //   Grid,
+  //   GridItem,
   Heading,
   //   IconButton,
   //   Input,
@@ -45,6 +45,9 @@ const KanbanBoard = () => {
   const [connections, setConnections] = useState([]);
   // State to store the user's full name
   const [userFullName, setUserFullName] = useState('');
+  const [priority, setPriority] = useState(''); // New state for priority
+  const [costPerHour, setCostPerHour] = useState(''); // New state for cost per hour
+  const [timeEstimate, setTimeEstimate] = useState(''); // New state for time estimate
 
   // Function to fetch user's connections from the backend
   const fetchConnections = async () => {
@@ -151,6 +154,9 @@ const KanbanBoard = () => {
         deadline,
         tags: tags.slice(0, 5), // Ensure maximum of 5 tags
         status: 'To Do',
+        priority: priority ? parseInt(priority) : 1, // Set priority to 1 (low priority) if not provided
+        costPerHour: costPerHour ? parseFloat(costPerHour) : null, // Parse the costPerHour to a float or set it to null
+        timeEstimate: timeEstimate ? parseFloat(timeEstimate) : null, // Parse the timeEstimate to a float or set it to null
       };
 
       if (editingTask) {
@@ -306,7 +312,6 @@ const KanbanBoard = () => {
     //   onOpen();
     // }
     // Call the backend function to get the task details
-    // Call the backend function to get the task details
     fetchBackend(
       '/task/get',
       'GET',
@@ -350,10 +355,12 @@ const KanbanBoard = () => {
   return (
     <Box p={4}>
       <Heading as="h1" mb={4}>
-        Kanban Board
+        Zombies Board
       </Heading>
-      <Grid templateColumns="repeat(3, 1fr)" gap={4}>
-        <GridItem>
+      <Flex justify="space-between">
+        {' '}
+        {/* Use Flex container with row direction */}
+        <Box flex={1}>
           <Flex direction="column" align="center">
             <Heading size="md" mb={4}>
               To Do
@@ -373,8 +380,8 @@ const KanbanBoard = () => {
             </Stack>
             <AddTaskButton onOpen={onOpen} />
           </Flex>
-        </GridItem>
-        <GridItem>
+        </Box>
+        <Box flex={1}>
           <Flex direction="column" align="center">
             <Heading size="md" mb={4}>
               In Progress
@@ -393,8 +400,8 @@ const KanbanBoard = () => {
                 ))}
             </Stack>
           </Flex>
-        </GridItem>
-        <GridItem>
+        </Box>
+        <Box flex={1}>
           <Flex direction="column" align="center">
             <Heading size="md" mb={4}>
               Completed
@@ -413,8 +420,28 @@ const KanbanBoard = () => {
                 ))}
             </Stack>
           </Flex>
-        </GridItem>
-      </Grid>
+        </Box>
+        <Box flex={1}>
+          <Flex direction="column" align="center">
+            <Heading size="md" mb={4}>
+              Blocked
+            </Heading>
+            <Stack spacing={4} w="300px">
+              {tasks
+                .filter(task => task.status === 'Blocked')
+                .map(task => (
+                  <TaskCard
+                    key={task.id}
+                    task={task}
+                    onRemove={handleRemoveTask}
+                    onEdit={handleEditTask}
+                    onStatusChange={handleStatusChange}
+                  />
+                ))}
+            </Stack>
+          </Flex>
+        </Box>
+      </Flex>
       <TaskModal
         isOpen={isOpen}
         onClose={handleCloseModal}
@@ -432,6 +459,12 @@ const KanbanBoard = () => {
         setDeadline={setDeadline}
         tags={tags}
         setTags={setTags}
+        priority={priority}
+        setPriority={setPriority}
+        costPerHour={costPerHour}
+        setCostPerHour={setCostPerHour}
+        timeEstimate={timeEstimate}
+        setTimeEstimate={setTimeEstimate}
       />
     </Box>
   );

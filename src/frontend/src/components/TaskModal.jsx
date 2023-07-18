@@ -1,3 +1,4 @@
+/* eslint-disable react/no-children-prop */
 /* eslint-disable react/prop-types */
 import React from 'react';
 import {
@@ -14,6 +15,8 @@ import {
   Select,
   Stack,
   Input,
+  InputRightAddon,
+  InputGroup,
   Textarea,
 } from '@chakra-ui/react';
 import { AddIcon, CloseIcon } from '@chakra-ui/icons';
@@ -36,6 +39,12 @@ const TaskModal = props => {
     setDeadline,
     tags,
     setTags,
+    priority,
+    setPriority,
+    costPerHour,
+    setCostPerHour,
+    timeEstimate,
+    setTimeEstimate,
   } = props;
 
   const handleSubmit = e => {
@@ -86,6 +95,30 @@ const TaskModal = props => {
                 placeholder="Deadline"
                 value={deadline}
                 onChange={e => setDeadline(e.target.value)}
+              />
+              <Select
+                placeholder="Priority"
+                value={priority}
+                onChange={e => setPriority(e.target.value)}
+              >
+                <option value="1">Low</option>
+                <option value="2">Moderate</option>
+                <option value="3">High</option>
+              </Select>
+              <InputGroup>
+                <Input
+                  type="number"
+                  placeholder="Cost per Hour (optional)"
+                  value={costPerHour}
+                  onChange={e => setCostPerHour(e.target.value)}
+                />
+                <InputRightAddon children="AUD" />
+              </InputGroup>
+              <Input
+                type="number"
+                placeholder="Time Estimate (in hours)"
+                value={timeEstimate}
+                onChange={e => setTimeEstimate(e.target.value)}
               />
               <Stack spacing={2}>
                 {tags.map((tag, index) => (
