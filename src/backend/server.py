@@ -315,14 +315,33 @@ Task based
 
 @app.route("/task/create", methods=["POST"])
 def server_create_task():
+    auth_header = request.headers.get("Authorization")
+    token = ""
+    if auth_header:
+        bearer, _, token = auth_header.partition(" ")
+        if bearer.lower() != "bearer":
+            return {"Success": False, "Message": "Invalid token format"}, 400
+        else:
+            return {"Success": False, "Message": "No token provided"}, 401
     data = request.json
-    result = create_task(data)
+    result = create_task(token, data)
     return jsonify(result)
 
 @app.route("/task/update/<task_id>", methods=["PUT"])
 def server_update_task(task_id):
+
+    auth_header = request.headers.get("Authorization")
+    token = ""
+    if auth_header:
+        bearer, _, token = auth_header.partition(" ")
+        if bearer.lower() != "bearer":
+            return {"Success": False, "Message": "Invalid token format"}, 400
+        else:
+            return {"Success": False, "Message": "No token provided"}, 401
+
+
     data = request.json
-    result = update_details(task_id, data)
+    result = update_details(token, task_id, data)
     return jsonify(result)
 
 

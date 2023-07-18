@@ -37,7 +37,7 @@ def is_title_valid(title: str):
         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 .,-_"
     )
 
-    # Check length requirement
+    # Check length requirementk
     if len(title) < min_length or len(title) > max_length:
         return False
 
@@ -99,8 +99,8 @@ Create tasks
 """
 
 
-def create_task(data: dict):
-    token = data["token"]
+def create_task(token:str, data: dict):
+    token = token
     # Verify account login - check the token
     token_result = check_jwt_token(token)
     if not token_result["Success"]:
@@ -308,7 +308,7 @@ def update_priority(task_id: str, new_priority: int):
 
 def update_details(token:str, task_id: str, new_data: dict):
 
-    user_details = getAccountInfo(new_data['token'])
+    user_details = getAccountInfo(token)
     task_master = user_details['email']
     # title
     if not is_title_valid(new_data["title"]):

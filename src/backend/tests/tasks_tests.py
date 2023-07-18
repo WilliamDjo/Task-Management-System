@@ -407,12 +407,3 @@ class TaskDetailsTest(unittest.TestCase):
         print(user_info)
 
         print("alala")
-
-
-
-
-
-        
-if __name__ == "__main__":
-        
-   
