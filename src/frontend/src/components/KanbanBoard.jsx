@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable camelcase */
 /* eslint-disable react/prop-types */
 import React, { useState, useEffect } from 'react';
@@ -32,6 +33,12 @@ import TaskModal from './TaskModal';
 import { fetchBackend } from '../fetch';
 
 const KanbanBoard = () => {
+  const [name, setName] = React.useState('Name');
+  const [username, setUsername] = React.useState('username');
+  const [email, setEmail] = React.useState('email@example.com');
+  //   const [connections, setConnections] = React.useState(1);
+  const [organization, setOrganization] = React.useState('Example Company');
+  const [emailNotifications, setEmailNotifications] = React.useState(true);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
   const [tasks, setTasks] = useState([]);
@@ -70,20 +77,33 @@ const KanbanBoard = () => {
     try {
       // Retrieve the token from the localStorage
       const token = localStorage.getItem('token');
+      console.log(token);
 
       if (!token) {
         console.error('User token not found in localStorage.');
         return;
       }
 
+      const successGetProfile = data => {
+        setEmail(data.Data.email);
+        setEmailNotifications(data.Data.emailNotifications);
+        setConnections(data.Data.connections);
+        setName(`${data.Data.first_name} ${data.Data.last_name}`);
+        setUsername(data.Data.username);
+        setOrganization(data.Data.organization);
+        // setLoaded(true);
+        console.log(data);
+      };
+
       const response = await fetchBackend(
         '/getuserprofile',
         'POST',
         { token },
-        toast
+        toast,
+        successGetProfile
       );
 
-      console.log(response);
+      console.log('response: ' + response);
 
       if (response.Success) {
         const { first_name, last_name } = response.Data;
