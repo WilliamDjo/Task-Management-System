@@ -280,7 +280,7 @@ def account_login(email, password):
     # Return token
     login_token = tokens.generate_jwt_token(email)
 
-    active_users[email] = login_token 
+    active_users[email] = login_token
 
     return {
         "Success": True,
@@ -360,9 +360,11 @@ def update_password_account(new_password, token):
     result = db.updateUserInfo(email, new_user_dict)
     return {"Success": result["Success"], "Message": result["Message"]}
 
+
 """
 Update email on backened
 """
+
 
 def update_email_account(new_email, token):
     global active_users
@@ -530,33 +532,28 @@ def change_password(email, new_password):
     }
 
 
-#testing code: DO NOT USE
+# testing code: DO NOT USE
 def add_sys_admin():
-    
     first_name = "Sys"
     last_name = "Admin"
     username = "I_am_sys_admin"
     email = "sysAdmin@gmmail.com"
     password = "PassWord123!"
     sys_admin = True
-    return account_register(first_name, last_name, username, email, password,  sys_admin)
+    return account_register(first_name, last_name, username, email, password, sys_admin)
 
 
-
-
-#testing code: DO NOT USE
+# testing code: DO NOT USE
 def add_sys_admin():
-    
     first_name = "Sys"
     last_name = "Admin"
     username = "I_am_sys_admin"
     email = "sysAdmin@gmmail.com"
     password = "PassWord123!"
     sys_admin = True
-    return account_register(first_name, last_name, username, email, password,  sys_admin)
+    return account_register(first_name, last_name, username, email, password, sys_admin)
 
 
 if __name__ == "__main__":
-   result =  add_sys_admin()
-   print(result)
-    
+    result = add_sys_admin()
+    print(result)

@@ -7,7 +7,7 @@ import os
 import account
 from backend.task_sys import create_task, delete_task, get_all_tasks, get_all_tasks_assigned_to, get_task_details, get_tasks_given_by, update_details, update_task_title
 from flask_cors import CORS
-
+import connections
 
 """ Accessing Other Files"""
 parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -53,6 +53,7 @@ def login():
     }
     return jsonify(to_return)
 
+
 @app.route("/logout", methods=["POST"])
 def logout():
     # Request
@@ -63,6 +64,7 @@ def logout():
         "Message": status["Message"],
     }
     return jsonify(to_return)
+
 
 @app.route("/update/username", methods=["PUT"])
 def update_useranme():
@@ -75,9 +77,11 @@ def update_useranme():
     }
     return jsonify(to_return)
 
+
 """
 Update email wrapper function
 """
+
 
 @app.route("/update/email", methods=["PUT"])
 def update_email():
@@ -91,9 +95,11 @@ def update_email():
     }
     return jsonify(to_return)
 
+
 """
 Update password
 """
+
 
 @app.route("/update/password", methods=["PUT"])
 def update_password():
@@ -106,7 +112,10 @@ def update_password():
     }
     return jsonify(to_return)
 
+
 """Update notificitons Set true"""
+
+
 @app.route("/update/notifications", methods=["PUT"])
 def server_update_notifications_true():
     token = request.json["token"]
@@ -117,6 +126,7 @@ def server_update_notifications_true():
         "Message": status["Message"],
     }
     return jsonify(to_return)
+
 
 @app.route("/getuserprofile", methods=["POST"])
 def getuserprofile():
@@ -130,6 +140,7 @@ def getuserprofile():
     }
     return jsonify(to_return)
 
+
 @app.route("/getallusers", methods=["POST"])
 def getallusers():
     token = request.json["token"]
@@ -140,6 +151,7 @@ def getallusers():
         "Data": status["Data"],
     }
     return jsonify(to_return)
+
 
 @app.route("/admin/reset", methods=["PUT"])
 def server_admin_reset_password():
@@ -154,6 +166,7 @@ def server_admin_reset_password():
     }
     return jsonify(to_return)
 
+
 @app.route("/admin/delete", methods=["DELETE"])
 def server_admin_delete_email():
     token = request.json["token"]
@@ -165,6 +178,7 @@ def server_admin_delete_email():
         "Message": status["Message"],
     }
     return jsonify(to_return)
+
 
 @app.route("/reset/password", methods=["PUT"])
 def reset_password():
@@ -199,9 +213,12 @@ def reset_account():
     }
     return jsonify(to_return)
 
-'''
+
+"""
 Task based
-'''
+"""
+
+
 @app.route("/task/create", methods=["POST"])
 def server_create_task():
     data = request.json
@@ -214,6 +231,7 @@ def server_update_task(task_id):
     data = request.json
     result = update_details(task_id, data)
     return jsonify(result)
+
 
 @app.route("/task/delete/<task_id>", methods=['DELETE'])
 def server_delete_task(task_id):
@@ -239,7 +257,6 @@ def server_get_all():
     return jsonify(result)
 
 
-
 @app.route("/task/getAllAssignedTo", methods=["GET"])
 def server_get_all_tasks():
     token = request.headers.get('token')
@@ -258,6 +275,69 @@ def server_get_all_tasks():
     result = get_tasks_given_by(token, email)
 
     return jsonify(result)
+
+"""
+Connections based
+"""
+
+
+@app.route("user/connections", methods=["GET"])
+def get_user_connections():
+    token = request.json["token"]
+    status = connections.getUserConnections(token)
+    to_return = {
+        "Success": status["Success"],
+        "Message": status["Message"],
+    }
+    return jsonify(to_return)
+
+
+@app.route("user/pendingconnections", methods=["GET"])
+def get_user_pending_connections():
+    token = request.json["token"]
+    status = connections.getPendingConnections(token)
+    to_return = {
+        "Success": status["Success"],
+        "Message": status["Message"],
+    }
+    return jsonify(to_return)
+
+
+@app.route("user/respondconnection/<email>", methods=["POST"])
+def respond_to_connection(email):
+    token = request.json["token"]
+    accepted = request.json["accepted"]
+    status = connections.respondToConnection(token, email, accepted)
+    to_return = {
+        "Success": status["Success"],
+        "Message": status["Message"],
+    }
+    return jsonify(to_return)
+
+
+@app.route("user/addconnection/<email>", methods=["POST"])
+def initiate_connection(email):
+    token = request.json["token"]
+    status = connections.AddConnection(token, email)
+    to_return = {
+        "Success": status["Success"],
+        "Message": status["Message"],
+    }
+    return jsonify(to_return)
+
+
+@app.route("user/getconnection/<email>", methods=["GET"])
+def get_specific_connection(email):
+    token = request.json["token"]
+    status = connections.getConnections(token, email)
+    to_return = {
+        "Success": status["Success"],
+        "Message": status["Message"],
+        "Data": status["Data"],
+        "Tasks": status["Tasks"],
+    }
+    return jsonify(to_return)
+
 
 
 if __name__ == '__main__':
