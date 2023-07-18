@@ -150,13 +150,15 @@ const KanbanBoard = () => {
       const task = {
         title: newTask,
         description,
-        assignedTo,
         deadline,
-        tags: tags.slice(0, 5), // Ensure maximum of 5 tags
-        status: 'To Do',
-        priority: priority ? parseInt(priority) : 1, // Set priority to 1 (low priority) if not provided
-        costPerHour: costPerHour ? parseFloat(costPerHour) : null, // Parse the costPerHour to a float or set it to null
-        timeEstimate: timeEstimate ? parseFloat(timeEstimate) : null, // Parse the timeEstimate to a float or set it to null
+        progress: 'To Do',
+        assignee: assignedTo,
+        cost_per_hr: costPerHour ? parseFloat(costPerHour) : null,
+        estimation_spent_hrs: timeEstimate ? parseFloat(timeEstimate) : null,
+        actual_time_hr: null,
+        priority: priority ? parseInt(priority) : 1,
+        task_master: 'User123',
+        labels: tags.slice(0, 5),
       };
 
       if (editingTask) {
@@ -188,6 +190,9 @@ const KanbanBoard = () => {
             setAssignedTo('');
             setDeadline('');
             setTags([]);
+            setPriority(''); // Reset priority state for new task
+            setCostPerHour(''); // Reset costPerHour state for new task
+            setTimeEstimate(''); // Reset timeEstimate state for new task
             setEditingTask(null);
             onClose();
           },
@@ -228,6 +233,10 @@ const KanbanBoard = () => {
             setAssignedTo('');
             setDeadline('');
             setTags([]);
+            setPriority(''); // Reset priority state for new task
+            setCostPerHour(''); // Reset costPerHour state for new task
+            setTimeEstimate(''); // Reset timeEstimate state for new task
+            setEditingTask(null);
             onClose();
           },
           () => {
@@ -319,13 +328,23 @@ const KanbanBoard = () => {
       toast,
       data => {
         // onSuccess: Task details fetched successfully
-        // Update the state with the fetched task
-        setEditingTask(data);
-        setNewTask(data.title);
-        setDescription(data.description);
-        setAssignedTo(data.assignedTo);
-        setDeadline(data.deadline);
-        setTags(data.tags);
+        // Set the state with the fetched task details
+        const taskToEdit = data.Data;
+        setEditingTask(taskToEdit);
+        setNewTask(taskToEdit.title);
+        setDescription(taskToEdit.description);
+        setAssignedTo(taskToEdit.assignee);
+        setDeadline(taskToEdit.deadline);
+        setTags(taskToEdit.labels);
+        setPriority(taskToEdit.priority.toString());
+        setCostPerHour(
+          taskToEdit.cost_per_hr ? taskToEdit.cost_per_hr.toString() : ''
+        );
+        setTimeEstimate(
+          taskToEdit.estimation_spent_hrs
+            ? taskToEdit.estimation_spent_hrs.toString()
+            : ''
+        );
         onOpen();
       },
       () => {
@@ -349,6 +368,9 @@ const KanbanBoard = () => {
     setAssignedTo('');
     setDeadline('');
     setTags([]);
+    setPriority('');
+    setCostPerHour('');
+    setTimeEstimate('');
     onClose();
   };
 
