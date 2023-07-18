@@ -33,7 +33,7 @@ const Register = () => {
   const [first_name, setFirstName] = useState('');
   const [last_name, setLastName] = useState('');
   const [username, setUsername] = useState('');
-  const [Sys_admin, setSysAdmin] = useState(false);
+  const [sys_admin, setSysAdmin] = useState(false);
   const [registrationError, setRegistrationError] = useState(false);
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const [passwordMismatchError, setPasswordMismatchError] = useState(false);
@@ -54,7 +54,7 @@ const Register = () => {
         first_name,
         last_name,
         username,
-        Sys_admin,
+        sys_admin,
       };
 
       try {
