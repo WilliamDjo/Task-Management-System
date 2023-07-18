@@ -428,11 +428,12 @@ def getAccountInfo(token):
         return {"Success": False, "Message": "User not logged in", "Data": ""}
     email = valid_jwt["Data"]["email"]
     userInformation = db.getSingleUserInformation(email)
-
+    data = userInformation["Data"]
+    del data["connections"]
     return {
         "Success": True,
         "Message": "Account info retrieved",
-        "Data": userInformation["Data"],
+        "Data": data,
     }
 
 
