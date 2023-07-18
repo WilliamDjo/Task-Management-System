@@ -67,7 +67,18 @@ def login():
 @app.route("/logout", methods=["POST"])
 def logout():
     # Request
-    token = request.json["token"]
+    token = ""
+
+    auth_header = request.headers.get("Authorization")
+    if auth_header:
+        bearer, _, token = auth_header.partition(" ")
+        if bearer.lower() != "bearer":
+            return {"Success": False, "Message": "Invalid token format"}, 400
+        # Now, the variable 'token' contains the token passed in the 'Authorization' header.
+        # You can use this token to perform your operations.
+    else:
+        return {"Success": False, "Message": "No token provided"}, 401
+
     status = account.account_logout(token)
     to_return = {
         "Success": status["Success"],
@@ -78,7 +89,17 @@ def logout():
 
 @app.route("/update/username", methods=["PUT"])
 def update_useranme():
-    token = request.json["token"]
+    token = ""
+
+    auth_header = request.headers.get("Authorization")
+    if auth_header:
+        bearer, _, token = auth_header.partition(" ")
+        if bearer.lower() != "bearer":
+            return {"Success": False, "Message": "Invalid token format"}, 400
+        # Now, the variable 'token' contains the token passed in the 'Authorization' header.
+        # You can use this token to perform your operations.
+    else:
+        return {"Success": False, "Message": "No token provided"}, 401
     new_username = request.json["username"]
     status = account.update_username(new_username, token)
     to_return = {
@@ -95,7 +116,17 @@ Update email wrapper function
 
 @app.route("/update/email", methods=["PUT"])
 def update_email():
-    token = request.json["token"]
+    token = ""
+
+    auth_header = request.headers.get("Authorization")
+    if auth_header:
+        bearer, _, token = auth_header.partition(" ")
+        if bearer.lower() != "bearer":
+            return {"Success": False, "Message": "Invalid token format"}, 400
+        # Now, the variable 'token' contains the token passed in the 'Authorization' header.
+        # You can use this token to perform your operations.
+    else:
+        return {"Success": False, "Message": "No token provided"}, 401
     new_email = request.json["email"]
     status = account.update_email_account(new_email, token)
     to_return = {
@@ -113,7 +144,17 @@ Update password
 
 @app.route("/update/password", methods=["PUT"])
 def update_password():
-    token = request.json["token"]
+    token = ""
+
+    auth_header = request.headers.get("Authorization")
+    if auth_header:
+        bearer, _, token = auth_header.partition(" ")
+        if bearer.lower() != "bearer":
+            return {"Success": False, "Message": "Invalid token format"}, 400
+        # Now, the variable 'token' contains the token passed in the 'Authorization' header.
+        # You can use this token to perform your operations.
+    else:
+        return {"Success": False, "Message": "No token provided"}, 401
     new_password = request.json["password"]
     status = account.update_password_account(new_password, token)
     to_return = {
@@ -128,7 +169,17 @@ def update_password():
 
 @app.route("/update/notifications", methods=["PUT"])
 def server_update_notifications_true():
-    token = request.json["token"]
+    token = ""
+
+    auth_header = request.headers.get("Authorization")
+    if auth_header:
+        bearer, _, token = auth_header.partition(" ")
+        if bearer.lower() != "bearer":
+            return {"Success": False, "Message": "Invalid token format"}, 400
+        # Now, the variable 'token' contains the token passed in the 'Authorization' header.
+        # You can use this token to perform your operations.
+    else:
+        return {"Success": False, "Message": "No token provided"}, 401
     value = request.json["value"]
     status = account.update_notificiation_set(value, token)
     to_return = {
@@ -140,7 +191,17 @@ def server_update_notifications_true():
 
 @app.route("/getuserprofile", methods=["POST"])
 def getuserprofile():
-    token = request.json["token"]
+    token = ""
+
+    auth_header = request.headers.get("Authorization")
+    if auth_header:
+        bearer, _, token = auth_header.partition(" ")
+        if bearer.lower() != "bearer":
+            return {"Success": False, "Message": "Invalid token format"}, 400
+        # Now, the variable 'token' contains the token passed in the 'Authorization' header.
+        # You can use this token to perform your operations.
+    else:
+        return {"Success": False, "Message": "No token provided"}, 401
     status = account.getAccountInfo(token)
 
     to_return = {
@@ -153,7 +214,17 @@ def getuserprofile():
 
 @app.route("/getallusers", methods=["POST"])
 def getallusers():
-    token = request.json["token"]
+    token = ""
+
+    auth_header = request.headers.get("Authorization")
+    if auth_header:
+        bearer, _, token = auth_header.partition(" ")
+        if bearer.lower() != "bearer":
+            return {"Success": False, "Message": "Invalid token format"}, 400
+        # Now, the variable 'token' contains the token passed in the 'Authorization' header.
+        # You can use this token to perform your operations.
+    else:
+        return {"Success": False, "Message": "No token provided"}, 401
     status = account.getAllAccounts(token)
     to_return = {
         "Success": status["Success"],
@@ -179,7 +250,17 @@ def server_admin_reset_password():
 
 @app.route("/admin/delete", methods=["DELETE"])
 def server_admin_delete_email():
-    token = request.json["token"]
+    token = ""
+
+    auth_header = request.headers.get("Authorization")
+    if auth_header:
+        bearer, _, token = auth_header.partition(" ")
+        if bearer.lower() != "bearer":
+            return {"Success": False, "Message": "Invalid token format"}, 400
+        # Now, the variable 'token' contains the token passed in the 'Authorization' header.
+        # You can use this token to perform your operations.
+    else:
+        return {"Success": False, "Message": "No token provided"}, 401
     email_to_delete = request.json["email"]
 
     status = account.admin_delete_acc(token, email_to_delete)
@@ -248,8 +329,17 @@ def server_update_task(task_id):
 
 @app.route("/task/delete/<task_id>", methods=["DELETE"])
 def server_delete_task(task_id):
-    data = request.json
-    token = data["token"]
+    token = ""
+    auth_header = request.headers.get("Authorization")
+    if auth_header:
+        bearer, _, token = auth_header.partition(" ")
+        if bearer.lower() != "bearer":
+            return {"Success": False, "Message": "Invalid token format"}, 400
+        # Now, the variable 'token' contains the token passed in the 'Authorization' header.
+        # You can use this token to perform your operations.
+    else:
+        return {"Success": False, "Message": "No token provided"}, 401
+
     result = delete_task(token, task_id)
     return jsonify(result)
 
@@ -257,7 +347,16 @@ def server_delete_task(task_id):
 @app.route("/task/get", methods=["GET"])
 def server_get_task_details():
     task_id = request.headers.get("task_id")
-    token = request.headers.get("token")
+    token = ""
+    auth_header = request.headers.get("Authorization")
+    if auth_header:
+        bearer, _, token = auth_header.partition(" ")
+        if bearer.lower() != "bearer":
+            return {"Success": False, "Message": "Invalid token format"}, 400
+        # Now, the variable 'token' contains the token passed in the 'Authorization' header.
+        # You can use this token to perform your operations.
+    else:
+        return {"Success": False, "Message": "No token provided"}, 401
 
     result = get_task_details(token, task_id)
 
@@ -266,14 +365,32 @@ def server_get_task_details():
 
 @app.route("/task/getAll", methods=["GET"])
 def server_get_all():
-    token = request.headers.get("token")
+    token = ""
+    auth_header = request.headers.get("Authorization")
+    if auth_header:
+        bearer, _, token = auth_header.partition(" ")
+        if bearer.lower() != "bearer":
+            return {"Success": False, "Message": "Invalid token format"}, 400
+        # Now, the variable 'token' contains the token passed in the 'Authorization' header.
+        # You can use this token to perform your operations.
+    else:
+        return {"Success": False, "Message": "No token provided"}, 401
     result = get_all_tasks(token)
     return jsonify(result)
 
 
 @app.route("/task/getAllAssignedTo", methods=["GET"])
 def server_get_all_tasks_assigned_to():
-    token = request.headers.get("token")
+    token = ""
+    auth_header = request.headers.get("Authorization")
+    if auth_header:
+        bearer, _, token = auth_header.partition(" ")
+        if bearer.lower() != "bearer":
+            return {"Success": False, "Message": "Invalid token format"}, 400
+        # Now, the variable 'token' contains the token passed in the 'Authorization' header.
+        # You can use this token to perform your operations.
+    else:
+        return {"Success": False, "Message": "No token provided"}, 401
     email = request.headers.get("email")
 
     result = get_all_tasks_assigned_to(token, email)
@@ -283,7 +400,16 @@ def server_get_all_tasks_assigned_to():
 
 @app.route("/task/getTasksGivenBy", methods=["GET"])
 def server_get_all_tasks():
-    token = request.headers.get("token")
+    token = ""
+    auth_header = request.headers.get("Authorization")
+    if auth_header:
+        bearer, _, token = auth_header.partition(" ")
+        if bearer.lower() != "bearer":
+            return {"Success": False, "Message": "Invalid token format"}, 400
+        # Now, the variable 'token' contains the token passed in the 'Authorization' header.
+        # You can use this token to perform your operations.
+    else:
+        return {"Success": False, "Message": "No token provided"}, 401
     email = request.headers.get("email")
 
     result = get_tasks_given_by(token, email)
@@ -298,7 +424,16 @@ Connections based
 
 @app.route("/user/connections", methods=["GET"])
 def get_user_connections():
-    token = request.json["token"]
+    token = ""
+    auth_header = request.headers.get("Authorization")
+    if auth_header:
+        bearer, _, token = auth_header.partition(" ")
+        if bearer.lower() != "bearer":
+            return {"Success": False, "Message": "Invalid token format"}, 400
+        # Now, the variable 'token' contains the token passed in the 'Authorization' header.
+        # You can use this token to perform your operations.
+    else:
+        return {"Success": False, "Message": "No token provided"}, 401
     status = connections.getUserConnections(token)
     to_return = {
         "Success": status["Success"],
@@ -309,7 +444,16 @@ def get_user_connections():
 
 @app.route("/user/pendingconnections", methods=["GET"])
 def get_user_pending_connections():
-    token = request.json["token"]
+    token = ""
+    auth_header = request.headers.get("Authorization")
+    if auth_header:
+        bearer, _, token = auth_header.partition(" ")
+        if bearer.lower() != "bearer":
+            return {"Success": False, "Message": "Invalid token format"}, 400
+        # Now, the variable 'token' contains the token passed in the 'Authorization' header.
+        # You can use this token to perform your operations.
+    else:
+        return {"Success": False, "Message": "No token provided"}, 401
     status = connections.getPendingConnections(token)
     to_return = {
         "Success": status["Success"],
@@ -320,7 +464,16 @@ def get_user_pending_connections():
 
 @app.route("/user/respondconnection/<email>", methods=["POST"])
 def respond_to_connection(email):
-    token = request.json["token"]
+    token = ""
+    auth_header = request.headers.get("Authorization")
+    if auth_header:
+        bearer, _, token = auth_header.partition(" ")
+        if bearer.lower() != "bearer":
+            return {"Success": False, "Message": "Invalid token format"}, 400
+        # Now, the variable 'token' contains the token passed in the 'Authorization' header.
+        # You can use this token to perform your operations.
+    else:
+        return {"Success": False, "Message": "No token provided"}, 401
     accepted = request.json["accepted"]
     status = connections.respondToConnection(token, email, accepted)
     to_return = {
@@ -332,7 +485,16 @@ def respond_to_connection(email):
 
 @app.route("/user/addconnection/<email>", methods=["POST"])
 def initiate_connection(email):
-    token = request.json["token"]
+    token = ""
+    auth_header = request.headers.get("Authorization")
+    if auth_header:
+        bearer, _, token = auth_header.partition(" ")
+        if bearer.lower() != "bearer":
+            return {"Success": False, "Message": "Invalid token format"}, 400
+        # Now, the variable 'token' contains the token passed in the 'Authorization' header.
+        # You can use this token to perform your operations.
+    else:
+        return {"Success": False, "Message": "No token provided"}, 401
     status = connections.AddConnection(token, email)
     to_return = {
         "Success": status["Success"],
@@ -343,7 +505,16 @@ def initiate_connection(email):
 
 @app.route("/user/getconnection/<email>", methods=["GET"])
 def get_specific_connection(email):
-    token = request.json["token"]
+    token = ""
+    auth_header = request.headers.get("Authorization")
+    if auth_header:
+        bearer, _, token = auth_header.partition(" ")
+        if bearer.lower() != "bearer":
+            return {"Success": False, "Message": "Invalid token format"}, 400
+        # Now, the variable 'token' contains the token passed in the 'Authorization' header.
+        # You can use this token to perform your operations.
+    else:
+        return {"Success": False, "Message": "No token provided"}, 401
     status = connections.getConnections(token, email)
     to_return = {
         "Success": status["Success"],
