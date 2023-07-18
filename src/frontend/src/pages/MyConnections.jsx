@@ -42,7 +42,7 @@ const MyConnections = () => {
       setLoaded(true);
     }
     const token = localStorage.getItem('token');
-    fetchBackend('/user/connections', 'GET', { token }, toast, successGetConnections);
+    fetchBackend('/user/connections', 'POST', { token }, toast, successGetConnections);
   }, [])
 
   const myConnectionsLoaded = () => {
