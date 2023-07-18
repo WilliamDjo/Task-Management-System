@@ -24,8 +24,10 @@ const TaskModal = props => {
     onClose,
     task,
     onSubmit,
+    userFullName,
     assignedTo,
     setAssignedTo,
+    connections,
     newTask,
     setNewTask,
     description,
@@ -120,11 +122,18 @@ const TaskModal = props => {
                 value={assignedTo}
                 onChange={e => setAssignedTo(e.target.value)}
               >
-                <option value="">Select Assignee</option>
+                {/* <option value="">Select Assignee</option>
                 <option value="You">You</option>
                 <option value="Alice">Alice</option>
                 <option value="Bob">Bob</option>
-                <option value="Charlie">Charlie</option>
+                <option value="Charlie">Charlie</option> */}
+                <option value="">Select Assignee</option>
+                <option value={userFullName}>{userFullName}</option>
+                {connections.map(connection => (
+                  <option key={connection.id} value={connection.name}>
+                    {connection.name}
+                  </option>
+                ))}
               </Select>
             </Stack>
           </ModalBody>

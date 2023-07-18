@@ -1,5 +1,6 @@
+/* eslint-disable camelcase */
 /* eslint-disable react/prop-types */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Flex,
@@ -40,6 +41,54 @@ const KanbanBoard = () => {
   const [deadline, setDeadline] = useState('');
   const [tags, setTags] = useState([]);
   const [editingTask, setEditingTask] = useState(null);
+  // State to store the user's connections
+  const [connections, setConnections] = useState([]);
+  // State to store the user's full name
+  const [userFullName, setUserFullName] = useState('');
+
+  // Function to fetch user's connections from the backend
+  const fetchConnections = async () => {
+    try {
+      const response = await fetchBackend(
+        '/user/connections/',
+        'GET',
+        null,
+        toast
+      );
+      setConnections(response.data);
+    } catch (error) {
+      // Handle error if fetching connections fails
+      console.error('Failed to fetch connections:', error);
+    }
+  };
+
+  // Function to fetch user's profile from the backend
+  const fetchUserProfile = async () => {
+    try {
+      const response = await fetchBackend(
+        '/getuserprofile',
+        'POST',
+        { token: 'YOUR_USER_TOKEN' },
+        toast
+      );
+      if (response.Success) {
+        const { first_name, last_name } = response.Data;
+        setUserFullName(`${first_name} ${last_name}`);
+      }
+    } catch (error) {
+      // Handle error if fetching user profile fails
+      console.error('Failed to fetch user profile:', error);
+    }
+  };
+  // Fetch the user's connections on component mount
+  useEffect(() => {
+    fetchConnections();
+  }, []);
+
+  // Fetch the user's profile on component mount
+  useEffect(() => {
+    fetchUserProfile();
+  }, []);
 
   const handleAddTask = () => {
     // if (newTask && assignedTo) {
@@ -93,7 +142,6 @@ const KanbanBoard = () => {
     //     isClosable: true,
     //   });
     // }
-    // Function to handle task creation
 
     if (newTask && assignedTo) {
       const task = {
@@ -372,8 +420,10 @@ const KanbanBoard = () => {
         onClose={handleCloseModal}
         task={editingTask}
         onSubmit={handleAddTask}
+        userFullName={userFullName}
         assignedTo={assignedTo}
         setAssignedTo={setAssignedTo}
+        connections={connections} // Pass the user's connections to the modal
         newTask={newTask}
         setNewTask={setNewTask}
         description={description}
