@@ -10,6 +10,7 @@ from database import db
 import tokens
 import password
 import account
+from database import db_tasks
 
 """
 the Data field in response should be a list of users containing their first_name, last_name, username and email
@@ -134,8 +135,14 @@ def getConnections(token, email_to_see):
     checkConnection = db.checkConnection(email_to_see, email_user)
     tasks = []
     if checkConnection or isAdmin:
-        # Get the tasks for the user
-        pass
+        all_tasks = db_tasks.getTasksAssigned(email_to_see)
+        if all_tasks["Success"]:
+            for i in all_tasks["Data"]:
+                tasks.append(
+                    {"id": i["id"], "title": i["title"], "deadline": i["deadline"]}
+                )
+            tasks = sorted(tasks, key=lambda i: (i["deadline"] is None, i["deadline"]))
+
     return {
         "Success": "True",
         "Message": "Information Retrieved",

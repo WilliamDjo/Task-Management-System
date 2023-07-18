@@ -180,6 +180,34 @@ def getTasksAssigned(task_assignee) -> dict:
     return {"Success": True, "Data": tasks_given, "Message": "Successfully Returned"}
 
 
+def searchTasks(search_string):
+    db = getDB()
+    TaskSystemCollection = getTaskInfoCollection(db)
+
+    search_regex = re.compile(f".*{search_string}.*", re.IGNORECASE)
+
+    query = {
+        "$or": [
+            {"id": search_regex},
+            {"title": search_string},
+            {"description": search_regex},
+            {"deadline": search_regex},
+            {"progress": search_regex},
+            {"assignee": search_regex},
+            {"cost_per_hr": search_regex},
+            {"estimation_spent_hrs": search_regex},
+            {"actual_time_hr": search_regex},
+            {"priority": search_regex},
+            {"task_master": search_regex},
+            {"labels": {"$in": [search_string]}},
+        ]
+    }
+    # perform the query
+    results = TaskSystemCollection.find(query)
+
+    return list(results)
+
+
 """
 Helper function to generate IDs
 """
