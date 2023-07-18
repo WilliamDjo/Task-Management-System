@@ -33,7 +33,7 @@ const Login = () => {
   const [loginError, setLoginError] = useState(false);
   const [loginSuccess, setLoginSuccess] = useState(false);
   // eslint-disable-next-line no-unused-vars
-  const [Sys_admin, setSysAdmin] = useState(false);
+  const [sys_admin, setSysAdmin] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async () => {
@@ -42,6 +42,7 @@ const Login = () => {
     const credentials = {
       email,
       password,
+      sys_admin,
     };
 
     try {
