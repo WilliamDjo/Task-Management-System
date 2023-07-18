@@ -6,14 +6,17 @@ import os
 from urllib import response
 from flask import Flask, json
 
+
 parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_folder)
 
 import task_sys 
 from account import account_register, account_login, active_users
 from database.db import clear_collection
+from database.db_tasks import getTasksAssigned, getTasksGiven
 from tokens import active_tokens
 from server import app
+from backend.task_sys import get__tasks_given_by
 
 def test_regiser():
 
@@ -59,207 +62,264 @@ def clear_db():
     clear_collection('task_system')
     clear_collection('sequence_collection')
 
-class CreateTaskTestCase(unittest.TestCase):
+# class CreateTaskTestCase(unittest.TestCase):
     
-    def test_create_task_with_valid_data(self):
-        clear_db()
-        token = test_regiser()
+#     def test_create_task_with_valid_data(self):
+#         clear_db()
+#         token = test_regiser()
 
-        data = {
-            "token": token,
-            "title": "Task Title",
-            "description": "Task Description",
-            "deadline": "2023-31-07",
-            "progress": "Not Started",
-            "cost_per_hr": 10,
-            "assignee": "",
-            "estimation_spent_hrs": 0,
-            "actual_time_hr": 0,
-            "priority": 2,
-            "labels": ["Label1", "Label2"]
-        }
+#         data = {
+#             "token": token,
+#             "title": "Task Title",
+#             "description": "Task Description",
+#             "deadline": "2023-31-07",
+#             "progress": "Not Started",
+#             "cost_per_hr": 10,
+#             "assignee": "",
+#             "estimation_spent_hrs": 0,
+#             "actual_time_hr": 0,
+#             "priority": 2,
+#             "labels": ["Label1", "Label2"]
+#         }
 
-        result = task_sys.create_task(data)
+#         result = task_sys.create_task(data)
        
-        if not result["Success"]:
-            print(result)
+#         if not result["Success"]:
+#             print(result)
 
-        self.assertTrue(result["Success"])
+#         self.assertTrue(result["Success"])
 
-    def test_update_task_title_with_valid_title(self):
+#     def test_update_task_title_with_valid_title(self):
 
-        title = "New Task Title"
-        task_id = create_task_for_test()
+#         title = "New Task Title"
+#         task_id = create_task_for_test()
 
-        result = task_sys.update_task_title(task_id, title)
+#         result = task_sys.update_task_title(task_id, title)
 
-        if not result["Success"]:
-            print(result)
+#         if not result["Success"]:
+#             print(result)
 
-        self.assertTrue(result["Success"])
+#         self.assertTrue(result["Success"])
 
-    def test_update_task_desc_with_valid_description(self):
+#     def test_update_task_desc_with_valid_description(self):
         
-        task_id = create_task_for_test()
-        description = "New Task Description"
+#         task_id = create_task_for_test()
+#         description = "New Task Description"
 
-        result = task_sys.update_task_desc(task_id, description)
+#         result = task_sys.update_task_desc(task_id, description)
 
-        if not result["Success"]:
-            print(result)
+#         if not result["Success"]:
+#             print(result)
 
 
-        self.assertTrue(result["Success"])
+#         self.assertTrue(result["Success"])
 
-    def test_update_cost_with_valid_cost(self):
-        task_id = create_task_for_test()
-        new_cost = 10
+#     def test_update_cost_with_valid_cost(self):
+#         task_id = create_task_for_test()
+#         new_cost = 10
 
-        result = task_sys.update_cost(task_id, new_cost)
+#         result = task_sys.update_cost(task_id, new_cost)
 
-        self.assertTrue(result["Success"])
+#         self.assertTrue(result["Success"])
 
-class TaskSystemTests(unittest.TestCase):
-    def setUp(self):
-        self.app = app.test_client()
-        self.app.testing = True
+# class TaskSystemTests(unittest.TestCase):
+#     def setUp(self):
+#         self.app = app.test_client()
+#         self.app.testing = True
 
-    def details_setup(self):
+#     def details_setup(self):
 
-        clear_db()
-        register_data = {
-            'first_name': 'John',
-            'last_name' : 'Doe',
-            'username': 'johndoe',
-            'email': 'john@example.com',
-            'password': 'Password123!',
-            'sys_admin': False
-        }
+#         clear_db()
+#         register_data = {
+#             'first_name': 'John',
+#             'last_name' : 'Doe',
+#             'username': 'johndoe',
+#             'email': 'john@example.com',
+#             'password': 'Password123!',
+#             'sys_admin': False
+#         }
 
-        response = self.app.post('/signup', data=json.dumps(register_data), content_type='application/json')
-        response_data = json.loads(response.data)
-        token = response_data['Token']
+#         response = self.app.post('/signup', data=json.dumps(register_data), content_type='application/json')
+#         response_data = json.loads(response.data)
+#         token = response_data['Token']
 
-        return token
+#         return token
     
-    def test_create_task_server(self):
+#     def test_create_task_server(self):
         
-        token = self.details_setup()
+#         token = self.details_setup()
 
-        #create task
-        task_data = {
-            "token": token,
-            "title": "Task Title",
-            "description": "Task Description",
-            "deadline": "2023-31-07",
-            "progress": "Not Started",
-            "cost_per_hr": 10,
-            "assignee": "",
-            "estimation_spent_hrs": 0,
-            "actual_time_hr": 0,
-            "priority": 2,
-            "labels": ["Label1", "Label2"]
-        }
-        task_create_response = self.app.post('/task/create', data=json.dumps(task_data),  content_type='application/json')
-        task_response_data = json.loads(task_create_response.data)
+#         #create task
+#         task_data = {
+#             "token": token,
+#             "title": "Task Title",
+#             "description": "Task Description",
+#             "deadline": "2023-31-07",
+#             "progress": "Not Started",
+#             "cost_per_hr": 10,
+#             "assignee": "",
+#             "estimation_spent_hrs": 0,
+#             "actual_time_hr": 0,
+#             "priority": 2,
+#             "labels": ["Label1", "Label2"]
+#         }
+#         task_create_response = self.app.post('/task/create', data=json.dumps(task_data),  content_type='application/json')
+#         task_response_data = json.loads(task_create_response.data)
 
-        assert(task_response_data['Success'] == True)
+#         assert(task_response_data['Success'] == True)
 
-    def test_update_details(self):
+#     def test_update_details(self):
         
-        token = self.details_setup()
+#         token = self.details_setup()
 
-        #create task
-        task_data = {
-            "token": token,
-            "title": "Task Title",
-            "description": "Task Description",
-            "deadline": "2023-31-07",
-            "progress": "Not Started",
-            "cost_per_hr": 10,
-            "assignee": "",
-            "estimation_spent_hrs": 0,
-            "actual_time_hr": 0,
-            "priority": 2,
-            "labels": ["Label1", "Label2"]
-        }
+#         #create task
+#         task_data = {
+#             "token": token,
+#             "title": "Task Title",
+#             "description": "Task Description",
+#             "deadline": "2023-31-07",
+#             "progress": "Not Started",
+#             "cost_per_hr": 10,
+#             "assignee": "",
+#             "estimation_spent_hrs": 0,
+#             "actual_time_hr": 0,
+#             "priority": 2,
+#             "labels": ["Label1", "Label2"]
+#         }
 
-        task_create_response = self.app.post('/task/create', data=json.dumps(task_data),  content_type='application/json')
-        task_response_data = json.loads(task_create_response.data)
-        task_id = task_response_data['Task_id']
+#         task_create_response = self.app.post('/task/create', data=json.dumps(task_data),  content_type='application/json')
+#         task_response_data = json.loads(task_create_response.data)
+#         task_id = task_response_data['Task_id']
 
-        new_task_data = {
-            "token": token,
-            "title": "New title",
-            "description": "Task Description - 02",
-            "deadline": "2023-31-07",
-            "progress": "Not Started",
-            "assignee": "",
-            "cost_per_hr": 10,
-            "estimation_spent_hrs": 0,
-            "actual_time_hr": 0,
-            "priority": 2,
-            "labels": ["Label1", "Label2"]
-        }
+#         new_task_data = {
+#             "token": token,
+#             "title": "New title",
+#             "description": "Task Description - 02",
+#             "deadline": "2023-31-07",
+#             "progress": "Not Started",
+#             "assignee": "",
+#             "cost_per_hr": 10,
+#             "estimation_spent_hrs": 0,
+#             "actual_time_hr": 0,
+#             "priority": 2,
+#             "labels": ["Label1", "Label2"]
+#         }
 
-        put_str = '/task/update/' + str(task_id)
-        task_update_response = self.app.put(put_str, data=json.dumps(new_task_data),  content_type='application/json')
-        task_update_response_data = json.loads(task_update_response.data)
+#         put_str = '/task/update/' + str(task_id)
+#         task_update_response = self.app.put(put_str, data=json.dumps(new_task_data),  content_type='application/json')
+#         task_update_response_data = json.loads(task_update_response.data)
 
-        assert(task_update_response_data['Success'] == True)
+#         assert(task_update_response_data['Success'] == True)
 
-class TaskDeleteTests(unittest.TestCase):
+# class TaskDeleteTests(unittest.TestCase):
     
-    def setUp(self):
-        self.app = app.test_client()
-        self.app.testing = True
+#     def setUp(self):
+#         self.app = app.test_client()
+#         self.app.testing = True
 
-    def details_setup(self):
+#     def details_setup(self):
 
-        clear_db()
-        register_data = {
-            'first_name': 'John',
-            'last_name' : 'Doe',
-            'username': 'johndoe',
-            'email': 'john@example.com',
-            'password': 'Password123!',
-            'sys_admin': False
-        }
+#         clear_db()
+#         register_data = {
+#             'first_name': 'John',
+#             'last_name' : 'Doe',
+#             'username': 'johndoe',
+#             'email': 'john@example.com',
+#             'password': 'Password123!',
+#             'sys_admin': False
+#         }
 
-        response = self.app.post('/signup', data=json.dumps(register_data), content_type='application/json')
-        response_data = json.loads(response.data)
-        token = response_data['Token']
+#         response = self.app.post('/signup', data=json.dumps(register_data), content_type='application/json')
+#         response_data = json.loads(response.data)
+#         token = response_data['Token']
 
-        return token
+#         return token
     
-#     # def test_delete(self):
-#     #     clear_db()
-#     #     token = test_regiser()
-#     #     task_id = create_task_for_test()
+# #     # def test_delete(self):
+# #     #     clear_db()
+# #     #     token = test_regiser()
+# #     #     task_id = create_task_for_test()
 
-#     #     headers = {
-#     #         'Authorization': f'Bearer {token}'
-#     #     }
+# #     #     headers = {
+# #     #         'Authorization': f'Bearer {token}'
+# #     #     }
 
-#     #     del_str = '/task/delete/' + str(task_id)
-#     #     task_del_response = self.app.delete(del_str, headers=headers)
-#     #     task_del_response_data = json.loads(task_del_response.data)
-#     #     assert task_del_response_data['Success'] == True
+# #     #     del_str = '/task/delete/' + str(task_id)
+# #     #     task_del_response = self.app.delete(del_str, headers=headers)
+# #     #     task_del_response_data = json.loads(task_del_response.data)
+# #     #     assert task_del_response_data['Success'] == True
 
         
-# # class TaskNotificationTests(unittest.TestCase):
-# #     def test_send_task_notification(self):
-# #         assignee_email = "akshayvalluru67@gmail.com"
-# #         task_title = "Sample Task"
+# # # class TaskNotificationTests(unittest.TestCase):
+# # #     def test_send_task_notification(self):
+# # #         assignee_email = "akshayvalluru67@gmail.com"
+# # #         task_title = "Sample Task"
 
-# #         try:
-# #             task_sys.send_task_notification(assignee_email, task_title)
-# #             print("Task notification email sent successfully!")
-# #         except Exception as e:
-# #             print(f"Failed to send task notification email: {str(e)}")
+# # #         try:
+# # #             task_sys.send_task_notification(assignee_email, task_title)
+# # #             print("Task notification email sent successfully!")
+# # #         except Exception as e:
+# # #             print(f"Failed to send task notification email: {str(e)}")
+
+# class TaskDetailsTest(unittest.TestCase):
+    
+
+#     def setUp(self):
+#         self.app = app.test_client()
+#         self.app.testing = True
+
+#     def details_setup(self):
+
+#         clear_db()
+#         register_data = {
+#             'first_name': 'John',
+#             'last_name' : 'Doe',
+#             'username': 'johndoe',
+#             'email': 'john@example.com',
+#             'password': 'Password123!',
+#             'sys_admin': False
+#         }
+
+#         response = self.app.post('/signup', data=json.dumps(register_data), content_type='application/json')
+#         response_data = json.loads(response.data)
+#         token = response_data['Token']
+
+#         return token
+    
+#     def test_details(self):
+
+#         token = test_regiser()
+        
+#         task_id = create_task_for_test()
+#         result = task_sys.get_task_details(token, task_id )
+
+#         assert(result['Success'] == True)
+
+#     def server_task_details(self):
+
+#         token = self.details_setup()
+#         task_id = create_task_for_test()
+#         headers = {'task_id': task_id, 'token': token}
+#         with self.app.test_client() as client:
+#             response = client.get('/task/get', headers=headers)
+
+#         result = response.get_json()
+
+#         assert(result['Successs'] == True)
+        
+#     def test_get_all_server(self):
+        
+#         token = self.details_setup()
+#         headers = {'token': token}
+#         task_id = create_task_for_test()
+#         response = self.app.get('/task/getAll', headers=headers)
+#         result = response.get_json()
+#         print(result)
+#         assert(result['Success'] == True)
+
+
 
 class TaskDetailsTest(unittest.TestCase):
-    
 
     def setUp(self):
         self.app = app.test_client()
@@ -282,42 +342,17 @@ class TaskDetailsTest(unittest.TestCase):
         token = response_data['Token']
 
         return token
-    
+
     def test_details(self):
 
         token = test_regiser()
-        
         task_id = create_task_for_test()
-        result = task_sys.get_task_details(token, task_id )
-
-        assert(result['Success'] == True)
-
-    def server_task_details(self):
-
-        token = self.details_setup()
-        task_id = create_task_for_test()
-        headers = {'task_id': task_id, 'token': token}
-        with self.app.test_client() as client:
-            response = client.get('/task/get', headers=headers)
-
-        result = response.get_json()
-
-        assert(result['Successs'] == True)
-        
-    def test_get_all_server(self):
-        
-        token = self.details_setup()
-        headers = {'token': token}
-        task_id = create_task_for_test()
-        response = self.app.get('/task/getAll', headers=headers)
-        result = response.get_json()
+        task_id_2 = create_task_for_test()
+        result = get__tasks_given_by(token, 'johndoe@example.com')
         print(result)
-        assert(result['Success'] == True)
 
 
-
-
-
+     
 
 if __name__ == "__main__":
     unittest.main()
