@@ -23,6 +23,14 @@ import PendingConnections from './pages/PendingConnections';
 import PendingProfile from './pages/PendingProfile';
 import VerifyEmail from './pages/VerifyEmail';
 import ResetPassword from './pages/ResetPassword';
+import Connections from './pages/Connections';
+import AddConnection from './pages/AddConnection';
+import MyConnections from './pages/MyConnections';
+import ConnectionProfile from './pages/ConnectionProfile';
+import SearchEverything from './pages/SearchEverything';
+import MyProfile from './pages/MyProfile';
+import PendingConnections from './pages/PendingConnections';
+import PendingProfile from './pages/PendingProfile';
 
 const App = () => {
   return (
@@ -60,6 +68,7 @@ const App = () => {
           <Route path="changeemail" element={<ChangeEmail />} />
           <Route path="verifyemail" element={<VerifyEmail />} />
           <Route path="resetpassword" element={<ResetPassword />} />
+          <Route path="searcheverything" element={<SearchEverything />} />
         </Routes>
       </BrowserRouter>
     </ChakraProvider>

@@ -55,7 +55,9 @@ const ConnectionProfile = () => {
       setLoaded(true);
     }
     const token = localStorage.getItem('token');
+
     fetchBackend(`/user/getconnection/${email}`, 'GET', { token }, toast, successGetConnectionProfile);
+
   }, [])
 
   const connectionProfileLoaded = () => {

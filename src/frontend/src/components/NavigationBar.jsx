@@ -11,7 +11,8 @@ import {
   ChatIcon,
   SettingsIcon,
   UnlockIcon,
-  CopyIcon
+  CopyIcon,
+  Search2Icon
 } from '@chakra-ui/icons'
 import React from 'react';
 import {
@@ -20,6 +21,7 @@ import {
 } from 'react-router-dom';
 
 import { fetchBackend, isNone } from '../fetch';
+
 
 const NavigationBar = () => {
   const toast = useToast();
@@ -37,16 +39,23 @@ const NavigationBar = () => {
       localStorage.removeItem('token');
       localStorage.removeItem('admin');
       navigate('/');
-    }
+    };
 
     const failLogout = () => {
       localStorage.removeItem('token');
       localStorage.removeItem('admin');
       navigate('/');
-    }
+    };
     const token = localStorage.getItem('token');
-    fetchBackend('/logout', 'POST', { token }, toast, successLogout, failLogout);
-  }
+    fetchBackend(
+      '/logout',
+      'POST',
+      { token },
+      toast,
+      successLogout,
+      failLogout
+    );
+  };
 
   const isAdmin = () => {
     if (!isNone(localStorage.getItem('admin')) && localStorage.getItem('admin') === 'true') {
@@ -56,10 +65,12 @@ const NavigationBar = () => {
   }
 
   return (
-    <Box bg='black' color='blue.50'>
-      <Flex alignItems='center'>
+    <Box bg="black" color="blue.50">
+      <Flex alignItems="center">
         <RouteLink to="/dashboard">
-          <Heading _hover={hoverStyle} size='md'>TaskMaster</Heading>
+          <Heading _hover={hoverStyle} size="md">
+            TaskMaster
+          </Heading>
         </RouteLink>
         <Spacer />
         {
@@ -77,21 +88,26 @@ const NavigationBar = () => {
           </RouteLink>
         }
         <RouteLink to="/connections">
-          <Tooltip label='Connections'>
-            <ChatIcon m='1' _hover={hoverStyle} />
+          <Tooltip label="Connections">
+            <ChatIcon m="1" _hover={hoverStyle} />
           </Tooltip>
         </RouteLink>
         <RouteLink to="/profile">
-          <Tooltip label='Profile'>
-            <SettingsIcon m='1' _hover={hoverStyle} />
+          <Tooltip label="Profile">
+            <SettingsIcon m="1" _hover={hoverStyle} />
           </Tooltip>
         </RouteLink>
-        <Text m='1' _hover={hoverStyle} onClick={handleLogout}>
+        <RouteLink to="/searcheverything">
+          <Tooltip label="Search">
+            <Search2Icon m="1" _hover={hoverStyle} />
+          </Tooltip>
+        </RouteLink>
+        <Text m="1" _hover={hoverStyle} onClick={handleLogout}>
           Logout
         </Text>
       </Flex>
     </Box>
   );
-}
+};
 
 export default NavigationBar;
