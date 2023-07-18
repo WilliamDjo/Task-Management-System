@@ -1,3 +1,4 @@
+/* eslint-disable multiline-ternary */
 import React from 'react';
 import {
   Box,
@@ -5,7 +6,7 @@ import {
   ButtonGroup,
   Center,
   Spinner,
-  useToast
+  useToast,
 } from '@chakra-ui/react';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -27,22 +28,27 @@ const PendingProfile = () => {
   const info = [
     {
       title: 'Organization',
-      attribute: organization
-    }
-  ]
+      attribute: organization,
+    },
+  ];
 
   React.useEffect(() => {
-    const successGetConnectionProfile = (data) => {
+    const successGetConnectionProfile = data => {
       setName(`${data.Data.first_name} ${data.Data.last_name}`);
       setUsername(data.Data.username);
       setOrganization(data.Data.organization);
       setLoaded(true);
-    }
+    };
     const token = localStorage.getItem('token');
 
-    fetchBackend(`/user/getconnection/${email}`, 'GET', { token }, toast, successGetConnectionProfile);
-
-  }, [])
+    fetchBackend(
+      `/user/getconnection/${email}`,
+      'GET',
+      { token },
+      toast,
+      successGetConnectionProfile
+    );
+  }, []);
 
   const handleRespondConnection = (email, value) => {
     const successRespondConnection = () => {
@@ -53,43 +59,60 @@ const PendingProfile = () => {
         isClosable: true,
       });
       if (value === true) {
-        navigate(`/connections/my/${email}`)
+        navigate(`/connections/my/${email}`);
       } else {
-        navigate('/connections/pending')
+        navigate('/connections/pending');
       }
-    }
+    };
     const token = localStorage.getItem('token');
     const body = {
       token,
       email,
-      value
-    }
-    fetchBackend('/user/respondconnection', 'POST', body, toast, successRespondConnection);
-  }
+      value,
+    };
+    fetchBackend(
+      '/user/respondconnection',
+      'POST',
+      body,
+      toast,
+      successRespondConnection
+    );
+  };
 
   const pendingProfileLoaded = () => {
     return (
-      <ProfileCard
-        name={name}
-        username={username}
-        email={email}
-        info={info}
-      >
+      <ProfileCard name={name} username={username} email={email} info={info}>
         <ButtonGroup isAttached>
-          <Button colorScheme='green' onClick={() => handleRespondConnection(email, true)}>Accept</Button>
-          <Button colorScheme='red' onClick={() => handleRespondConnection(email, false)}>Decline</Button>
+          <Button
+            colorScheme="green"
+            onClick={() => handleRespondConnection(email, true)}
+          >
+            Accept
+          </Button>
+          <Button
+            colorScheme="red"
+            onClick={() => handleRespondConnection(email, false)}
+          >
+            Decline
+          </Button>
         </ButtonGroup>
       </ProfileCard>
     );
-  }
+  };
 
   return (
     <ConnectionsBar pendingConnections>
       <Box>
-        {loaded ? pendingProfileLoaded() : <Center><Spinner /></Center>}
+        {loaded ? (
+          pendingProfileLoaded()
+        ) : (
+          <Center>
+            <Spinner />
+          </Center>
+        )}
       </Box>
     </ConnectionsBar>
   );
-}
+};
 
 export default PendingProfile;

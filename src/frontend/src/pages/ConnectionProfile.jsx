@@ -1,3 +1,4 @@
+/* eslint-disable multiline-ternary */
 import React from 'react';
 import {
   Box,
@@ -14,7 +15,7 @@ import {
   Th,
   Thead,
   Tr,
-  useToast
+  useToast,
 } from '@chakra-ui/react';
 import { useParams } from 'react-router-dom';
 
@@ -31,8 +32,8 @@ const ConnectionProfile = () => {
     {
       id: 100,
       title: 'Task',
-      deadline: '2023-07-15 09:00:00 AM'
-    }
+      deadline: '2023-07-15 09:00:00 AM',
+    },
   ]);
 
   const { email } = useParams();
@@ -42,47 +43,47 @@ const ConnectionProfile = () => {
   const info = [
     {
       title: 'Organization',
-      attribute: organization
-    }
-  ]
+      attribute: organization,
+    },
+  ];
 
   React.useEffect(() => {
-    const successGetConnectionProfile = (data) => {
+    const successGetConnectionProfile = data => {
       setName(`${data.Data.first_name} ${data.Data.last_name}`);
       setUsername(data.Data.username);
       setOrganization(data.Data.organization);
       setTasks(data.Data.tasks);
       setLoaded(true);
-    }
+    };
     const token = localStorage.getItem('token');
 
-    fetchBackend(`/user/getconnection/${email}`, 'GET', { token }, toast, successGetConnectionProfile);
-
-  }, [])
+    fetchBackend(
+      `/user/getconnection/${email}`,
+      'GET',
+      { token },
+      toast,
+      successGetConnectionProfile
+    );
+  }, []);
 
   const connectionProfileLoaded = () => {
     return (
-      <ProfileCard
-        name={name}
-        username={username}
-        email={email}
-        info={info}
-      />
+      <ProfileCard name={name} username={username} email={email} info={info} />
     );
-  }
+  };
 
   const connectionAssignedTaskListLoaded = () => {
     return (
-      <Card mt='4'>
+      <Card mt="4">
         <CardBody>
-          <Heading fontSize='lg' textTransform='uppercase'>
+          <Heading fontSize="lg" textTransform="uppercase">
             Assigned Task List
           </Heading>
           <TableContainer>
-            <Table variant='simple'>
+            <Table variant="simple">
               <Thead>
                 <Tr>
-                  <Hide below='sm'>
+                  <Hide below="sm">
                     <Th>ID</Th>
                   </Hide>
                   <Th>Title</Th>
@@ -93,7 +94,7 @@ const ConnectionProfile = () => {
                 {tasks.map((task, index) => {
                   return (
                     <Tr key={index}>
-                      <Hide below='sm'>
+                      <Hide below="sm">
                         <Td>{task.id}</Td>
                       </Hide>
                       <Td>{task.title}</Td>
@@ -106,17 +107,23 @@ const ConnectionProfile = () => {
           </TableContainer>
         </CardBody>
       </Card>
-    )
-  }
+    );
+  };
 
   return (
     <ConnectionsBar myConnections>
       <Box>
-        {loaded ? connectionProfileLoaded() : <Center><Spinner /></Center>}
+        {loaded ? (
+          connectionProfileLoaded()
+        ) : (
+          <Center>
+            <Spinner />
+          </Center>
+        )}
         {loaded && connectionAssignedTaskListLoaded()}
       </Box>
     </ConnectionsBar>
   );
-}
+};
 
 export default ConnectionProfile;

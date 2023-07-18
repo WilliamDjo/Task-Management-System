@@ -33,7 +33,7 @@ const Login = () => {
   const [loginError, setLoginError] = useState(false);
   const [loginSuccess, setLoginSuccess] = useState(false);
   // eslint-disable-next-line no-unused-vars
-  const [sys_admin, setSysAdmin] = useState(false);
+  const [Sys_admin, setSysAdmin] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async () => {
@@ -51,7 +51,7 @@ const Login = () => {
         credentials,
         null,
         async data => {
-          const { Token, sys_admin } = data;
+          const { Token, Sys_admin } = data;
 
           // Store the token and isAdmin status in localStorage
           if (!Token) {
@@ -61,11 +61,11 @@ const Login = () => {
             console.log(data);
             console.log(Token);
           } else {
-            setSysAdmin(sys_admin);
+            setSysAdmin(Sys_admin);
             localStorage.setItem('token', Token);
             console.log('Login successful');
             console.log(Token);
-            if (sys_admin) {
+            if (Sys_admin) {
               navigate('/admin');
             } else {
               navigate('/dashboard');
