@@ -7,25 +7,28 @@ import json
 import os
 import sys
 import re
+from datetime import date, datetime
+from database.db import getDB, clear_collection
+
 
 """
 TESTING: DELETE
 """
 
-from datetime import date, datetime
-from db import getDB, clear_collection
 
 """
-Returns the the entire collection
+Returns the entire collection
 """
 
 
 def getTaskInfoCollection(db: Database) -> Collection:
     return db["task_system"]
 
+
 """
 Adds a new task to the task system
 """
+
 
 def addNewTask(data: dict) -> dict:
     db = getDB()
@@ -34,7 +37,6 @@ def addNewTask(data: dict) -> dict:
     TaskSystemCollection = getTaskInfoCollection(db)
 
     # Create a dictionary with the structure of a task to be inserted
-
     task_id = get_next_task_id()
     task_info = {
         "id": task_id,
@@ -62,10 +64,9 @@ def addNewTask(data: dict) -> dict:
     # Get the id of the inserted document
     inserted_id = insert_result.inserted_id
 
-
     # Return the inserted task information
-
     return {"Success": True, "Task_id": task_id}
+
 
 def getTaskFromID(task_id: str) -> dict:
     db = getDB()
@@ -81,6 +82,7 @@ def getTaskFromID(task_id: str) -> dict:
 
     return {"Success": True, "Message": "Task Found", "Data": task}
 
+
 def updateTaskInfo(task_id: str, data: dict) -> dict:
     # Get the database
     db = getDB()
@@ -90,24 +92,23 @@ def updateTaskInfo(task_id: str, data: dict) -> dict:
 
     task = TaskSystemCollection.find_one({"id": task_id})
 
-
     if task is None:
-       return {"Success": False, "Message": "No task found with given id"}
-    
+        return {"Success": False, "Message": "No task found with given id"}
+
     if "token" in data:
         del data["token"]
 
     result = TaskSystemCollection.update_one({"id": task_id}, {"$set": data})
-   
-    return {"Success": True, "Message": "Update successfull"}
+
+    return {"Success": True, "Message": "Update successful"}
+
 
 def deleteTask(task_id: str) -> dict:
-   # Get the database
-   db = getDB()
+    # Get the database
+    db = getDB()
 
-
-   # Get the collection object database
-   TaskSystemCollection = getTaskInfoCollection(db)
+    # Get the collection object database
+    TaskSystemCollection = getTaskInfoCollection(db)
 
     # Get the collection object for 'UserInfo' from the database
     TaskSystemCollection = getTaskInfoCollection(db)
@@ -122,31 +123,27 @@ def deleteTask(task_id: str) -> dict:
     # If a user was found, delete the user
     TaskSystemCollection.delete_one({"id": task_id})
 
-   # If a user was found, delete the user
-   TaskSystemCollection.delete_one({"id": task_id})
+    # If a user was found, delete the user
+    TaskSystemCollection.delete_one({"id": task_id})
 
-   # Return a dictionary indicating success
-   return {"Success": True, "Message": "Task deleted successfully"}
+    # Return a dictionary indicating success
+    return {"Success": True, "Message": "Task deleted successfully"}
+
 
 def getAllTasks() -> dict:
     # Get the database
     db = getDB()
-
 
     TaskSystemCollection = getTaskInfoCollection(db)
     # Get the collection object for 'UserInfo' from the database
     task_infos = TaskSystemCollection.find()
     data = json.loads(json_util.dumps(task_infos))
 
+    return {"Success": True, "Data": data}
 
-    return {
-        "Success": True,
-        "Data": data
-   }
 
-#Return all tasks given out by the master
+# Return all tasks given out by the master
 def getTasksGiven(task_master) -> dict:
-
     db = getDB()
     TaskSystemCollection = getTaskInfoCollection(db)
     task_infos = TaskSystemCollection.find({"task_master": task_master})
@@ -155,22 +152,17 @@ def getTasksGiven(task_master) -> dict:
     for task_info in task_infos:
         tasks_given.append(task_info)
 
-
     if len(tasks_given) == 0:
         return {
-        "Success": False,
-        "Data": tasks_given,
-        "Message": "No tasks given out by task master"
+            "Success": False,
+            "Data": tasks_given,
+            "Message": "No tasks given out by task master",
         }
-    return {
-        "Success": True,
-        "Data": tasks_given,
-        "Message": "Successfully Retuerned"
-    }
+    return {"Success": True, "Data": tasks_given, "Message": "Successfully Returned"}
 
-#Return all tasks assigned to an assignee
+
+# Return all tasks assigned to an assignee
 def getTasksAssigned(task_assignee) -> dict:
-
     db = getDB()
     TaskSystemCollection = getTaskInfoCollection(db)
     task_infos = TaskSystemCollection.find({"assignee": task_assignee})
@@ -179,24 +171,19 @@ def getTasksAssigned(task_assignee) -> dict:
     for task_info in task_infos:
         tasks_given.append(task_info)
 
-
     if len(tasks_given) == 0:
         return {
-        "Success": False,
-        "Data": tasks_given,
-        "Message": "No tasks given to by task assignee"
+            "Success": False,
+            "Data": tasks_given,
+            "Message": "No tasks given to by task assignee",
         }
-    return {
-        "Success": True,
-        "Data": tasks_given,
-        "Message": "Successfully Returned"
-    }
-
+    return {"Success": True, "Data": tasks_given, "Message": "Successfully Returned"}
 
 
 """
 Helper function to generate IDs
 """
+
 
 def get_next_task_id() -> str:
     db = getDB()
@@ -221,13 +208,11 @@ def get_next_task_id() -> str:
 
     return formatted_id
 
+
 def reset_counter():
     db = getDB()
     sequence_collection = db["sequence_collection"]
     sequence_name = "task_id"
 
-   # Update the sequence counter to reset it
-   sequence_collection.update_one(
-       {'_id': sequence_name},
-       {'$set': {'seq_value': 0}}
-   )
+    # Update the sequence counter to reset it
+    sequence_collection.update_one({"_id": sequence_name}, {"$set": {"seq_value": 0}})

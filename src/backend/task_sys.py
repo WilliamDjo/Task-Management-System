@@ -281,19 +281,17 @@ def update_priority(task_id: str, new_priority: int):
 
     return db_tasks.updateTaskInfo(task_id, {"priority": new_priority})
 
-    token_result = check_jwt_token(new_data['token'])
-    if not token_result['Success']:
-        return {
-            "Success": False, 
-            "Message": "No user logged in"
-        }
+    token_result = check_jwt_token(new_data["token"])
+    if not token_result["Success"]:
+        return {"Success": False, "Message": "No user logged in"}
 
-    #title 
-    if not is_title_valid(new_data['title']):
+    # title
+    if not is_title_valid(new_data["title"]):
         return {
             "Success": False,
-            "Message": "Invalid Title Format, needs to be > 2 and  < 100"        
+            "Message": "Invalid Title Format, needs to be > 2 and  < 100",
         }
+
 
 def update_details(task_id: str, new_data: dict):
     # title
@@ -342,19 +340,15 @@ def update_details(task_id: str, new_data: dict):
     return db_tasks.updateTaskInfo(task_id, new_data)
 
 
-'''
+"""
 Delete
-'''
-def delete_task(token:str, task_id:str):
+"""
 
+
+def delete_task(token: str, task_id: str):
     token_result = check_jwt_token(token)
-    if not token_result['Success']:
-        return {
-            "Success": False, 
-            "Message": "No user logged in"
-        }
-    
-
+    if not token_result["Success"]:
+        return {"Success": False, "Message": "No user logged in"}
 
 
 """
@@ -374,21 +368,18 @@ def assign_task(token:str,task_id:str, assignee_email:str):
 
 """
 
+
 def assign_task(task_id: str, assignee_email: str):
     is_assignee_valid(assignee_email)
 
     # TODO: check if assignee workload permits
 
-
     # TODO: send email
-
-
 
     update_task_assignee(task_id, assignee_email)
 
 
 def send_task_notification(assignee_email, task_title):
-    
     sender_email = "zombies3900w11a@gmx.com"
     sender_password = "wEvZ28Xm9b3uviN"
 
@@ -463,7 +454,6 @@ def send_task_notification(assignee_email, task_title):
         print(f"Error: {e}")
 
 
-
 """
 LABELS
 """
@@ -481,74 +471,50 @@ def add_label(task_id: str, new_label: str):
     curr_labels.append(new_label)
     db_tasks.updateTaskInfo(task_id, {"labels": curr_labels})
 
-def get_task_details(token:str, task_id:str):
 
-    #check token
+def get_task_details(token: str, task_id: str):
+    # check token
     token_result = check_jwt_token(token)
-    if not token_result['Success']:
-        return {
-            "Success": False, 
-            "Message": "No user logged in"
-        }
-
+    if not token_result["Success"]:
+        return {"Success": False, "Message": "No user logged in"}
 
     return db_tasks.getTaskFromID(task_id)
 
 
-def get_all_tasks_assigned_to(token:str, email:str):
-
-    #check token
+def get_all_tasks_assigned_to(token: str, email: str):
+    # check token
     token_result = check_jwt_token(token)
-    if not token_result['Success']:
-        return {
-            "Success": False, 
-            "Message": "No user logged in"
-        }
-    
-    #check if email exists
+    if not token_result["Success"]:
+        return {"Success": False, "Message": "No user logged in"}
+
+    # check if email exists
     db_result = getSingleUserInformation(email)
 
-    if not (db_result['Success']):
-        return {
-            "Success": False, 
-            "Message": "Email Does not exist"
-        }
+    if not (db_result["Success"]):
+        return {"Success": False, "Message": "Email Does not exist"}
 
     return db_tasks.getTasksAssigned(email)
 
 
-
-def get_tasks_given_by(token:str, email:str):
-
-    #check token
+def get_tasks_given_by(token: str, email: str):
+    # check token
     token_result = check_jwt_token(token)
-    if not token_result['Success']:
-        return {
-            "Success": False, 
-            "Message": "No user logged in"
-        }
-    
-    #check if email exists
+    if not token_result["Success"]:
+        return {"Success": False, "Message": "No user logged in"}
+
+    # check if email exists
     db_result = getSingleUserInformation(email)
 
-    if not (db_result['Success']):
-        return {
-            "Success": False, 
-            "Message": "Email Does not exist"
-        }
+    if not (db_result["Success"]):
+        return {"Success": False, "Message": "Email Does not exist"}
 
     return db_tasks.getTasksGiven(email)
 
 
-def get_all_tasks(token:str):
-
-    #check token
+def get_all_tasks(token: str):
+    # check token
     token_result = check_jwt_token(token)
-    if not token_result['Success']:
-        return {
-            "Success": False, 
-            "Message": "No user logged in"
-        }
+    if not token_result["Success"]:
+        return {"Success": False, "Message": "No user logged in"}
 
     return db_tasks.getAllTasks()
-

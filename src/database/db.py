@@ -611,3 +611,10 @@ def print_all_from_collection(collection_name: str):
     # Loop through the documents and print each one
     for document in documents:
         print(document)
+
+
+if __name__ == "__main__":
+    clear_collection("sequence_collection")
+    clear_collection("task_system")
+    clear_collection("user_info")
+    clear_collection("user_profile")
