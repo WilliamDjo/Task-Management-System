@@ -83,9 +83,12 @@ const KanbanBoard = () => {
         toast
       );
 
+      console.log(response);
+
       if (response.Success) {
         const { first_name, last_name } = response.Data;
         setUserFullName(`${first_name} ${last_name}`);
+        console.log('hello1');
       }
     } catch (error) {
       // Handle error if fetching user profile fails
