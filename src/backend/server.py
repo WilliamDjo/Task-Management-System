@@ -237,8 +237,6 @@ def server_create_task():
     result = create_task(data)
     return jsonify(result)
 
-
-# TODO: maybe not send in URL?
 @app.route("/task/update/<task_id>", methods=["PUT"])
 def server_update_task(task_id):
     data = request.json

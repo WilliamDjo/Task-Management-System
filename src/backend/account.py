@@ -423,6 +423,7 @@ def getAccountInfo(token):
     global active_users
 
     valid_jwt = tokens.check_jwt_token(token)
+    print(valid_jwt)
     if not valid_jwt["Success"]:
         return {"Success": False, "Message": "User not logged in", "Data": ""}
     email = valid_jwt["Data"]["email"]
