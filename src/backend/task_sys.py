@@ -17,7 +17,7 @@ import ssl
 parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_folder)
 
-from database import db_tasks
+from database import db_tasks, db
 from tokens import active_tokens
 from datetime import datetime
 from account import is_email_valid, active_users
@@ -37,7 +37,7 @@ def is_title_valid(title: str):
         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 .,-_"
     )
 
-    # Check length requirement
+    # Check length requirementk
     if len(title) < min_length or len(title) > max_length:
         return False
 
@@ -78,12 +78,12 @@ def is_label_valid(label: str):
     return True
 
 
-# TODO: Ensure given assignee email is present in connections
 def is_assignee_valid(assignee: str):
-    # Check if user exists in db
     res = checkUser(assignee)
     if res["Success"]:
         return False
+
+    
 
     return True
 
@@ -99,8 +99,8 @@ Create tasks
 """
 
 
-def create_task(data: dict):
-    token = data["token"]
+def create_task(token:str, data: dict):
+    token = token
     # Verify account login - check the token
     token_result = check_jwt_token(token)
     if not token_result["Success"]:
@@ -190,12 +190,19 @@ def create_task(data: dict):
     # If assigned to none, default to task master
     if task_assignee == "":
         task_assignee = task_master
+    else:
 
-    # if not is_assignee_valid(task_assignee):
-    #     return {
-    #         "Success": False,
-    #         "Message": "Assignee is not valid"
-    #     }
+        if not is_assignee_valid(task_assignee):
+            return {
+                "Success": False,
+                "Message": "Assignee is not valid"
+            }
+
+        #Check if both users are connected
+        if not db.checkConnection(task_master, task_assignee):
+
+            print("p\n\n\n\npp")
+    
 
     valid_labels = [label for label in task_labels if is_label_valid(label)]
 
@@ -214,6 +221,8 @@ def create_task(data: dict):
     }
 
     result = db_tasks.addNewTask(new_dict)
+
+    send_task_notification(task_assignee, task_title)
 
     return result
 
@@ -248,9 +257,13 @@ def update_task_progress(task_id: str, progress: str):
 
 
 def update_task_assignee(task_id: str, email: str):
+    
     if not is_assignee_valid(email):
         return {"Success": False, "Message": "Invalid assignee"}
-    # TODO call email notif
+    
+    #Check connections TODO
+    
+
     return db_tasks.updateTaskInfo(task_id, {"assignee": email})
 
 
@@ -293,7 +306,10 @@ def update_priority(task_id: str, new_priority: int):
         }
 
 
-def update_details(task_id: str, new_data: dict):
+def update_details(token:str, task_id: str, new_data: dict):
+
+    user_details = getAccountInfo(token)
+    task_master = user_details['email']
     # title
     if not is_title_valid(new_data["title"]):
         return {
@@ -311,13 +327,32 @@ def update_details(task_id: str, new_data: dict):
     if not is_progress_status(new_data["progress"]):
         return {"Success": False, "Message": "Invalid Progress status"}
 
-    # Assignee TODO
-    # if not is_assignee_valid(new_data['assignee']):
-    #     return {
-    #         "Success": False,
-    #         "Message": "Invalid assignee"
-    #     }
-    # #TODO call email notif
+    task_assignee = new_data['assignee']
+    if not is_assignee_valid(new_data['assignee']):
+        return {
+            "Success": False,
+            "Message": "Invalid assignee"
+        }
+    
+    if task_assignee == "":
+        task_assignee = task_master
+        
+    else:
+
+        if not is_assignee_valid(task_assignee):
+            return {
+                "Success": False,
+                "Message": "Assignee is not valid"
+            }
+
+        #Check if both users are connected
+        if not db.checkConnection(task_master, task_assignee):
+
+            return {
+                "Success": False,
+                "Message": "Users not connected"
+            }
+
 
     # cost_pr_hr
     if new_data["cost_per_hr"] < 0:
@@ -335,7 +370,12 @@ def update_details(task_id: str, new_data: dict):
     if new_data["priority"] < 1 or new_data["priority"] > 3:
         return {"Success": False, "Message": "Priority is randked on 3, update failed"}
 
-    # labels: TODO
+    # labels
+    task_labels = new_data["labels"]
+    valid_labels = [label for label in task_labels if is_label_valid(label)]
+
+
+    send_task_notification()
 
     return db_tasks.updateTaskInfo(task_id, new_data)
 
@@ -353,19 +393,6 @@ def delete_task(token: str, task_id: str):
 
 """
 Assignee 
-
-'''
-def assign_task(token:str,task_id:str, assignee_email:str):
-
-    token_result = check_jwt_token(token)
-    if not token_result['Success']:
-        return {
-            "Success": False, 
-            "Message": "No user logged in"
-        }
-
-    is_assignee_valid(assignee_email)
-
 """
 
 
