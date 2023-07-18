@@ -5,23 +5,19 @@ import {
   Spacer,
   Text,
   Tooltip,
-  useToast
+  useToast,
 } from '@chakra-ui/react';
 import {
   ChatIcon,
   SettingsIcon,
   UnlockIcon,
   CopyIcon,
-  Search2Icon
-} from '@chakra-ui/icons'
+  Search2Icon,
+} from '@chakra-ui/icons';
 import React from 'react';
-import {
-  Link as RouteLink,
-  useNavigate
-} from 'react-router-dom';
+import { Link as RouteLink, useNavigate } from 'react-router-dom';
 
 import { fetchBackend, isNone } from '../fetch';
-
 
 const NavigationBar = () => {
   const toast = useToast();
@@ -58,11 +54,14 @@ const NavigationBar = () => {
   };
 
   const isAdmin = () => {
-    if (!isNone(localStorage.getItem('admin')) && localStorage.getItem('admin') === 'true') {
-      return true
+    if (
+      !isNone(localStorage.getItem('admin')) &&
+      localStorage.getItem('admin') === 'true'
+    ) {
+      return true;
     }
-    return false
-  }
+    return false;
+  };
 
   return (
     <Box bg="black" color="blue.50">
@@ -73,20 +72,20 @@ const NavigationBar = () => {
           </Heading>
         </RouteLink>
         <Spacer />
-        {
-          isAdmin() && <RouteLink to="/dashboard">
-            <Tooltip label='Task Controls'>
-              <CopyIcon m='1' _hover={hoverStyle} />
+        {isAdmin() && (
+          <RouteLink to="/dashboard">
+            <Tooltip label="Task Controls">
+              <CopyIcon m="1" _hover={hoverStyle} />
             </Tooltip>
           </RouteLink>
-        }
-        {
-          isAdmin() && <RouteLink to="/admin">
-            <Tooltip label='User Controls'>
-              <UnlockIcon m='1' _hover={hoverStyle} />
+        )}
+        {isAdmin() && (
+          <RouteLink to="/admin">
+            <Tooltip label="User Controls">
+              <UnlockIcon m="1" _hover={hoverStyle} />
             </Tooltip>
           </RouteLink>
-        }
+        )}
         <RouteLink to="/connections">
           <Tooltip label="Connections">
             <ChatIcon m="1" _hover={hoverStyle} />
