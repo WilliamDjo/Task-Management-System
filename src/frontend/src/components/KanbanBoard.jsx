@@ -61,11 +61,11 @@ const KanbanBoard = () => {
     try {
       const response = await fetchBackend(
         '/user/connections/',
-        'GET',
+        'POST',
         null,
         toast
       );
-      setConnections(response.data);
+      setConnections(response.Data);
     } catch (error) {
       // Handle error if fetching connections fails
       console.error('Failed to fetch connections:', error);
