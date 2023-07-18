@@ -10,34 +10,37 @@ from flask import Flask, json
 parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_folder)
 
-import task_sys 
+import task_sys
 from account import account_register, account_login, active_users
 from database.db import clear_collection
 from database.db_tasks import getTasksAssigned, getTasksGiven
 from tokens import active_tokens
 from server import app
-from backend.task_sys import get__tasks_given_by
+from backend.task_sys import get_tasks_given_by
+
 
 def test_regiser():
-
     first_name = "John"
     last_name = "Doe"
     username = "johndoe"
     email = "johndoe@example.com"
     password = "Password123!"
     sys_admin = False
-    result = account_register(first_name, last_name, username, email, password, sys_admin)
-    return result['token']
+    result = account_register(
+        first_name, last_name, username, email, password, sys_admin
+    )
+    return result["token"]
+
 
 def test_login():
     email = "johndoe@example.com"
     password = "Password123!"
     result = account_login(email, password)
 
-    return result['token']
+    return result["token"]
+
 
 def create_task_for_test():
-
     clear_db()
     token = test_regiser()
     data = {
@@ -51,19 +54,21 @@ def create_task_for_test():
         "estimation_spent_hrs": 0,
         "actual_time_hr": 0,
         "priority": 2,
-        "labels": ["Label1", "Label2"]
+        "labels": ["Label1", "Label2"],
     }
     result = task_sys.create_task(data)
-    return result['Task_id']
+    return result["Task_id"]
+
 
 def clear_db():
-    clear_collection('user_info')
-    clear_collection('user_profile')
-    clear_collection('task_system')
-    clear_collection('sequence_collection')
+    clear_collection("user_info")
+    clear_collection("user_profile")
+    clear_collection("task_system")
+    clear_collection("sequence_collection")
+
 
 # class CreateTaskTestCase(unittest.TestCase):
-    
+
 #     def test_create_task_with_valid_data(self):
 #         clear_db()
 #         token = test_regiser()
@@ -83,7 +88,7 @@ def clear_db():
 #         }
 
 #         result = task_sys.create_task(data)
-       
+
 #         if not result["Success"]:
 #             print(result)
 
@@ -102,7 +107,7 @@ def clear_db():
 #         self.assertTrue(result["Success"])
 
 #     def test_update_task_desc_with_valid_description(self):
-        
+
 #         task_id = create_task_for_test()
 #         description = "New Task Description"
 
@@ -144,9 +149,9 @@ def clear_db():
 #         token = response_data['Token']
 
 #         return token
-    
+
 #     def test_create_task_server(self):
-        
+
 #         token = self.details_setup()
 
 #         #create task
@@ -169,7 +174,7 @@ def clear_db():
 #         assert(task_response_data['Success'] == True)
 
 #     def test_update_details(self):
-        
+
 #         token = self.details_setup()
 
 #         #create task
@@ -212,7 +217,7 @@ def clear_db():
 #         assert(task_update_response_data['Success'] == True)
 
 # class TaskDeleteTests(unittest.TestCase):
-    
+
 #     def setUp(self):
 #         self.app = app.test_client()
 #         self.app.testing = True
@@ -234,7 +239,7 @@ def clear_db():
 #         token = response_data['Token']
 
 #         return token
-    
+
 # #     # def test_delete(self):
 # #     #     clear_db()
 # #     #     token = test_regiser()
@@ -249,7 +254,7 @@ def clear_db():
 # #     #     task_del_response_data = json.loads(task_del_response.data)
 # #     #     assert task_del_response_data['Success'] == True
 
-        
+
 # # # class TaskNotificationTests(unittest.TestCase):
 # # #     def test_send_task_notification(self):
 # # #         assignee_email = "akshayvalluru67@gmail.com"
@@ -262,7 +267,7 @@ def clear_db():
 # # #             print(f"Failed to send task notification email: {str(e)}")
 
 # class TaskDetailsTest(unittest.TestCase):
-    
+
 
 #     def setUp(self):
 #         self.app = app.test_client()
@@ -285,11 +290,11 @@ def clear_db():
 #         token = response_data['Token']
 
 #         return token
-    
+
 #     def test_details(self):
 
 #         token = test_regiser()
-        
+
 #         task_id = create_task_for_test()
 #         result = task_sys.get_task_details(token, task_id )
 
@@ -306,9 +311,9 @@ def clear_db():
 #         result = response.get_json()
 
 #         assert(result['Successs'] == True)
-        
+
 #     def test_get_all_server(self):
-        
+
 #         token = self.details_setup()
 #         headers = {'token': token}
 #         task_id = create_task_for_test()
@@ -318,41 +323,37 @@ def clear_db():
 #         assert(result['Success'] == True)
 
 
-
 class TaskDetailsTest(unittest.TestCase):
-
     def setUp(self):
         self.app = app.test_client()
         self.app.testing = True
 
     def details_setup(self):
-
         clear_db()
         register_data = {
-            'first_name': 'John',
-            'last_name' : 'Doe',
-            'username': 'johndoe',
-            'email': 'john@example.com',
-            'password': 'Password123!',
-            'sys_admin': False
+            "first_name": "John",
+            "last_name": "Doe",
+            "username": "johndoe",
+            "email": "john@example.com",
+            "password": "Password123!",
+            "sys_admin": False,
         }
 
-        response = self.app.post('/signup', data=json.dumps(register_data), content_type='application/json')
+        response = self.app.post(
+            "/signup", data=json.dumps(register_data), content_type="application/json"
+        )
         response_data = json.loads(response.data)
-        token = response_data['Token']
+        token = response_data["Token"]
 
         return token
 
     def test_details(self):
-
         token = test_regiser()
         task_id = create_task_for_test()
         task_id_2 = create_task_for_test()
-        result = get__tasks_given_by(token, 'johndoe@example.com')
+        result = get_tasks_given_by(token, "johndoe@example.com")
         print(result)
 
-
-     
 
 if __name__ == "__main__":
     unittest.main()
