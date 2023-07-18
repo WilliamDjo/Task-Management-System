@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import sys
 import os
 import account
@@ -11,7 +12,6 @@ from backend.task_sys import (
     get_tasks_given_by,
     update_details,
 )
-from flask_cors import CORS
 import connections
 
 """ Accessing Other Files"""
@@ -21,7 +21,7 @@ sys.path.append(parent_folder)
 """Flask Set up"""
 app = Flask(__name__)
 
-CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(app)
 
 
 @app.route("/signup", methods=["POST"])
@@ -436,7 +436,7 @@ Connections based
 """
 
 
-@app.route("/user/connections", methods=["GET"])
+@app.route("/user/connections", methods=["POST"])
 def get_user_connections():
     token = ""
     auth_header = request.headers.get("Authorization")
