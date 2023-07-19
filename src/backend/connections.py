@@ -36,10 +36,10 @@ def getPendingConnections(token):
         userInfo = db.getSingleUserInformation(i)
         to_return.append(
             {
-                "first_name": userInfo["first_name"],
-                "last_name": userInfo["last_name"],
-                "email": userInfo["email"],
-                "username": userInfo["user"],
+                "first_name": userInfo["Data"]["first_name"],
+                "last_name": userInfo["Data"]["last_name"],
+                "email": userInfo["Data"]["email"],
+                "username": userInfo["Data"]["username"],
             }
         )
     print(to_return)
@@ -60,19 +60,20 @@ def getUserConnections(token):
 
     connections = db.getUserConnections(email)
 
-    connections = connections["connections"]
+    connections = connections["Connections"]["connections"]
 
     to_return = []
     for i in connections:
         userInfo = db.getSingleUserInformation(i)
-        to_return.append(
-            {
-                "first_name": userInfo["first_name"],
-                "last_name": userInfo["last_name"],
-                "email": userInfo["email"],
-                "username": userInfo["user"],
-            }
-        )
+        if userInfo["Success"]:
+            to_return.append(
+                {
+                    "first_name": userInfo["Data"]["first_name"],
+                    "last_name": userInfo["Data"]["last_name"],
+                    "email": userInfo["Data"]["email"],
+                    "username": userInfo["Data"]["username"],
+                }
+            )
     return {"Success": True, "Message": "Connections Retrieved", "Data": to_return}
 
 
@@ -87,7 +88,7 @@ def respondToConnection(token, email_to_respond, accepted):
     updateConnection = db.updateConnection(email_user, email_to_respond, accepted)
     return {
         "Success": updateConnection["Success"],
-        "Message": updateConnection["message"],
+        "Message": updateConnection["Message"],
     }
 
 
@@ -132,7 +133,7 @@ def getConnections(token, email_to_see):
             "Data": {},
             "Tasks": [],
         }
-    isAdmin = userInfo_A["SystemAdmin"]
+    isAdmin = userInfo_A["Data"]["SystemAdmin"]
     checkConnection = db.checkConnection(email_to_see, email_user)
     tasks = []
     if checkConnection or isAdmin:
@@ -148,10 +149,10 @@ def getConnections(token, email_to_see):
         "Success": "True",
         "Message": "Information Retrieved",
         "Data": {
-            "first_name": userInfo_B["first_name"],
-            "last_name": userInfo_B["last_name"],
-            "email": userInfo_B["email"],
-            "username": userInfo_B["user"],
+            "first_name": userInfo_B["Data"]["first_name"],
+            "last_name": userInfo_B["Data"]["last_name"],
+            "email": userInfo_B["Data"]["email"],
+            "username": userInfo_B["Data"]["username"],
         },
         "Tasks": tasks,
     }
