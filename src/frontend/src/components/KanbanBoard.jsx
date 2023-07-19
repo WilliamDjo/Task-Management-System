@@ -63,28 +63,30 @@ const KanbanBoard = () => {
   };
 
   // Function to fetch user's connections from the backend
-  //   const fetchConnections = () => {
-  //     try {
-  //       const successGetConnections = data => {
-  //         setConnections(data.Data);
-  //       };
+  const fetchConnections = () => {
+    try {
+      const successGetConnections = data => {
+        setConnections(data.Data);
+      };
 
-  //       const response = fetchBackend(
-  //         '/user/connections/',
-  //         'POST',
-  //         null,
-  //         toast,
-  //         successGetConnections
-  //       );
-  //       console.log('hello connections ' + connections);
-  //       console.log(response);
-  //       //   setConnections(response.Data);
-  //     } catch (error) {
-  //       // Handle error if fetching connections fails
-  //       console.error('Failed to fetch connections:', error);
-  //     }
-  //     // console.log('baba');
-  //   };
+      const token = localStorage.getItem('token');
+
+      const response = fetchBackend(
+        '/user/connections/',
+        'POST',
+        { token },
+        toast,
+        successGetConnections
+      );
+      console.log('hello connections ' + connections);
+      console.log(response);
+      //   setConnections(response.Data);
+    } catch (error) {
+      // Handle error if fetching connections fails
+      console.error('Failed to fetch connections:', error);
+    }
+    // console.log('baba');
+  };
 
   // Function to fetch user's profile from the backend
   const fetchUserProfile = () => {
@@ -135,7 +137,7 @@ const KanbanBoard = () => {
   // Fetch the user's profile on component mount
   useEffect(() => {
     fetchUserProfile();
-    //   fetchConnections();
+    fetchConnections();
   }, []);
 
   const handleAddTask = () => {
