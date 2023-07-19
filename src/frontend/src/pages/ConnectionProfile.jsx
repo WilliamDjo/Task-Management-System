@@ -26,7 +26,6 @@ import ProfileCard from '../components/ProfileCard';
 const ConnectionProfile = () => {
   const [name, setName] = React.useState('Name');
   const [username, setUsername] = React.useState('username');
-  const [organization, setOrganization] = React.useState('Example Company');
   const [loaded, setLoaded] = React.useState(false);
   const [tasks, setTasks] = React.useState([
     {
@@ -40,19 +39,11 @@ const ConnectionProfile = () => {
 
   const toast = useToast();
 
-  const info = [
-    {
-      title: 'Organization',
-      attribute: organization,
-    },
-  ];
-
   React.useEffect(() => {
     const successGetConnectionProfile = data => {
       setName(`${data.Data.first_name} ${data.Data.last_name}`);
       setUsername(data.Data.username);
-      setOrganization(data.Data.organization);
-      setTasks(data.Data.tasks);
+      setTasks(data.Tasks);
       setLoaded(true);
     };
     const token = localStorage.getItem('token');
@@ -68,7 +59,7 @@ const ConnectionProfile = () => {
 
   const connectionProfileLoaded = () => {
     return (
-      <ProfileCard name={name} username={username} email={email} info={info} />
+      <ProfileCard name={name} username={username} email={email} />
     );
   };
 

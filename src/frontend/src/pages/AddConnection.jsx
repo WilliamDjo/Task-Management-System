@@ -39,9 +39,8 @@ const AddConnection = () => {
     const token = localStorage.getItem('token');
     const body = {
       token,
-      email
     }
-    fetchBackend('/user/addconnection', 'POST', body, toast, successRequestConnection, failRequestConnection);
+    fetchBackend(`/user/addconnection/${email}/`, 'POST', body, toast, successRequestConnection, failRequestConnection);
   }
   return (
     <ConnectionsBar addConnections>

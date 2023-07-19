@@ -47,13 +47,13 @@ const PendingConnections = () => {
     fetchBackend('/user/pendingconnections', 'GET', { token }, toast, successGetConnections);
   }, []);
 
-  const handleRespondConnection = (email, value) => {
+  const handleRespondConnection = (email, accepted) => {
     const successRespondConnection = () => {
       const newConnections = [...connections];
       const filteredConnections = newConnections.filter((connection) => connection.email !== email);
       setConnections(filteredConnections);
       toast({
-        title: `Connection successfully ${value ? 'accepted' : 'declined'}.`,
+        title: `Connection successfully ${accepted ? 'accepted' : 'declined'}.`,
         status: 'success',
         duration: 5000,
         isClosable: true,
@@ -62,10 +62,9 @@ const PendingConnections = () => {
     const token = localStorage.getItem('token');
     const body = {
       token,
-      email,
-      value
+      accepted
     }
-    fetchBackend('/user/respondconnection', 'POST', body, toast, successRespondConnection);
+    fetchBackend(`/user/respondconnection/${email}`, 'POST', body, toast, successRespondConnection);
   }
 
   const pendingConnectionsLoaded = () => {

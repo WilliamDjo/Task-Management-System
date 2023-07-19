@@ -17,7 +17,6 @@ import ProfileCard from '../components/ProfileCard';
 const PendingProfile = () => {
   const [name, setName] = React.useState('Name');
   const [username, setUsername] = React.useState('username');
-  const [organization, setOrganization] = React.useState('Example Company');
   const [loaded, setLoaded] = React.useState(false);
 
   const { email } = useParams();
@@ -25,18 +24,10 @@ const PendingProfile = () => {
 
   const toast = useToast();
 
-  const info = [
-    {
-      title: 'Organization',
-      attribute: organization,
-    },
-  ];
-
   React.useEffect(() => {
     const successGetConnectionProfile = data => {
       setName(`${data.Data.first_name} ${data.Data.last_name}`);
       setUsername(data.Data.username);
-      setOrganization(data.Data.organization);
       setLoaded(true);
     };
     const token = localStorage.getItem('token');
@@ -50,15 +41,15 @@ const PendingProfile = () => {
     );
   }, []);
 
-  const handleRespondConnection = (email, value) => {
+  const handleRespondConnection = (email, accepted) => {
     const successRespondConnection = () => {
       toast({
-        title: `Connection successfully ${value ? 'accepted' : 'declined'}.`,
+        title: `Connection successfully ${accepted ? 'accepted' : 'declined'}.`,
         status: 'success',
         duration: 5000,
         isClosable: true,
       });
-      if (value === true) {
+      if (accepted === true) {
         navigate(`/connections/my/${email}`);
       } else {
         navigate('/connections/pending');
@@ -67,11 +58,10 @@ const PendingProfile = () => {
     const token = localStorage.getItem('token');
     const body = {
       token,
-      email,
-      value,
+      accepted,
     };
     fetchBackend(
-      '/user/respondconnection',
+      `/user/respondconnection/${email}`,
       'POST',
       body,
       toast,
@@ -81,7 +71,7 @@ const PendingProfile = () => {
 
   const pendingProfileLoaded = () => {
     return (
-      <ProfileCard name={name} username={username} email={email} info={info}>
+      <ProfileCard name={name} username={username} email={email}>
         <ButtonGroup isAttached>
           <Button
             colorScheme="green"
