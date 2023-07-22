@@ -1,7 +1,8 @@
+/* eslint-disable multiline-ternary */
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/no-children-prop */
 /* eslint-disable react/prop-types */
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Flex,
   Modal,
@@ -19,6 +20,7 @@ import {
   InputRightAddon,
   InputGroup,
   Textarea,
+  Text,
 } from '@chakra-ui/react';
 import { AddIcon, CloseIcon } from '@chakra-ui/icons';
 
@@ -46,7 +48,17 @@ const TaskModal = props => {
     setCostPerHour,
     timeEstimate,
     setTimeEstimate,
+    actualTimeSpent,
+    resetActualTime,
   } = props;
+
+  const [actualTime, setActualTime] = useState(actualTimeSpent);
+
+  // Function to handle changes in the actual time spent input
+  const handleActualTimeChange = e => {
+    const actualTimeSpent = e.target.value;
+    setActualTime(actualTimeSpent);
+  };
 
   const handleSubmit = e => {
     e.preventDefault();
@@ -70,6 +82,17 @@ const TaskModal = props => {
     updatedTags.splice(index, 1);
     setTags(updatedTags);
   };
+
+  // Function to reset actual time spent when progress changes to 'To Do' or 'In Progress'
+  useEffect(() => {
+    if (
+      task &&
+      (task.progress === 'To Do' || task.progress === 'In Progress')
+    ) {
+      resetActualTime();
+    }
+  }, [task, resetActualTime]);
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="lg">
       <ModalOverlay />
@@ -121,6 +144,7 @@ const TaskModal = props => {
                 value={timeEstimate}
                 onChange={e => setTimeEstimate(e.target.value)}
               />
+
               <Stack spacing={2}>
                 {tags.map((tag, index) => (
                   <Flex key={index}>
@@ -151,26 +175,47 @@ const TaskModal = props => {
                   />
                 )}
               </Stack>
+
               <Select
                 placeholder="Assign To"
                 value={assignedTo}
                 onChange={e => setAssignedTo(e.target.value)}
               >
-                {/* <option value="">Select Assignee</option>
-                <option value="You">You</option>
-                <option value="Alice">Alice</option>
-                <option value="Bob">Bob</option>
-                <option value="Charlie">Charlie</option> */}
                 <option value="">Select Assignee</option>
                 <option value={userFullName}>{userFullName}</option>
-                {connections.map(connection => (
+                <option value="Alice">Alice</option>
+                <option value="Bob">Bob</option>
+                <option value="Charlie">Charlie</option>
+                {/* <option value="">Select Assignee</option> */}
+
+                {/* {connections.map(connection => (
                   <option
                     key={connection.username}
                     value={connection.first_name}
                   >
                     {connection.first_name}
                   </option>
-                ))}
+                ))} */}
+
+                {/* {console.log('task modal: ' + connections)} */}
+                {/* {connections && connections.length > 0 ? (
+                  <Select
+                    value={assignedTo}
+                    onChange={e => setAssignedTo(e.target.value)}
+                    size="sm"
+                  >
+                    <option value="">Select Assignee</option>
+                    {connections.map(connection => (
+                      <option key={connection.id} value={connection.name}>
+                        {connection.name}
+                      </option>
+                    ))}
+                  </Select>
+                ) : (
+                  <Text fontSize="sm" color="gray.500">
+                    No connections available.
+                  </Text>
+                )} */}
               </Select>
             </Stack>
           </ModalBody>
