@@ -4,7 +4,7 @@ import { Input, InputGroup, InputRightElement, Button } from '@chakra-ui/react';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 
 // eslint-disable-next-line react/prop-types
-const PasswordBar = ({ value, onChange }) => {
+const PasswordBar = ({ value, onChange, onKeyDown }) => {
   const [showPassword, setShowPassword] = useState(false);
   return (
     <InputGroup>
@@ -12,6 +12,7 @@ const PasswordBar = ({ value, onChange }) => {
         type={showPassword ? 'text' : 'password'}
         value={value}
         onChange={onChange}
+        onKeyDown={onKeyDown}
       />
       <InputRightElement h={'full'}>
         <Button

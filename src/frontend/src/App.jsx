@@ -14,8 +14,26 @@ import PageNotFound from './pages/PageNotFound';
 import CantLogin from './pages/CantLogin';
 import ForgotPassword from './pages/ForgotPassword';
 import ChangeEmail from './pages/ChangeEmail';
+import Connections from './pages/Connections';
+import AddConnection from './pages/AddConnection';
+import MyConnections from './pages/MyConnections';
+import ConnectionProfile from './pages/ConnectionProfile';
+import MyProfile from './pages/MyProfile';
+import PendingConnections from './pages/PendingConnections';
+import PendingProfile from './pages/PendingProfile';
+import VerifyEmail from './pages/VerifyEmail';
+import ResetPassword from './pages/ResetPassword';
+import SearchEverything from './pages/SearchEverything';
+// import Connections from './pages/Connections';
+// import AddConnection from './pages/AddConnection';
+// import MyConnections from './pages/MyConnections';
+// import ConnectionProfile from './pages/ConnectionProfile';
+// import SearchEverything from './pages/SearchEverything';
+// import MyProfile from './pages/MyProfile';
+// import PendingConnections from './pages/PendingConnections';
+// import PendingProfile from './pages/PendingProfile';
 
-function App () {
+const App = () => {
   return (
     <ChakraProvider theme={theme}>
       <BrowserRouter>
@@ -26,20 +44,36 @@ function App () {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="profile" element={<Outlet />}>
             <Route index element={<Profile />} />
+            <Route path="my" element={<MyProfile />} />
             <Route path="edit" element={<EditAccount />} />
           </Route>
           <Route path="admin" element={<Outlet />}>
             <Route index element={<AdminDashboard />} />
           </Route>
+          <Route path="connections" element={<Outlet />}>
+            <Route index element={<Connections />} />
+            <Route path="my" element={<Outlet />}>
+              <Route index element={<MyConnections />} />
+              <Route path=":email" element={<ConnectionProfile />} />
+            </Route>
+            <Route path="add" element={<AddConnection />} />
+            <Route path="pending" element={<Outlet />}>
+              <Route index element={<PendingConnections />} />
+              <Route path=":email" element={<PendingProfile />} />
+            </Route>
+          </Route>
 
           <Route path="*" element={<PageNotFound />} />
           <Route path="forgotpassword" element={<ForgotPassword />} />
-          <Route path="cantlogin" element={<CantLogin/>}/>
-          <Route path="changeemail" element={<ChangeEmail/>}/>
+          <Route path="cantlogin" element={<CantLogin />} />
+          <Route path="changeemail" element={<ChangeEmail />} />
+          <Route path="verifyemail" element={<VerifyEmail />} />
+          <Route path="resetpassword" element={<ResetPassword />} />
+          <Route path="searcheverything" element={<SearchEverything />} />
         </Routes>
       </BrowserRouter>
     </ChakraProvider>
   );
-}
+};
 
 export default App;
