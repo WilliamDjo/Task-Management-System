@@ -176,47 +176,26 @@ const TaskModal = props => {
                 )}
               </Stack>
 
-              <Select
-                placeholder="Assign To"
-                value={assignedTo}
-                onChange={e => setAssignedTo(e.target.value)}
-              >
-                <option value="">Select Assignee</option>
-                <option value={userFullName}>{userFullName}</option>
-                <option value="Alice">Alice</option>
-                <option value="Bob">Bob</option>
-                <option value="Charlie">Charlie</option>
-                {/* <option value="">Select Assignee</option> */}
-
-                {/* {connections.map(connection => (
-                  <option
-                    key={connection.username}
-                    value={connection.first_name}
-                  >
-                    {connection.first_name}
+              {/* {console.log('task modal: ' + connections)} */}
+              {connections && (
+                <Select
+                  placeholder="Assign To"
+                  value={assignedTo}
+                  onChange={e => setAssignedTo(e.target.value)}
+                  size="sm"
+                >
+                  {/* <option value="">Select Assignee</option> */}
+                  <option value={userFullName}>
+                    {userFullName} {'(Yourself)'}
                   </option>
-                ))} */}
-
-                {/* {console.log('task modal: ' + connections)} */}
-                {/* {connections && connections.length > 0 ? (
-                  <Select
-                    value={assignedTo}
-                    onChange={e => setAssignedTo(e.target.value)}
-                    size="sm"
-                  >
-                    <option value="">Select Assignee</option>
-                    {connections.map(connection => (
-                      <option key={connection.id} value={connection.name}>
-                        {connection.name}
-                      </option>
-                    ))}
-                  </Select>
-                ) : (
-                  <Text fontSize="sm" color="gray.500">
-                    No connections available.
-                  </Text>
-                )} */}
-              </Select>
+                  {connections.map(connection => (
+                    <option key={connection.id} value={connection.email}>
+                      {connection.first_name} {connection.last_name}
+                    </option>
+                  ))}
+                </Select>
+              )}
+              {/* {console.log('A: ' + assignedTo)} */}
             </Stack>
           </ModalBody>
           <ModalFooter>
