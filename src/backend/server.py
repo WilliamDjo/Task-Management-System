@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 import sys
 import os
 import account
@@ -318,8 +318,8 @@ def server_create_task():
         bearer, _, token = auth_header.partition(" ")
         if bearer.lower() != "bearer":
             return {"Success": False, "Message": "Invalid token format"}, 400
-        else:
-            return {"Success": False, "Message": "No token provided"}, 401
+    else:
+        return {"Success": False, "Message": "No token provided"}, 401
     data = request.json
     result = create_task(token, data)
     return jsonify(result)
@@ -333,8 +333,8 @@ def server_update_task(task_id):
         bearer, _, token = auth_header.partition(" ")
         if bearer.lower() != "bearer":
             return {"Success": False, "Message": "Invalid token format"}, 400
-        else:
-            return {"Success": False, "Message": "No token provided"}, 401
+    else:
+        return {"Success": False, "Message": "No token provided"}, 401
 
     data = request.json
     result = update_details(token, task_id, data)
@@ -499,8 +499,12 @@ def respond_to_connection(email):
     return jsonify(to_return)
 
 
-@app.route("/user/addconnection/<email>", methods=["POST"])
+@app.route("/user/addconnection/<email>/", methods=["POST", "OPTIONS"])
+@cross_origin()
 def initiate_connection(email):
+    if request.method == "OPTIONS":
+        return _build_preflight_response()
+
     token = ""
     auth_header = request.headers.get("Authorization")
     if auth_header:
@@ -517,6 +521,14 @@ def initiate_connection(email):
         "Message": status["Message"],
     }
     return jsonify(to_return)
+
+
+def _build_preflight_response():
+    response = jsonify({})
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    response.headers.add("Access-Control-Allow-Methods", "POST")
+    response.headers.add("Access-Control-Allow-Headers", "Content-Type,Authorization")
+    return response
 
 
 @app.route("/user/getconnection/<email>", methods=["GET"])

@@ -8,7 +8,7 @@ import re
 from account import is_email_valid
 from backend.account import getAccountInfo
 from backend.password import send_email
-from backend.tokens import check_jwt_token
+import tokens
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -62,8 +62,8 @@ def is_description_valid(description: str):
 def is_deadline_valid(deadline):
     current_datetime = datetime.now()
     try:
-        dt = datetime.strptime(deadline, "%Y-%m-%d")
-        return dt.date() < current_datetime.date()
+        # dt = datetime.strptime(deadline, "%Y-%m-%d")
+        return deadline.date() >= current_datetime.date()
     except ValueError:
         return False
 
@@ -102,7 +102,7 @@ Create tasks
 def create_task(token:str, data: dict):
     token = token
     # Verify account login - check the token
-    token_result = check_jwt_token(token)
+    token_result = tokens.check_jwt_token(token)
     if not token_result["Success"]:
         return {"Success": False, "Message": "No user logged in"}
 
@@ -126,6 +126,7 @@ def create_task(token:str, data: dict):
 
     try:
         task_deadline_dt = datetime.strptime(task_deadline, "%Y-%m-%d")
+        print(task_deadline_dt)
 
         if not is_deadline_valid(task_deadline_dt):
             return {"Success": False, "Message": "Deadline cannot be in the past"}
@@ -294,7 +295,7 @@ def update_priority(task_id: str, new_priority: int):
 
     return db_tasks.updateTaskInfo(task_id, {"priority": new_priority})
 
-    token_result = check_jwt_token(new_data["token"])
+    token_result = tokens.check_jwt_token(new_data["token"])
     if not token_result["Success"]:
         return {"Success": False, "Message": "No user logged in"}
 
@@ -386,7 +387,7 @@ Delete
 
 
 def delete_task(token: str, task_id: str):
-    token_result = check_jwt_token(token)
+    token_result = tokens.check_jwt_token(token)
     if not token_result["Success"]:
         return {"Success": False, "Message": "No user logged in"}
 
@@ -501,7 +502,7 @@ def add_label(task_id: str, new_label: str):
 
 def get_task_details(token: str, task_id: str):
     # check token
-    token_result = check_jwt_token(token)
+    token_result = tokens.check_jwt_token(token)
     if not token_result["Success"]:
         return {"Success": False, "Message": "No user logged in"}
 
@@ -510,7 +511,7 @@ def get_task_details(token: str, task_id: str):
 
 def get_all_tasks_assigned_to(token: str, email: str):
     # check token
-    token_result = check_jwt_token(token)
+    token_result = tokens.check_jwt_token(token)
     if not token_result["Success"]:
         return {"Success": False, "Message": "No user logged in"}
 
@@ -525,7 +526,7 @@ def get_all_tasks_assigned_to(token: str, email: str):
 
 def get_tasks_given_by(token: str, email: str):
     # check token
-    token_result = check_jwt_token(token)
+    token_result = tokens.check_jwt_token(token)
     if not token_result["Success"]:
         return {"Success": False, "Message": "No user logged in"}
 
@@ -540,7 +541,7 @@ def get_tasks_given_by(token: str, email: str):
 
 def get_all_tasks(token: str):
     # check token
-    token_result = check_jwt_token(token)
+    token_result = tokens.check_jwt_token(token)
     if not token_result["Success"]:
         return {"Success": False, "Message": "No user logged in"}
 
