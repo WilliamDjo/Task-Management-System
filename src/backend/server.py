@@ -318,8 +318,8 @@ def server_create_task():
         bearer, _, token = auth_header.partition(" ")
         if bearer.lower() != "bearer":
             return {"Success": False, "Message": "Invalid token format"}, 400
-        else:
-            return {"Success": False, "Message": "No token provided"}, 401
+    else:
+        return {"Success": False, "Message": "No token provided"}, 401
     data = request.json
     result = create_task(token, data)
     return jsonify(result)
@@ -333,8 +333,8 @@ def server_update_task(task_id):
         bearer, _, token = auth_header.partition(" ")
         if bearer.lower() != "bearer":
             return {"Success": False, "Message": "Invalid token format"}, 400
-        else:
-            return {"Success": False, "Message": "No token provided"}, 401
+    else:
+        return {"Success": False, "Message": "No token provided"}, 401
 
     data = request.json
     result = update_details(token, task_id, data)
