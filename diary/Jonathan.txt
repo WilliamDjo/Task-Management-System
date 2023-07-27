@@ -18,3 +18,9 @@ Met at uni to discuss data structures and routes for sprint 2's tasks and connec
 
 Week 7
 Working on frontend for connections, pending connections, adding connections and connections profiles. Moved some components into their own files, for reusable code.
+
+Week 8
+Working on admin controls for tasks and viewing user profiles, admins can see all users even those who are not connected and configured the admin to be able to see all tasks as well. Made some fixes for connections in backend and frontend to get it to work for demo 2. Had our retro for sprint 2.
+
+Week 9
+Fixed a small bug in backend for task creation and updating.
