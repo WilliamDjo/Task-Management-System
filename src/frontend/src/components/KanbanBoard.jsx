@@ -53,10 +53,10 @@ const KanbanBoard = () => {
   const [connections, setConnections] = useState([]);
   // State to store the user's full name
   const [userFullName, setUserFullName] = useState('');
-  const [priority, setPriority] = useState(''); // New state for priority
-  const [costPerHour, setCostPerHour] = useState(''); // New state for cost per hour
-  const [timeEstimate, setTimeEstimate] = useState(''); // New state for time estimate
-  const [actualTimeSpent, setActualTimeSpent] = useState({});
+  const [priority, setPriority] = useState(); // New state for priority
+  const [costPerHour, setCostPerHour] = useState(); // New state for cost per hour
+  const [timeEstimate, setTimeEstimate] = useState(); // New state for time estimate
+  const [actualTimeSpent, setActualTimeSpent] = useState(0);
 
   // Function to reset the actual time spent in TaskModal
   const handleResetActualTime = () => {
@@ -200,22 +200,22 @@ const KanbanBoard = () => {
     //   });
     // }
     if (newTask && assignedTo) {
+      const token = localStorage.getItem('token');
       const task = {
-        id: Date.now(),
+        // id: Date.now(),
         title: newTask,
         description,
         deadline,
-        progress: 'To Do',
+        progress: 'Not Started',
         assignee: assignedTo,
         cost_per_hr: costPerHour ? parseFloat(costPerHour) : null,
         estimation_spent_hrs: timeEstimate ? parseFloat(timeEstimate) : null,
         actual_time_hr: actualTimeSpent,
         priority: priority ? parseInt(priority) : 1,
-        task_master: name,
+        // task_master: name,
         labels: tags.slice(0, 5),
+        token,
       };
-
-      const token = localStorage.getItem('token');
 
       // For the case when we're updating an existing task
       if (editingTask) {
@@ -249,25 +249,19 @@ const KanbanBoard = () => {
         // For the case when we're creating a new task
       } else {
         const successCreateTask = data => {
-          if (data.Success) {
-            setTasks([...tasks, task]);
-            toast({
-              title: 'Task Added',
-              description: 'Task has been added successfully.',
-              status: 'success',
-              duration: 3000,
-              isClosable: true,
-            });
-          }
+          // setTasks([...tasks, data.Data]);
+          // toast({
+          //   title: 'Task Added',
+          //   description: 'Task has been added successfully.',
+          //   status: 'success',
+          //   duration: 3000,
+          //   isClosable: true,
+          // });
+          toast({ title: data.message });
         };
 
-        fetchBackend(
-          '/task/create',
-          'POST',
-          { token, ...task },
-          toast,
-          successCreateTask
-        );
+        fetchBackend('/task/create', 'POST', task, toast, successCreateTask);
+        console.log('task: ' + task);
       }
 
       setNewTask('');
@@ -304,7 +298,7 @@ const KanbanBoard = () => {
     //     return task;
     //   })
     // );
-    if (progress === 'In Progress' || progress === 'To Do') {
+    if (progress === 'In Progress' || progress === 'Not Started') {
       // Reset actual time spent to null when changing the status to In Progress or To Do
       setActualTimeSpent(prevState => ({
         ...prevState,
@@ -375,7 +369,7 @@ const KanbanBoard = () => {
             </Heading>
             <Stack spacing={4} w="300px">
               {tasks
-                .filter(task => task.progress === 'To Do')
+                .filter(task => task.progress === 'Not Started')
                 .map(task => (
                   <TaskCard
                     key={task.id}
