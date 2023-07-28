@@ -143,7 +143,7 @@ def create_task(token:str, data: dict):
     if task_progress not in ["Not Started", "In Progress", "Blocked", "Completed"]:
         return {
             "Success": False,
-            "Message": "Error in data recieved (Progress state not valid",
+            "Message": "Error in data recieved (Progress state not valid)",
         }
 
     task_cost = data["cost_per_hr"]
