@@ -1,11 +1,5 @@
 import hashlib
-import sys
-import os
 import re
-
-parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(parent_folder)
-
 from database import db
 import tokens
 import password

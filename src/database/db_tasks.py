@@ -1,20 +1,9 @@
-# imports
-from pymongo import MongoClient
 from pymongo.database import Database
 from pymongo.collection import Collection
-from bson import Binary, json_util
+from bson import json_util
 import json
-import os
-import sys
 import re
-from datetime import date, datetime
-from database.db import getDB, clear_collection
-
-
-"""
-TESTING: DELETE
-"""
-
+from db_helper import getDB
 
 """
 Returns the entire collection
@@ -60,9 +49,7 @@ def addNewTask(data: dict) -> dict:
             task_info[key] = data[key]
 
     # task
-    insert_result = TaskSystemCollection.insert_one(task_info)
-    # Get the id of the inserted document
-    inserted_id = insert_result.inserted_id
+    TaskSystemCollection.insert_one(task_info)
 
     # Return the inserted task information
     return {"Success": True, "Task_id": task_id}
@@ -98,7 +85,7 @@ def updateTaskInfo(task_id: str, data: dict) -> dict:
     if "token" in data:
         del data["token"]
 
-    result = TaskSystemCollection.update_one({"id": task_id}, {"$set": data})
+    TaskSystemCollection.update_one({"id": task_id}, {"$set": data})
 
     return {"Success": True, "Message": "Update successful"}
 
@@ -109,21 +96,14 @@ def deleteTask(task_id: str) -> dict:
 
     # Get the collection object database
     TaskSystemCollection = getTaskInfoCollection(db)
-
-    # Get the collection object for 'UserInfo' from the database
-    TaskSystemCollection = getTaskInfoCollection(db)
-
-    # Attempt to retrieve the user with the given email
+    # Attempt to retrieve the task with the given task_id
     task = TaskSystemCollection.find_one({"id": task_id})
 
-    # If no user was found, return a dictionary indicating failure
+    # If no task was found, return a dictionary indicating failure
     if task is None:
         return {"Success": False, "Message": "No task found"}
 
-    # If a user was found, delete the user
-    TaskSystemCollection.delete_one({"id": task_id})
-
-    # If a user was found, delete the user
+    # If a task was found, delete the task
     TaskSystemCollection.delete_one({"id": task_id})
 
     # Return a dictionary indicating success
@@ -155,7 +135,7 @@ def getTasksGiven(task_master) -> dict:
     if len(tasks_given) == 0:
         return {
             "Success": False,
-            "Data": tasks_given,
+            "Data": [],
             "Message": "No tasks given out by task master",
         }
     return {"Success": True, "Data": tasks_given, "Message": "Successfully Returned"}
@@ -174,7 +154,7 @@ def getTasksAssigned(task_assignee) -> dict:
     if len(tasks_given) == 0:
         return {
             "Success": False,
-            "Data": tasks_given,
+            "Data": [],
             "Message": "No tasks given to by task assignee",
         }
     return {"Success": True, "Data": tasks_given, "Message": "Successfully Returned"}
@@ -232,15 +212,6 @@ def get_next_task_id() -> str:
 
     # Format the task ID with a desired prefix
     task_id_prefix = "TASK"
-    formatted_id = f"{task_id_prefix}-{next_id:06d}"
+    formatted_id = f"{task_id_prefix}{next_id}"
 
     return formatted_id
-
-
-def reset_counter():
-    db = getDB()
-    sequence_collection = db["sequence_collection"]
-    sequence_name = "task_id"
-
-    # Update the sequence counter to reset it
-    sequence_collection.update_one({"_id": sequence_name}, {"$set": {"seq_value": 0}})

@@ -7,8 +7,6 @@ from urllib import response
 from flask import Flask, json
 
 
-
-
 parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_folder)
 
@@ -22,7 +20,6 @@ from backend.task_sys import get_tasks_given_by
 from backend.account import getAccountInfo
 from backend.connections import AddConnection, respondToConnection
 from backend.server import login
-
 
 
 def test_regiser():
@@ -60,7 +57,6 @@ def test_login():
 
 
 def create_task_for_test():
-
     token = test_regiser()
     data = {
         "token": token,
@@ -377,19 +373,15 @@ def clear_db():
 #         print(result)
 
 
-
 class TaskDetailsTest(unittest.TestCase):
-
     def setUp(self):
         self.app = app.test_client()
         self.app.testing = True
 
-   
-    #Register one user
+    # Register one user
     def tes(self):
-
         clear_db()
-        
+
         first_name = "user_1"
         last_name = "Doe"
         username = "johndoe"
@@ -400,8 +392,7 @@ class TaskDetailsTest(unittest.TestCase):
             first_name, last_name, username, email, password, sys_admin
         )
 
-        token = result['token']
-
+        token = result["token"]
 
         user_info = getAccountInfo(token)
         print(user_info)
