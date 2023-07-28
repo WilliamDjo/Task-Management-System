@@ -8,9 +8,9 @@ const Dashboard = () => {
   const toast = useToast();
 
   const newTask = () => {
-    const success = (data) => {
-      toast({ title: data.message })
-    }
+    const success = data => {
+      toast({ title: data.message });
+    };
     const title = 'Title';
     const description = 'This is a description';
     const deadline = '2023-12-31';
@@ -34,16 +34,16 @@ const Dashboard = () => {
       priority,
       labels,
       assignee,
-      token
-    }
+      token,
+    };
 
     fetchBackend('/task/create', 'POST', body, toast, success);
-  }
+  };
 
   React.useEffect(() => {
-    const success = (data) => {
+    const success = data => {
       console.log(data);
-    }
+    };
     const token = localStorage.getItem('token');
     fetchBackend('/task/getAll', 'GET', { token }, toast, success);
   });

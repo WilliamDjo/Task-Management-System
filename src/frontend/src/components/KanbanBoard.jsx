@@ -84,6 +84,33 @@ const KanbanBoard = () => {
     // console.log(connections);
   };
 
+  const fetchTasks = () => {
+    try {
+      // Retrieve the token from the localStorage
+      const token = localStorage.getItem('token');
+      const successGetTasks = data => {
+        setTasks(data.Data);
+      };
+
+      const body = {
+        token: token,
+        email: email,
+      };
+      fetchBackend(
+        '/task/getTasksGivenBy',
+        'GET',
+        body,
+        toast,
+        successGetTasks
+      );
+      console.log('email ' + email);
+      console.log('task ' + tasks);
+    } catch (error) {
+      // Handle error if fetching user profile fails
+      console.error('Failed to fetch tasks', error);
+    }
+  };
+
   // Function to fetch user's profile from the backend
   const fetchUserProfile = () => {
     try {
@@ -105,9 +132,11 @@ const KanbanBoard = () => {
         setOrganization(data.Data.organization);
         // setLoaded(true);
         // console.log(data);
+
+        fetchTasks();
       };
 
-      const response = fetchBackend(
+      fetchBackend(
         '/getuserprofile',
         'POST',
         { token },
@@ -137,6 +166,11 @@ const KanbanBoard = () => {
   useEffect(() => {
     fetchConnections();
   }, []);
+
+  // // Fetch the user's connections on component mount
+  // useEffect(() => {
+
+  // }, []);
 
   const handleAddTask = () => {
     // if (newTask && assignedTo) {
@@ -411,7 +445,7 @@ const KanbanBoard = () => {
             </Heading>
             <Stack spacing={4} w="300px">
               {tasks
-                .filter(task => task.progress === 'Done')
+                .filter(task => task.progress === 'Completed')
                 .map(task => (
                   <TaskCard
                     key={task.id}
