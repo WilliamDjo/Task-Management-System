@@ -1,4 +1,5 @@
 /* eslint-disable multiline-ternary */
+/* eslint-disable multiline-ternary */
 import React from 'react';
 import {
   Box,
@@ -58,9 +59,7 @@ const ConnectionProfile = () => {
   }, []);
 
   const connectionProfileLoaded = () => {
-    return (
-      <ProfileCard name={name} username={username} email={email} />
-    );
+    return <ProfileCard name={name} username={username} email={email} />;
   };
 
   const connectionAssignedTaskListLoaded = () => {
