@@ -1,18 +1,16 @@
-import sys
-import os
-from backend.account import getAccountInfo
-import tokens
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from datetime import datetime
 
-# Try removing this maybe?
-parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(parent_folder)
-
+# # Try removing this maybe?
+# parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# sys.path.append(parent_folder)
+import account
+import tokens
 from database import db_tasks, db
-from database.db import checkUser, getSingleUserInformation
+
+# from database.db import checkUser, getSingleUserInformation
 
 
 """
@@ -69,7 +67,7 @@ def is_label_valid(label: str):
 
 
 def is_assignee_valid(assignee: str):
-    res = checkUser(assignee)
+    res = db.checkUser(assignee)
     if res["Success"]:
         return False
 
@@ -95,7 +93,7 @@ def create_task(token: str, data: dict):
         return {"Success": False, "Message": "No user logged in"}
 
     # Get Task Master Details
-    user = getAccountInfo(token)
+    user = account.account.getAccountInfo(token)
     task_title = data["title"]
 
     if not is_title_valid(task_title):
@@ -288,7 +286,7 @@ def update_priority(task_id: str, new_priority: int):
 
 
 def update_details(token: str, task_id: str, new_data: dict):
-    user_details = getAccountInfo(token)
+    user_details = account.getAccountInfo(token)
     task_master = user_details["email"]
     # title
     if not is_title_valid(new_data["title"]):
@@ -482,7 +480,7 @@ def get_all_tasks_assigned_to(token: str, email: str):
         return {"Success": False, "Message": "No user logged in"}
 
     # check if email exists
-    db_result = getSingleUserInformation(email)
+    db_result = db.getSingleUserInformation(email)
 
     if not (db_result["Success"]):
         return {"Success": False, "Message": "Email Does not exist"}
@@ -497,7 +495,7 @@ def get_tasks_given_by(token: str, email: str):
         return {"Success": False, "Message": "No user logged in"}
 
     # check if email exists
-    db_result = getSingleUserInformation(email)
+    db_result = db.getSingleUserInformation(email)
 
     if not (db_result["Success"]):
         return {"Success": False, "Message": "Email Does not exist"}

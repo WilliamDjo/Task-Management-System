@@ -1,22 +1,13 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS, cross_origin
-import sys
-import os
+
 import account
-from backend.task_sys import (
-    create_task,
-    delete_task,
-    get_all_tasks,
-    get_all_tasks_assigned_to,
-    get_task_details,
-    get_tasks_given_by,
-    update_details,
-)
+import task_sys
 import connections
 
-""" Accessing Other Files"""
-parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(parent_folder)
+# """ Accessing Other Files"""
+# parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# sys.path.append(parent_folder)
 
 """Flask Set up"""
 app = Flask(__name__)
@@ -321,7 +312,7 @@ def server_create_task():
     else:
         return {"Success": False, "Message": "No token provided"}, 401
     data = request.json
-    result = create_task(token, data)
+    result = task_sys.create_task(token, data)
     return jsonify(result)
 
 
@@ -337,7 +328,7 @@ def server_update_task(task_id):
         return {"Success": False, "Message": "No token provided"}, 401
 
     data = request.json
-    result = update_details(token, task_id, data)
+    result = task_sys.update_details(token, task_id, data)
     return jsonify(result)
 
 
@@ -354,7 +345,7 @@ def server_delete_task(task_id):
     else:
         return {"Success": False, "Message": "No token provided"}, 401
 
-    result = delete_task(token, task_id)
+    result = task_sys.delete_task(token, task_id)
     return jsonify(result)
 
 
@@ -372,7 +363,7 @@ def server_get_task_details():
     else:
         return {"Success": False, "Message": "No token provided"}, 401
 
-    result = get_task_details(token, task_id)
+    result = task_sys.get_task_details(token, task_id)
 
     return jsonify(result)
 
@@ -389,7 +380,7 @@ def server_get_all():
         # You can use this token to perform your operations.
     else:
         return {"Success": False, "Message": "No token provided"}, 401
-    result = get_all_tasks(token)
+    result = task_sys.get_all_tasks(token)
     return jsonify(result)
 
 
@@ -407,7 +398,7 @@ def server_get_all_tasks_assigned_to():
         return {"Success": False, "Message": "No token provided"}, 401
     email = request.headers.get("email")
 
-    result = get_all_tasks_assigned_to(token, email)
+    result = task_sys.get_all_tasks_assigned_to(token, email)
 
     return jsonify(result)
 
@@ -426,7 +417,7 @@ def server_get_all_tasks():
         return {"Success": False, "Message": "No token provided"}, 401
     email = request.headers.get("email")
 
-    result = get_tasks_given_by(token, email)
+    result = task_sys.get_tasks_given_by(token, email)
 
     return jsonify(result)
 
