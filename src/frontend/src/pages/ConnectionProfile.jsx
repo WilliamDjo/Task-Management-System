@@ -95,6 +95,18 @@ const ConnectionProfile = () => {
       toast,
       successGetConnectionProfile
     );
+
+    // const id = setInterval(() => {
+    //   fetchBackend(
+    //     `/chat/${email}`,
+    //     'GET',
+    //     { token },
+    //     toast,
+    //     successGetChat
+    //   )
+    // }, 30000);
+
+    // return () => clearInterval(id);
   }, []);
 
   const connectionProfileLoaded = () => {
