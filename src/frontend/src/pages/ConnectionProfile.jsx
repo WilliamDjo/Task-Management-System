@@ -66,7 +66,11 @@ const ConnectionProfile = () => {
   React.useEffect(() => {
     const token = localStorage.getItem('token');
     const successGetChat = (data) => {
-      setMessages(data.Data);
+      const chats = data.Data.map((chat) => {
+        chat.clicked = false;
+        return chat;
+      })
+      setMessages(chats);
       setLoaded(true);
     }
 
@@ -143,16 +147,39 @@ const ConnectionProfile = () => {
     setMessages(newMessages);
   }
 
-  const sendMessage = (message) => {
-    const successSendMessage = () => {
+  const sendMessage = () => {
+    const successSendMessage = (data) => {
+      const newMessages = [...messages];
+      newMessages.unshift({
+        message: chatInput,
+        timestamp: data.Timestamp,
+        sender: true,
+        clicked: false
+      });
+      setMessages(newMessages);
+      setChatInput('');
+    }
 
+    if (chatInput === '') {
+      toast({
+        title: 'Message must have content',
+        status: 'warning',
+        duration: 5000,
+        isClosable: true,
+      });
+      return;
     }
     const token = localStorage.getItem('token');
+    const body = {
+      token,
+      message: chatInput
+    }
     fetchBackend(
       `/chat/${email}`,
       'POST',
-      { token },
+      body,
       toast,
+      successSendMessage,
       successSendMessage
     );
   }
@@ -167,7 +194,16 @@ const ConnectionProfile = () => {
             </Heading>
             <Divider />
             <InputGroup>
-              <Input value={chatInput} onChange={(event) => setChatInput(event.target.value)} />
+              <Input
+                value={chatInput}
+                onChange={(event) => setChatInput(event.target.value)}
+                onKeyDown={event => {
+                  if (event.key === 'Enter') {
+                    sendMessage();
+                    event.target.blur();
+                  }
+                }}
+              />
               <InputRightElement>
                 <IconButton
                   isRound={true}
@@ -176,6 +212,7 @@ const ConnectionProfile = () => {
                   _hover={{ bg: 'blue.500' }}
                   size='sm'
                   icon={<EmailIcon />}
+                  onClick={sendMessage}
                 />
               </InputRightElement>
             </InputGroup>
