@@ -2,15 +2,7 @@ from pymongo.database import Database
 from pymongo.collection import Collection
 from bson import Binary, json_util
 import json
-from db_helper import getDB
-
-
-def getUserInfoCollection(db: Database) -> Collection:
-    return db["user_info"]
-
-
-def getUserProfileCollection(db: Database) -> Collection:
-    return db["user_profile"]
+from db_helper import getDB, getUserInfoCollection, getUserProfileCollection
 
 
 def addNewUser(data: dict) -> dict:

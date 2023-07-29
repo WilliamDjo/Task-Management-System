@@ -1,5 +1,6 @@
 from pymongo import MongoClient
-
+from pymongo.database import Database
+from pymongo.collection import Collection
 
 url = "mongodb+srv://z5272191:QuyvHWVdlycdF84R@zombies.x0az3q5.mongodb.net/?retryWrites=true&w=majority"
 
@@ -10,6 +11,18 @@ def getDB():
     db = client["TaskSystem"]
 
     return db
+
+
+def getUserInfoCollection(db: Database) -> Collection:
+    return db["user_info"]
+
+
+def getUserProfileCollection(db: Database) -> Collection:
+    return db["user_profile"]
+
+
+def getChatCollection(db: Database) -> Collection:
+    return db["task_chats"]
 
 
 # FOR TESTING ONLY
