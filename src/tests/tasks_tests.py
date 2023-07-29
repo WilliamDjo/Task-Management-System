@@ -7,21 +7,6 @@ from urllib import response
 from flask import Flask, json
 
 
-parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(parent_folder)
-
-import task_sys
-from account import account_register, account_login, active_users
-from database.db import clear_collection
-from database.db_tasks import getTasksAssigned, getTasksGiven
-from tokens import active_tokens
-from server import app
-from backend.task_sys import get_tasks_given_by
-from backend.account import getAccountInfo
-from backend.connections import AddConnection, respondToConnection
-from backend.server import login
-
-
 def test_regiser():
     first_name = "John"
     last_name = "Doe"

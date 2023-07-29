@@ -4,16 +4,6 @@ import os
 from flask import Flask, json
 
 
-""" Accessing Other Files"""
-parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(parent_folder)
-
-from server import app
-from database.db import clear_collection
-from tokens import check_jwt_token
-from account import active_users
-
-
 class SignupTest(unittest.TestCase):
     def setUp(self):
         self.app = app.test_client()
