@@ -54,9 +54,58 @@ const Dashboard = () => {
     fetchBackend('/task/create', 'POST', body, toast, success);
   };
 
+  const showTasks = () => {
+    const success = data => {
+      setTasks(data.Data);
+    };
+
+    const token = localStorage.getItem('token');
+    fetchBackend('/task/getAll', 'GET', { token }, toast, success);
+  };
+
+  const consoleLogTask = id => {
+    const success = data => {
+      console.log(data);
+    };
+
+    const token = localStorage.getItem('token');
+    fetchBackend(`/task/get/${id}`, 'GET', { token }, toast, success);
+  };
+
+  const tasksAssigned = () => {
+    const success = data => {
+      console.log(data);
+    };
+
+    const token = localStorage.getItem('token');
+    fetchBackend(
+      `/task/getAllAssignedTo/${email}`,
+      'GET',
+      { token },
+      toast,
+      success
+    );
+  };
+
+  const tasksGiven = () => {
+    const success = data => {
+      console.log(data);
+    };
+
+    const token = localStorage.getItem('token');
+    fetchBackend(
+      `/task/getTasksGivenBy/${email}`,
+      'GET',
+      { token },
+      toast,
+      success
+    );
+  };
+
   React.useEffect(() => {
     const success = data => {
       console.log(data);
+      setTasks(data.Data);
     };
     const token = localStorage.getItem('token');
     fetchBackend('/task/getAll', 'GET', { token }, toast, success);
