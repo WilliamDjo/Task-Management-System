@@ -1,3 +1,6 @@
+from email.policy import default
+import json
+from marshal import dumps
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -114,10 +117,12 @@ def create_task(token: str, data: dict):
 
     try:
         task_deadline_dt = datetime.strptime(task_deadline, "%Y-%m-%d")
-        print(task_deadline_dt)
+        
 
         if not is_deadline_valid(task_deadline_dt):
             return {"Success": False, "Message": "Deadline cannot be in the past"}
+        else :
+            task_deadline_dt = task_deadline_dt.strftime("%Y-%m-%d %H:%M:%S")
 
     except ValueError:
         pass
@@ -512,3 +517,4 @@ def get_all_tasks(token: str):
         return {"Success": False, "Message": "No user logged in"}
 
     return db_tasks.getAllTasks()
+
