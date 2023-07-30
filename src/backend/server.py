@@ -386,8 +386,8 @@ def server_get_all():
     return jsonify(result)
 
 
-@app.route("/task/getAllAssignedTo", methods=["GET"])
-def server_get_all_tasks_assigned_to():
+@app.route("/task/getAllAssignedTo/<email>", methods=["GET"])
+def server_get_all_tasks_assigned_to(email):
     token = ""
     auth_header = request.headers.get("Authorization")
     if auth_header:
@@ -398,15 +398,15 @@ def server_get_all_tasks_assigned_to():
         # You can use this token to perform your operations.
     else:
         return {"Success": False, "Message": "No token provided"}, 401
-    email = request.headers.get("email")
+   
 
     result = task_sys.get_all_tasks_assigned_to(token, email)
 
     return jsonify(result)
 
 
-@app.route("/task/getTasksGivenBy", methods=["GET"])
-def server_get_all_tasks():
+@app.route("/task/getTasksGivenBy/<email>", methods=["GET"])
+def server_get_all_tasks(email):
     token = ""
     auth_header = request.headers.get("Authorization")
     if auth_header:
@@ -417,7 +417,6 @@ def server_get_all_tasks():
         # You can use this token to perform your operations.
     else:
         return {"Success": False, "Message": "No token provided"}, 401
-    email = request.headers.get("email")
 
     result = task_sys.get_tasks_given_by(token, email)
 
