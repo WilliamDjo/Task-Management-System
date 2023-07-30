@@ -84,7 +84,7 @@ const KanbanBoard = () => {
     // console.log(connections);
   };
 
-  const fetchTasks = () => {
+  const fetchTasks = email => {
     try {
       // Retrieve the token from the localStorage
       const token = localStorage.getItem('token');
@@ -93,11 +93,10 @@ const KanbanBoard = () => {
       };
 
       const body = {
-        token: token,
-        email: email,
+        token,
       };
       fetchBackend(
-        '/task/getTasksGivenBy',
+        `/task/getTasksGivenBy/${email}`,
         'GET',
         body,
         toast,
@@ -133,8 +132,7 @@ const KanbanBoard = () => {
         setOrganization(data.Data.organization);
         // setLoaded(true);
         // console.log(data);
-
-        fetchTasks();
+        fetchTasks(data.Data.email);
       };
 
       fetchBackend(
