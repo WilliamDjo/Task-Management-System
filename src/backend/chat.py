@@ -18,18 +18,28 @@ def getChats(token, receiverEmail):
             "Message": "No chat exists between these users",
             "Data": [],
         }
-    print(chatsRetrvd)
+
     chatsRetrvd = chatsRetrvd["Chat"]
+
+    # Sort chats based on timestamp in descending order (latest first)
+    sorted_chats = sorted(chatsRetrvd, key=lambda x: x["timestamp"], reverse=True)
+
     chats = []
-    for i in chatsRetrvd:
-        isSender = False
-        if i["sender"] == senderEmail:
-            isSender = True
-        chats.append(
-            {"message": i["message"], "timestamp": i["timestamp"], "sender": isSender}
+    for chat in sorted_chats:
+        timestamp_str = datetime.utcfromtimestamp(chat["timestamp"]).strftime(
+            "%d %b %Y %I:%M %p"
         )
 
-    return {"Success": True, "Message": "Chats retreived", "Data": chats}
+        isSender = chat["sender"] == senderEmail
+        chats.append(
+            {
+                "message": chat["message"],
+                "timestamp": timestamp_str,
+                "sender": isSender,
+            }
+        )
+
+    return {"Success": True, "Message": "Chats retrieved", "Data": chats}
 
 
 def updateChat(token, receiverEmail, message):
