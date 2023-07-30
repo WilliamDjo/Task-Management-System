@@ -3,7 +3,15 @@ from pymongo.collection import Collection
 from bson import json_util
 import json
 import re
-from db_helper import getDB
+
+import os
+import sys
+
+parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(parent_folder)
+
+
+from .db_helper import getDB
 
 """
 Returns the entire collection

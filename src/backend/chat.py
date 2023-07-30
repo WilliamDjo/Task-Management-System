@@ -12,14 +12,21 @@ def getChats(token, receiverEmail):
 
     senderEmail = valid_jwt["Data"]["email"]
     chatsRetrvd = db_chat.getChats(senderEmail, receiverEmail)
-    chatsRetrvd = chatsRetrvd["messages"]
+    if not chatsRetrvd["Success"]:
+        return {
+            "Success": False,
+            "Message": "No chat exists between these users",
+            "Data": [],
+        }
+    print(chatsRetrvd)
+    chatsRetrvd = chatsRetrvd["Chat"]
     chats = []
     for i in chatsRetrvd:
         isSender = False
         if i["sender"] == senderEmail:
             isSender = True
         chats.append(
-            {"message": i["msg"], "timestamp": i["timestamp"], "sender": isSender}
+            {"message": i["message"], "timestamp": i["timestamp"], "sender": isSender}
         )
 
     return {"Success": True, "Message": "Chats retreived", "Data": chats}

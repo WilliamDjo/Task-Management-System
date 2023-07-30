@@ -1,6 +1,11 @@
-from bson import Binary, json_util
-import json
-from db_helper import getDB, getChatCollection, getUserInfoCollection
+import os
+import sys
+
+parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(parent_folder)
+
+
+from .db_helper import getDB, getChatCollection, getUserInfoCollection
 from datetime import datetime
 
 
@@ -23,15 +28,15 @@ def addNewChat(
     if userInfo_A is None or userInfo_B is None:
         return {"Success": False, "Message": "No user found with the given email"}
 
-    id_A = userInfo_A["_id"]
-    id_B = userInfo_B["_id"]
+    id_A = str(userInfo_A["_id"])
+    id_B = str(userInfo_B["_id"])
 
     ids = [id_A, id_B]
     ids = sorted(ids)
     uid = "".join(ids)
 
     chat = {"_id": uid, "messages": []}
-    insert_result = chatCollection.insert_one(chat)
+    chatCollection.insert_one(chat)
 
     return {"Success": True, "Message": "Chat creation done"}
 
@@ -54,8 +59,8 @@ def checkChat(
     # If no user was found, return a dictionary indicating failure
     if userInfo_A is None or userInfo_B is None:
         return {"Success": False, "Message": "No user found with the given email"}
-    id_A = userInfo_A["_id"]
-    id_B = userInfo_B["_id"]
+    id_A = str(userInfo_A["_id"])
+    id_B = str(userInfo_B["_id"])
 
     ids = [id_A, id_B]
     ids = sorted(ids)
@@ -91,8 +96,8 @@ def addMessage(
     if userInfo_A is None or userInfo_B is None:
         return {"Success": False, "Message": "No user found with the given email"}
 
-    id_A = userInfo_A["_id"]
-    id_B = userInfo_B["_id"]
+    id_A = str(userInfo_A["_id"])
+    id_B = str(userInfo_B["_id"])
 
     ids = [id_A, id_B]
     ids = sorted(ids)
@@ -109,7 +114,12 @@ def addMessage(
         else:
             return chatResult
     # Create the message
-    message = {"sender": id_A, "receiver": id_B, "message": msg, "timestamp": timestamp}
+    message = {
+        "sender": sender,
+        "receiver": receiver,
+        "message": msg,
+        "timestamp": timestamp,
+    }
 
     # Add the message to the chat document
     chatCollection.update_one({"_id": uid}, {"$push": {"messages": message}})
@@ -136,11 +146,12 @@ def getChats(
     if userInfo_A is None or userInfo_B is None:
         return {"Success": False, "Message": "No user found with the given email"}
 
-    id_A = userInfo_A["_id"]
-    id_B = userInfo_B["_id"]
+    id_A = str(userInfo_A["_id"])
+    id_B = str(userInfo_B["_id"])
 
     ids = [id_A, id_B]
     ids = sorted(ids)
+    print(ids)
     uid = "".join(ids)
 
     # Check if a chat exists with this uid, if it does, retrieve the chat
