@@ -18,12 +18,12 @@ from database.db_helper import clear_collection
 BASE_URL = "http://127.0.0.1:5000"  # adjust if your app runs on different settings
 
 user_1 = {
-    "username": "sanyamjain1",
+    "username": "will_bill_short",
     "password": "Testpass123",
-    "first_name": "Sanyam",
-    "last_name": "Jain",
+    "first_name": "William",
+    "last_name": "Sh",
     "sys_admin": False,
-    "email": "sanyamjain1@gmail.com",
+    "email": "willbur@gmail.com",
 }
 
 user_2 = {
@@ -44,138 +44,19 @@ admin_1 = {
     "email": "adminer@admin.com",
 }
 
-#test user registration
-# response = requests.post(
-#     f"{BASE_URL}/signup",
-#     json=user_1,
-# )
-# resp_json = response.json()
-# print(resp_json)
-# token = resp_json["Token"]
-# headers = {
-#     "Authorization": f"Bearer {token}",
-# }
+task_1 = {
+    "title": "Task Title",
+    "description": "Task Description",
+    "deadline": "2023-31-07",
+    "progress": "Not Started",
+    "cost_per_hr": 10,
+    "assignee": "",
+    "estimation_spent_hrs": 0,
+    "actual_time_hr": 0,
+    "priority": 2,
+    "labels": ["Label1", "Label2"],
+}
 
-# response = requests.post(f"{BASE_URL}/logout", json={"token": token})
-# resp_json = response.json()
-# print(resp_json)
-
-# # test login
-# response = requests.post(
-#     f"{BASE_URL}/login",
-#     json={"email": user_1["email"], "password": user_1["password"]},
-# )
-# resp_json = response.json()
-# print(resp_json)
-# token = resp_json["Token"]
-# headers = {
-#     "Authorization": f"Bearer {token}",
-# }
-
-# # test logout
-# response = requests.post(f"{BASE_URL}/logout", json={"token": token})
-
-# test user registration
-# response = requests.post(
-#     f"{BASE_URL}/signup",
-#     json=user_2,
-# )
-# resp_json = response.json()
-# print(resp_json)
-# token = resp_json["Token"]
-# headers = {
-#     "Authorization": f"Bearer {token}",
-# }
-
-# headers = {
-#     "Authorization": f"Bearer {token}",
-# }
-
-# response = requests.post(f"{BASE_URL}/logout", json={"token": token})
-# resp_json = response.json()
-# print(resp_json)
-
-
-# # test user registration
-# response = requests.post(
-#     f"{BASE_URL}/signup",
-#     json=admin_1,
-# )
-# resp_json = response.json()
-# print(resp_json)
-# token = resp_json["Token"]
-# headers = {
-#     "Authorization": f"Bearer {token}",
-# }
-
-# response = requests.post(f"{BASE_URL}/logout", json={"token": token})
-# resp_json = response.json()
-# print(resp_json)
-
-# # test login
-# response = requests.post(
-#     f"{BASE_URL}/login",
-#     json={"email": user_2["email"], "password": user_2["password"]},
-# )
-# resp_json = response.json()
-# print(resp_json)
-# token = resp_json["Token"]
-# headers = {
-#     "Authorization": f"Bearer {token}",
-# }
-
-# # test logout
-# response = requests.post(f"{BASE_URL}/logout", json={"token": token})
-
-# response = requests.post(
-#     f"{BASE_URL}/login",
-#     json={"email": user_2["email"], "password": user_2["password"]},
-# )
-# resp_json = response.json()
-# token = resp_json["Token"]
-# print(resp_json)
-
-# headers = {
-#     "Authorization": f"Bearer {token}",
-# }
-# print(headers)
-# response = requests.post(f"{BASE_URL}/getuserprofile", headers=headers)
-# resp_json = response.json()
-# print(resp_json)
-
-# data_1 = {
-#     "title": "For Demo2",
-#     "description": "Task Description",
-#     "deadline": "2023-31-07",
-#     "progress": "Not Started",
-#     "cost_per_hr": 10,
-#     "assignee": "sanyamjain1@gmail.com",
-#     "estimation_spent_hrs": 0,
-#     "actual_time_hr": 0,
-#     "priority": 2,
-#     "labels": ["Label1", "Label2"],
-# }
-# data_2 = {
-#     "title": "For Demo2",
-#     "description": "Task Description",
-#     "deadline": "2023-31-07",
-#     "progress": "Not Started",
-#     "cost_per_hr": 10,
-#     "assignee": "sanyamjain2@gmail.com",
-#     "estimation_spent_hrs": 0,
-#     "actual_time_hr": 0,
-#     "priority": 2,
-#     "labels": ["Label1", "Label2"],
-# }
-
-# response = requests.post(f"{BASE_URL}/task/create", headers=headers, json=data_1)
-
-# resp_json = response.json()
-# print(resp_json)
-# response = requests.post(f"{BASE_URL}/task/create", headers=headers, json=data_2)
-
-# resp_json = response.json()
-# print(resp_json)
 
 def clear_db():
     clear_collection("user_info")
@@ -861,238 +742,347 @@ def clear_db():
 #         self.assertFalse(response_data["Success"], "Get all users should not be successful without authentication")
 
 
-class AdminResetPasswordEndpointTest(unittest.TestCase):
+# class AdminResetPasswordEndpointTest(unittest.TestCase):
 
-    def setUp(self):
-        clear_db()
-        self.base_url = BASE_URL
-        self.admin_token = self.register_and_login_test_admin()
-        self.user_token = self.register_and_login_test_user()
+#     def setUp(self):
+#         clear_db()
+#         self.base_url = BASE_URL
+#         self.admin_token = self.register_and_login_test_admin()
+#         self.user_token = self.register_and_login_test_user()
 
-    def register_and_login_test_admin(self):
-            # Prepare data for registering a test user
-            data = admin_1
-            # Make the POST request to register the test user
-            response = requests.post(self.base_url + "/signup", json=data)
+#     def register_and_login_test_admin(self):
+#             # Prepare data for registering a test user
+#             data = admin_1
+#             # Make the POST request to register the test user
+#             response = requests.post(self.base_url + "/signup", json=data)
 
-            self.assertEqual(response.status_code, 200, "Test user registration failed")
+#             self.assertEqual(response.status_code, 200, "Test user registration failed")
 
-            response_data = response.json()
-            token = response_data["Token"]
-            return token
-
-
-    def register_and_login_test_user(self):
-
-            data = user_1
-            response = requests.post(self.base_url + "/signup", json=data)
-
-            self.assertEqual(response.status_code, 200, "Test user registration failed")
-
-            response_data = response.json()
-            token = response_data["Token"]
-            return token
+#             response_data = response.json()
+#             token = response_data["Token"]
+#             return token
 
 
-    def test_successful_admin_reset_password(self):
-        # Prepare the authentication headers with the admin token
-        headers = {
-            "Authorization": "Bearer " + self.admin_token
-        }
+#     def register_and_login_test_user(self):
 
-        # Prepare data for admin reset password
-        data = {
-            "token": self.admin_token,  # Sending the admin token in the request JSON (can also be in headers)
-            "email": user_1['email'],  # Email of the user whose password needs to be reset
-            "password": "NewSecurePassword123!"  # New password for the user
-        }
+#             data = user_1
+#             response = requests.post(self.base_url + "/signup", json=data)
 
-        # Make the PUT request to the admin/reset endpoint with authentication headers and data
-        response = requests.put(self.base_url + "/admin/reset", headers=headers, json=data)
+#             self.assertEqual(response.status_code, 200, "Test user registration failed")
 
-        # Check if the request was successful (status code 200)
-        self.assertEqual(response.status_code, 200, "Admin reset password request failed")
+#             response_data = response.json()
+#             token = response_data["Token"]
+#             return token
 
-        # Check if the response contains the expected keys
-        response_data = response.json()
-        self.assertIn("Success", response_data, "Success key not found in response")
-        self.assertIn("Message", response_data, "Message key not found in response")
 
-        # Check if the admin reset password was successful
-        self.assertTrue(response_data["Success"], "Admin reset password was not successful")
+#     def test_successful_admin_reset_password(self):
+#         # Prepare the authentication headers with the admin token
+#         headers = {
+#             "Authorization": "Bearer " + self.admin_token
+#         }
 
-    def test_unauthorized_admin_reset_password(self):
-        # Prepare the authentication headers with the user token (intentionally causing an unauthorized attempt)
-        headers = {
-            "Authorization": "Bearer " + self.user_token
-        }
+#         # Prepare data for admin reset password
+#         data = {
+#             "token": self.admin_token,  # Sending the admin token in the request JSON (can also be in headers)
+#             "email": user_1['email'],  # Email of the user whose password needs to be reset
+#             "password": "NewSecurePassword123!"  # New password for the user
+#         }
 
-        # Prepare data for admin reset password
-        data = {
-            "token": self.user_token,  # Sending the admin token in the request JSON (can also be in headers)
-            "email": user_1['email'],  # Email of the user whose password needs to be reset
-            "password": "NewSecurePassword123!"  # New password for the user
-        }
+#         # Make the PUT request to the admin/reset endpoint with authentication headers and data
+#         response = requests.put(self.base_url + "/admin/reset", headers=headers, json=data)
 
-        # Make the PUT request to the admin/reset endpoint with user token (unauthorized)
-        response = requests.put(self.base_url + "/admin/reset", headers=headers, json=data)
+#         # Check if the request was successful (status code 200)
+#         self.assertEqual(response.status_code, 200, "Admin reset password request failed")
 
-        # Check if the request was unsuccessful (status code 401 - Unauthorized)
-        self.assertEqual(response.status_code, 200, "Admin reset password request should fail with unauthorized user token")
+#         # Check if the response contains the expected keys
+#         response_data = response.json()
+#         self.assertIn("Success", response_data, "Success key not found in response")
+#         self.assertIn("Message", response_data, "Message key not found in response")
 
-        # Check if the response contains the expected keys
-        response_data = response.json()
-        self.assertIn("Success", response_data, "Success key not found in response")
-        self.assertIn("Message", response_data, "Message key not found in response")
+#         # Check if the admin reset password was successful
+#         self.assertTrue(response_data["Success"], "Admin reset password was not successful")
 
-        # Check if the admin reset password was not successful
-        self.assertFalse(response_data["Success"], "Admin reset password should not be successful with unauthorized user token")
+#     def test_unauthorized_admin_reset_password(self):
+#         # Prepare the authentication headers with the user token (intentionally causing an unauthorized attempt)
+#         headers = {
+#             "Authorization": "Bearer " + self.user_token
+#         }
+
+#         # Prepare data for admin reset password
+#         data = {
+#             "token": self.user_token,  # Sending the admin token in the request JSON (can also be in headers)
+#             "email": user_1['email'],  # Email of the user whose password needs to be reset
+#             "password": "NewSecurePassword123!"  # New password for the user
+#         }
+
+#         # Make the PUT request to the admin/reset endpoint with user token (unauthorized)
+#         response = requests.put(self.base_url + "/admin/reset", headers=headers, json=data)
+
+#         # Check if the request was unsuccessful (status code 401 - Unauthorized)
+#         self.assertEqual(response.status_code, 200, "Admin reset password request should fail with unauthorized user token")
+
+#         # Check if the response contains the expected keys
+#         response_data = response.json()
+#         self.assertIn("Success", response_data, "Success key not found in response")
+#         self.assertIn("Message", response_data, "Message key not found in response")
+
+#         # Check if the admin reset password was not successful
+#         self.assertFalse(response_data["Success"], "Admin reset password should not be successful with unauthorized user token")
  
-class AdminDeleteEmailEndpointTest(unittest.TestCase):
+# class AdminDeleteEmailEndpointTest(unittest.TestCase):
+
+#     def setUp(self):
+#         clear_db()
+#         self.base_url = BASE_URL
+#         # Register and login a test admin before running the admin_delete_email tests
+#         self.admin_token = self.register_and_login_test_admin()
+#         # Register and login a test user before running the admin_delete_email tests
+#         self.user_token = self.register_and_login_test_user()
+
+#     def register_and_login_test_user(self):
+#         # Prepare data for registering a test user
+#         data = user_1
+
+
+#         # Make the POST request to register the test user
+#         response = requests.post(self.base_url + "/signup", json=data)
+
+
+#         # Check if the user registration was successful (status code 200)
+#         self.assertEqual(response.status_code, 200, "Test user registration failed")
+
+
+#         # Extract the token from the login response
+#         response_data = response.json()
+#         token = response_data["Token"]
+#         return token
+
+#     def register_and_login_test_admin(self):
+#         # Prepare data for registering a test user
+#         data = admin_1
+
+
+#         # Make the POST request to register the test user
+#         response = requests.post(self.base_url + "/signup", json=data)
+
+
+#         # Check if the user registration was successful (status code 200)
+#         self.assertEqual(response.status_code, 200, "Test user registration failed")
+
+
+#         # Extract the token from the login response
+#         response_data = response.json()
+#         token = response_data["Token"]
+#         return token
+
+#     def test_successful_admin_delete_email(self):
+#         # Prepare the authentication headers with the admin token
+#         headers = {
+#             "Authorization": "Bearer " + self.admin_token
+#         }
+
+#         # Prepare data for admin delete email
+#         data = {
+#             "email": user_1['email']  # Email of the user to be deleted
+#         }
+
+#         # Make the DELETE request to the admin/delete endpoint with authentication headers and data
+#         response = requests.delete(self.base_url + "/admin/delete", headers=headers, json=data)
+
+#         # Check if the request was successful (status code 200)
+#         self.assertEqual(response.status_code, 200, "Admin delete email request failed")
+
+#         # Check if the response contains the expected keys
+#         response_data = response.json()
+#         self.assertIn("Success", response_data, "Success key not found in response")
+#         self.assertIn("Message", response_data, "Message key not found in response")
+
+#         # Check if the admin delete email was successful
+#         self.assertTrue(response_data["Success"], "Admin delete email was not successful")
+
+#     def test_unauthorized_admin_delete_email(self):
+#         # Prepare the authentication headers with the user token (intentionally causing an unauthorized attempt)
+#         headers = {
+#             "Authorization": "Bearer " + self.user_token
+#         }
+
+#         # Prepare data for admin delete email
+#         data = {
+#             "email": user_1['email']
+#         }
+
+#         # Make the DELETE request to the admin/delete endpoint with user token (unauthorized)
+#         response = requests.delete(self.base_url + "/admin/delete", headers=headers, json=data)
+
+#         # Check if the request was unsuccessful (status code 401 - Unauthorized)
+#         self.assertEqual(response.status_code, 200, "Admin delete email request should fail with unauthorized user token")
+
+#         # Check if the response contains the expected keys
+#         response_data = response.json()
+#         self.assertIn("Success", response_data, "Success key not found in response")
+#         self.assertIn("Message", response_data, "Message key not found in response")
+
+#         # Check if the admin delete email was not successful
+#         self.assertFalse(response_data["Success"], "Admin delete email should not be successful with unauthorized user token")
+
+# class ResetPasswordEndpointTest(unittest.TestCase):
+
+#     def setUp(self):
+#         clear_db()
+#         # Assuming the API is running locally on port 5000
+#         self.base_url = BASE_URL
+#         self.register_and_login_test_user()
+
+
+#     def register_and_login_test_user(self):
+#         # Prepare data for registering a test user
+#         data = user_1
+
+#         response = requests.post(self.base_url + "/signup", json=data)
+
+#         self.assertEqual(response.status_code, 200, "Test user registration failed")
+
+#         response_data = response.json()
+#         token = response_data["Token"]
+#         return token
+
+#     def test_successful_reset_password(self):
+#         # Prepare data for reset password
+#         data = {
+#             "email": user_1["email"]  # Email of the user whose password needs to be reset
+#         }
+
+#         # Make the PUT request to the reset/password endpoint with data
+#         response = requests.put(self.base_url + "/reset/password", json=data)
+
+#         # Check if the request was successful (status code 200)
+#         self.assertEqual(response.status_code, 200, "Reset password request failed")
+
+#         # Check if the response contains the expected keys
+#         response_data = response.json()
+#         self.assertIn("Success", response_data, "Success key not found in response")
+#         self.assertIn("Message", response_data, "Message key not found in response")
+
+#         # Check if the reset password was successful
+#         self.assertTrue(response_data["Success"], "Reset password was not successful")
+
+
+
+
+# '''
+# Endpoints testing for Tasks
+# '''
+
+
+
+# class CreateTaskEndpointTest(unittest.TestCase):
+
+#     def setUp(self):
+#         clear_db()
+#         # Assuming the API is running locally on port 5000
+#         self.base_url = BASE_URL
+#         # Register and login a test user before running the create_task tests
+#         self.token = self.register_and_login_test_user()
+
+#     def register_and_login_test_user(self):
+#         # Prepare data for registering a test user
+#         data = user_1
+#         response = requests.post(self.base_url + "/signup", json=data)
+#         self.assertEqual(response.status_code, 200, "Test user registration failed")
+#         response_data = response.json()
+#         token = response_data["Token"]
+#         return token
+
+#     def test_successful_create_task(self):
+#         # Prepare the authentication headers with the user token
+#         headers = {
+#             "Authorization": "Bearer " + self.token
+#         }
+
+#         # Prepare data for creating a task
+#         data = task_1
+
+#         # Make the POST request to the task/create endpoint with authentication headers and data
+#         response = requests.post(self.base_url + "/task/create", headers=headers, json=data)
+
+#         # Check if the request was successful (status code 200)
+#         self.assertEqual(response.status_code, 200, "Create task request failed")
+
+#         # Check if the response contains the expected keys
+#         response_data = response.json()
+#         self.assertIn("Success", response_data, "Success key not found in response")
+#         # self.assertIn("Message", response_data, "Message key not found in response")
+#         # Include other expected keys in the response as needed
+
+#         # Check if the create task was successful
+#         response_data = response.json()
+#         self.assertTrue(response_data["Success"], "Create task was not successful")
+    
+
+class GetAssignedTasksToCurrEndpointTest(unittest.TestCase):
 
     def setUp(self):
-        clear_db()
-        self.base_url = BASE_URL
-        # Register and login a test admin before running the admin_delete_email tests
-        self.admin_token = self.register_and_login_test_admin()
-        # Register and login a test user before running the admin_delete_email tests
-        self.user_token = self.register_and_login_test_user()
-
-    def register_and_login_test_user(self):
-        # Prepare data for registering a test user
-        data = user_1
-
-
-        # Make the POST request to register the test user
-        response = requests.post(self.base_url + "/signup", json=data)
-
-
-        # Check if the user registration was successful (status code 200)
-        self.assertEqual(response.status_code, 200, "Test user registration failed")
-
-
-        # Extract the token from the login response
-        response_data = response.json()
-        token = response_data["Token"]
-        return token
-
-    def register_and_login_test_admin(self):
-        # Prepare data for registering a test user
-        data = admin_1
-
-
-        # Make the POST request to register the test user
-        response = requests.post(self.base_url + "/signup", json=data)
-
-
-        # Check if the user registration was successful (status code 200)
-        self.assertEqual(response.status_code, 200, "Test user registration failed")
-
-
-        # Extract the token from the login response
-        response_data = response.json()
-        token = response_data["Token"]
-        return token
-
-    def test_successful_admin_delete_email(self):
-        # Prepare the authentication headers with the admin token
-        headers = {
-            "Authorization": "Bearer " + self.admin_token
-        }
-
-        # Prepare data for admin delete email
-        data = {
-            "email": user_1['email']  # Email of the user to be deleted
-        }
-
-        # Make the DELETE request to the admin/delete endpoint with authentication headers and data
-        response = requests.delete(self.base_url + "/admin/delete", headers=headers, json=data)
-
-        # Check if the request was successful (status code 200)
-        self.assertEqual(response.status_code, 200, "Admin delete email request failed")
-
-        # Check if the response contains the expected keys
-        response_data = response.json()
-        self.assertIn("Success", response_data, "Success key not found in response")
-        self.assertIn("Message", response_data, "Message key not found in response")
-
-        # Check if the admin delete email was successful
-        self.assertTrue(response_data["Success"], "Admin delete email was not successful")
-
-    def test_unauthorized_admin_delete_email(self):
-        # Prepare the authentication headers with the user token (intentionally causing an unauthorized attempt)
-        headers = {
-            "Authorization": "Bearer " + self.user_token
-        }
-
-        # Prepare data for admin delete email
-        data = {
-            "email": user_1['email']
-        }
-
-        # Make the DELETE request to the admin/delete endpoint with user token (unauthorized)
-        response = requests.delete(self.base_url + "/admin/delete", headers=headers, json=data)
-
-        # Check if the request was unsuccessful (status code 401 - Unauthorized)
-        self.assertEqual(response.status_code, 200, "Admin delete email request should fail with unauthorized user token")
-
-        # Check if the response contains the expected keys
-        response_data = response.json()
-        self.assertIn("Success", response_data, "Success key not found in response")
-        self.assertIn("Message", response_data, "Message key not found in response")
-
-        # Check if the admin delete email was not successful
-        self.assertFalse(response_data["Success"], "Admin delete email should not be successful with unauthorized user token")
-
-class ResetPasswordEndpointTest(unittest.TestCase):
-
-    def setUp(self):
-        clear_db()
+        # clear_db()
         # Assuming the API is running locally on port 5000
         self.base_url = BASE_URL
-        self.register_and_login_test_user()
+        # Register and login a test user before running the get_assigned_tasks_to_curr tests
+        self.token = self.register_and_login_test_user()
 
 
     def register_and_login_test_user(self):
         # Prepare data for registering a test user
         data = user_1
 
-        response = requests.post(self.base_url + "/signup", json=data)
-
-        self.assertEqual(response.status_code, 200, "Test user registration failed")
-
+        # Make the POST request to register the test user
+        response = requests.post(self.base_url + "/login", json=data)
+        
+        # Check if the user registration was successful (status code 200)
+        # self.assertEqual(response.status_code, 200, "Test user registration failed")
         response_data = response.json()
         token = response_data["Token"]
-        return token
 
-    def test_successful_reset_password(self):
-        # Prepare data for reset password
-        data = {
-            "email": user_1["email"]  # Email of the user whose password needs to be reset
+        headers = {
+            "Authorization": "Bearer " + token
         }
 
-        # Make the PUT request to the reset/password endpoint with data
-        response = requests.put(self.base_url + "/reset/password", json=data)
+        # Prepare data for creating a task
+        data = task_1
+
+        # Make the POST request to the task/create endpoint with authentication headers and data
+        response = requests.post(self.base_url + "/task/create", headers=headers, json=data)
 
         # Check if the request was successful (status code 200)
-        self.assertEqual(response.status_code, 200, "Reset password request failed")
+        # self.assertEqual(response.status_code, 200, "Create task request failed")
+
+        # Extract the token from the login response
+        response_data = response.json()
+
+        return token
+
+
+    def test_successful_get_assigned_tasks_to_curr(self):
+        # Prepare the authentication headers with the user token
+        headers = {
+            "Authorization": "Bearer " + self.token
+        }
+
+        # Make the GET request to the task/getAllAssignedTocurr endpoint with authentication headers
+        response = requests.get(self.base_url + "/task/getAllAssignedTocurr", headers=headers)
+
+        # Check if the request was successful (status code 200)
+        self.assertEqual(response.status_code, 200, "Get assigned tasks to current user request failed")
 
         # Check if the response contains the expected keys
         response_data = response.json()
         self.assertIn("Success", response_data, "Success key not found in response")
         self.assertIn("Message", response_data, "Message key not found in response")
+        # Include other expected keys in the response as needed
 
-        # Check if the reset password was successful
-        self.assertTrue(response_data["Success"], "Reset password was not successful")
+        # Check if getting assigned tasks to current user was successful
+        self.assertTrue(response_data["Success"], "Getting assigned tasks to current user was not successful")
+
+
 
 
 if __name__ == "__main__":
     unittest.main()
-
-
-
-
-
-
-# if __name__ == "__main__":
-#     unittest.main()

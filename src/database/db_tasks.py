@@ -3,7 +3,14 @@ from pymongo.collection import Collection
 from bson import json_util
 import json
 import re
-from db_helper import getDB
+import sys
+import os
+# Assuming you are running the script from the parent directory of 'project'
+parent_dir = os.path.dirname(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.append(parent_dir)
+
+
+from database.db_helper import getDB
 
 """
 Returns the entire collection
@@ -63,11 +70,13 @@ def getTaskFromID(task_id: str) -> dict:
 
     task = TaskSystemCollection.find_one({"id": task_id})
 
+    task_details = json.loads(json_util.dumps(task))
+
     # If no user was found, return a dictionary indicating failure
     if task is None:
         return {"Success": False, "Message": "Incorrect task id"}
 
-    return {"Success": True, "Message": "Task Found", "Data": task}
+    return {"Success": True, "Message": "Task Found", "Data": task_details}
 
 
 def updateTaskInfo(task_id: str, data: dict) -> dict:
@@ -138,7 +147,9 @@ def getTasksGiven(task_master) -> dict:
             "Data": [],
             "Message": "No tasks given out by task master",
         }
-    return {"Success": True, "Data": tasks_given, "Message": "Successfully Returned"}
+
+    tasks_given_json  = json.loads(json_util.dumps(tasks_given))
+    return {"Success": True, "Data": tasks_given_json, "Message": "Successfully Returned"}
 
 
 # Return all tasks assigned to an assignee
@@ -147,17 +158,17 @@ def getTasksAssigned(task_assignee) -> dict:
     TaskSystemCollection = getTaskInfoCollection(db)
     task_infos = TaskSystemCollection.find({"assignee": task_assignee})
 
-    tasks_given = []
+    tasks_assigned_to = []
     for task_info in task_infos:
-        tasks_given.append(task_info)
+         tasks_assigned_to .append(task_info)
 
-    if len(tasks_given) == 0:
+    if len( tasks_assigned_to ) == 0:
         return {
             "Success": False,
             "Data": [],
             "Message": "No tasks given to by task assignee",
         }
-    return {"Success": True, "Data": tasks_given, "Message": "Successfully Returned"}
+    return {"Success": True, "Data":  tasks_assigned_to , "Message": "Successfully Returned"}
 
 
 def searchTasks(search_string):

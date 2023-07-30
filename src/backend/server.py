@@ -2,12 +2,15 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS, cross_origin
 
 import account
+from backend.task_sys import get_tasks_assigned_to_curr
 import task_sys
 import connections
+import sys 
+import os
 
 # """ Accessing Other Files"""
-# parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-# sys.path.append(parent_folder)
+parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(parent_folder)
 
 """Flask Set up"""
 app = Flask(__name__)
@@ -311,6 +314,7 @@ def server_create_task():
             return {"Success": False, "Message": "Invalid token format"}, 400
     else:
         return {"Success": False, "Message": "No token provided"}, 401
+
     data = request.json
     result = task_sys.create_task(token, data)
     return jsonify(result)
@@ -384,8 +388,8 @@ def server_get_all():
     return jsonify(result)
 
 
-@app.route("/task/getAllAssignedTo", methods=["GET"])
-def server_get_all_tasks_assigned_to():
+@app.route("/task/getAllAssignedTo/<email>", methods=["GET"])
+def server_get_all_tasks_assigned_to(email):
     token = ""
     auth_header = request.headers.get("Authorization")
     if auth_header:
@@ -396,15 +400,32 @@ def server_get_all_tasks_assigned_to():
         # You can use this token to perform your operations.
     else:
         return {"Success": False, "Message": "No token provided"}, 401
-    email = request.headers.get("email")
 
     result = task_sys.get_all_tasks_assigned_to(token, email)
 
     return jsonify(result)
 
 
-@app.route("/task/getTasksGivenBy", methods=["GET"])
-def server_get_all_tasks():
+@app.route("/task/getAllAssignedTocurr", methods=["GET"])
+def server_get_tasks_assigned_to_current():
+    
+    token = ""
+    auth_header = request.headers.get("Authorization")
+    if auth_header:
+        bearer, _, token = auth_header.partition(" ")
+        if bearer.lower() != "bearer":
+            return {"Success": False, "Message": "Invalid token format"}, 400
+    else:
+        return {"Success": False, "Message": "No token provided"}, 401
+    
+    
+    result = get_tasks_assigned_to_curr(token)
+    return jsonify(result)
+
+
+
+@app.route("/task/getTasksGivenBy/<email>", methods=["GET"])
+def server_get_all_tasks(email):
     token = ""
     auth_header = request.headers.get("Authorization")
     if auth_header:
@@ -415,7 +436,6 @@ def server_get_all_tasks():
         # You can use this token to perform your operations.
     else:
         return {"Success": False, "Message": "No token provided"}, 401
-    email = request.headers.get("email")
 
     result = task_sys.get_tasks_given_by(token, email)
 

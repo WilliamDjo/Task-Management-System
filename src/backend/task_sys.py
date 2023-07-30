@@ -7,6 +7,7 @@ from datetime import datetime
 # parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # sys.path.append(parent_folder)
 import account
+from account import getAccountInfo
 import tokens
 from database import db_tasks, db
 
@@ -93,7 +94,7 @@ def create_task(token: str, data: dict):
         return {"Success": False, "Message": "No user logged in"}
 
     # Get Task Master Details
-    user = account.account.getAccountInfo(token)
+    user = account.getAccountInfo(token)
     task_title = data["title"]
 
     if not is_title_valid(task_title):
@@ -486,6 +487,25 @@ def get_all_tasks_assigned_to(token: str, email: str):
         return {"Success": False, "Message": "Email Does not exist"}
 
     return db_tasks.getTasksAssigned(email)
+
+def get_tasks_assigned_to_curr(token: str):
+    # check token
+    token_result = tokens.check_jwt_token(token)
+    if not token_result["Success"]:
+        return {"Success": False, "Message": "No user logged in"}
+    
+    
+    #Get active user details
+    acc_info = getAccountInfo(token)
+
+    # db_result = db.getSingleUserInformation(acc_info['email'])
+
+    # if not (db_result["Success"]):
+    #     return {"Success": False, "Message": "Email Does not exist"}
+
+    return db_tasks.getTasksAssigned(acc_info['Data']['email'])
+
+
 
 
 def get_tasks_given_by(token: str, email: str):
