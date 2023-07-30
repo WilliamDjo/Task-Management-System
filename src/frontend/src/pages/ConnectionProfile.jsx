@@ -39,7 +39,7 @@ import { EmailIcon } from '@chakra-ui/icons';
 const ConnectionProfile = () => {
   const [name, setName] = React.useState('Name');
   const [username, setUsername] = React.useState('username');
-  const [loaded, setLoaded] = React.useState(true);
+  const [loaded, setLoaded] = React.useState(false);
   const [tasks, setTasks] = React.useState([
     {
       id: 100,
