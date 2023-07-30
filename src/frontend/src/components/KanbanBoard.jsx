@@ -300,7 +300,8 @@ const KanbanBoard = () => {
     setTasks(updatedTasks);
     // Retrieve the token from the localStorage
     const token = localStorage.getItem('token');
-    const body = { updatedTask, token }; // assuming you have the token available in the scope
+    updatedTask = { ...updatedTask, token };
+    // const body = { updatedTask, token }; // assuming you have the token available in the scope
     const onSuccess = data => {
       toast({ title: data });
     };
@@ -313,7 +314,7 @@ const KanbanBoard = () => {
     fetchBackend(
       `/task/update/${id}`,
       'PUT',
-      body,
+      updatedTask,
       toast,
       onSuccess,
       onFailure
