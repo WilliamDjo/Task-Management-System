@@ -352,7 +352,7 @@ def update_details(token: str, task_id: str, new_data: dict):
     task_labels = new_data["labels"]
     valid_labels = [label for label in task_labels if is_label_valid(label)]
 
-    send_task_notification()
+    # send_task_notification()
 
     return db_tasks.updateTaskInfo(task_id, new_data)
 
