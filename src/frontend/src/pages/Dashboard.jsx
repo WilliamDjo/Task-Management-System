@@ -1,10 +1,24 @@
 import React from 'react';
-import { Box, Button, Flex, useToast } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Flex,
+  FormControl,
+  FormLabel,
+  Input,
+  useToast,
+} from '@chakra-ui/react';
 import NavigationBar from '../components/NavigationBar';
 import KanbanBoard from '../components/KanbanBoard';
 import { fetchBackend } from '../fetch';
 
 const Dashboard = () => {
+  const [tasks, setTasks] = React.useState([
+    {
+      title: 'Hello',
+    },
+  ]);
+  const [email, setEmail] = React.useState('');
   const toast = useToast();
 
   const newTask = () => {
@@ -46,11 +60,31 @@ const Dashboard = () => {
     };
     const token = localStorage.getItem('token');
     fetchBackend('/task/getAll', 'GET', { token }, toast, success);
-  });
+  }, []);
   return (
     <Box minH="100vh" h="100vh">
       <Flex h="100%" flexFlow="column">
-        <Button onClick={newTask}>Click here</Button>
+        <Button onClick={newTask}>Click here for new tasks</Button>
+        <Button onClick={showTasks}>Click here to show all tasks</Button>
+        <FormControl>
+          <FormLabel>Email:</FormLabel>
+          <Input value={email} onChange={e => setEmail(e.target.value)}></Input>
+        </FormControl>
+        <Button onClick={tasksAssigned}>
+          Click here to console log all tasks assigned to email
+        </Button>
+        <Button onClick={tasksGiven}>
+          Click here to console log all tasks given by email
+        </Button>
+        <Box>
+          {tasks.map((x, index) => {
+            return (
+              <Box key={index} onClick={() => consoleLogTask(x.id)}>
+                {x.title} - {x.id}
+              </Box>
+            );
+          })}
+        </Box>
         <NavigationBar />
         {/* <ChakraProvider> */}
         <KanbanBoard />

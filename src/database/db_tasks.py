@@ -80,7 +80,9 @@ def getTaskFromID(task_id: str) -> dict:
     if task is None:
         return {"Success": False, "Message": "Incorrect task id"}
 
-    return {"Success": True, "Message": "Task Found", "Data": task}
+    data = json.loads(json_util.dumps(task))
+
+    return {"Success": True, "Message": "Task Found", "Data": data}
 
 
 def updateTaskInfo(task_id: str, data: dict) -> dict:
@@ -158,7 +160,8 @@ def getTasksGiven(task_master) -> dict:
             "Data": tasks_given,
             "Message": "No tasks given out by task master",
         }
-    return {"Success": True, "Data": tasks_given, "Message": "Successfully Returned"}
+    data = json.loads(json_util.dumps(tasks_given))
+    return {"Success": True, "Data": data, "Message": "Successfully Returned"}
 
 
 # Return all tasks assigned to an assignee
@@ -177,7 +180,9 @@ def getTasksAssigned(task_assignee) -> dict:
             "Data": tasks_given,
             "Message": "No tasks given to by task assignee",
         }
-    return {"Success": True, "Data": tasks_given, "Message": "Successfully Returned"}
+    
+    data = json.loads(json_util.dumps(tasks_given))
+    return {"Success": True, "Data": data, "Message": "Successfully Returned"}
 
 
 def searchTasks(search_string):
