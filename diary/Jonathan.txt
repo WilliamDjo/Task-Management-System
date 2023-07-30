@@ -23,4 +23,4 @@ Week 8
 Working on admin controls for tasks and viewing user profiles, admins can see all users even those who are not connected and configured the admin to be able to see all tasks as well. Made some fixes for connections in backend and frontend to get it to work for demo 2. Had our retro for sprint 2.
 
 Week 9
-Fixed a small bug in backend for task creation and updating.
+Fixed a small bug in backend for task creation and updating. Had a meeting to discuss allocations for sprint 3. Worked on frontend for chat feature and workload estimate.
