@@ -1,5 +1,6 @@
 from atexit import register
 import email
+from lib2to3.pgen2 import token
 from re import A
 import unittest
 import requests
@@ -1147,14 +1148,170 @@ class GetAssignedTasksToCurrEndpointTest(unittest.TestCase):
 #         tasks_data = response_data["Data"]
 #         self.assertIsInstance(tasks_data, list, "Data should be a list of tasks")
 
-class UpdateTaskEndpointTest(unittest.TestCase):
+# class UpdateTaskEndpointTest(unittest.TestCase):
+
+#     def setUp(self):
+#         # Assuming the API is running locally on port 5000
+#         self.base_url = BASE_URL
+#         # Register and login a test user before running the update_task tests
+#         self.token, self.task_id = self.register_and_login_test_user()
+
+
+#     def register_and_login_test_user(self):
+#         # Prepare data for registering a test user
+#         data = user_1
+
+#         # Make the POST request to register the test user
+#         response = requests.post(self.base_url + "/login", json=data)
+        
+#         # Check if the user registration was successful (status code 200)
+#         # self.assertEqual(response.status_code, 200, "Test user registration failed")
+#         response_data = response.json()
+#         token = response_data["Token"]
+
+#         headers = {
+#             "Authorization": "Bearer " + token
+#         }
+
+#         # Prepare data for creating a task
+#         data = task_1
+
+#         # Make the POST request to the task/create endpoint with authentication headers and data
+#         response = requests.post(self.base_url + "/task/create", headers=headers, json=data)
+
+#         # Check if the request was successful (status code 200)
+#         # self.assertEqual(response.status_code, 200, "Create task request failed")
+
+#         # Extract the token from the login response
+#         response_data = response.json()
+#         task_id = response_data['Task_id']
+#         return token, task_id
+
+#     def test_successful_update_task(self):
+#         # Prepare the authentication headers with the user token
+#         headers = {
+#             "Authorization": "Bearer " + self.token
+#         }
+
+#         # Prepare data for updating a task (assuming the task_id exists in the database)
+#         task_id = self.task_id  # Replace this with a valid task_id
+#         data = task_2
+
+#         # Make the PUT request to the task/update/<task_id> endpoint with authentication headers and data
+#         response = requests.put(self.base_url + f"/task/update/{task_id}", headers=headers, json=data)
+
+#         # Check if the request was successful (status code 200)
+#         self.assertEqual(response.status_code, 200, "Update task request failed")
+
+#         # Check if the response contains the expected keys
+#         response_data = response.json()
+#         self.assertIn("Success", response_data, "Success key not found in response")
+#         self.assertIn("Message", response_data, "Message key not found in response")
+#         # Include other expected keys in the response as needed
+
+#         # Check if updating the task was successful
+#         print(response_data['Message'])
+#         self.assertTrue(response_data["Success"], "Updating the task was not successful")
+
+    # def test_unauthorized_update_task(self):
+    #     # Prepare the authentication headers with an invalid token (intentionally causing an unauthorized attempt)
+    #     headers = {
+    #         "Authorization": "Bearer InvalidToken"
+    #     }
+
+    #     # Prepare data for updating a task (assuming the task_id exists in the database)
+    #     task_id = "task123"  # Replace this with a valid task_id
+    #     data = {
+    #         "title": "Updated Task Title",
+    #         "description": "Updated task description.",
+    #         "deadline": "2023-08-10",
+    #         # Include other fields that you want to update for the task
+    #     }
+
+    #     # Make the PUT request to the task/update/<task_id> endpoint with an invalid token (unauthorized)
+    #     response = requests.put(self.base_url + f"/task/update/{task_id}", headers=headers, json=data)
+
+    #     # Check if the request was unsuccessful (status code 401 - Unauthorized)
+    #     self.assertEqual(response.status_code, 401, "Update task request should fail with unauthorized token")
+
+    #     # Check if the response contains the expected keys
+    #     response_data = response.json()
+    #     self.assertIn("Success", response_data, "Success key not found in response")
+    #     self.assertIn("Message", response_data, "Message key not found in response")
+
+    #     # Check if updating the task was not successful
+    #     self.assertFalse(response_data["Success"], "Updating the task should not be successful with unauthorized token")
+
+
+# class DeleteTaskEndpointTest(unittest.TestCase):
+
+#     def setUp(self):
+#         # Assuming the API is running locally on port 5000
+#         self.base_url = BASE_URL
+#         # Register and login a test user before running the delete_task tests
+#         self.token, self.task_id = self.register_and_login_test_user()
+
+#     def register_and_login_test_user(self):
+#         # Prepare data for registering a test user
+#         data = user_1
+
+#         # Make the POST request to register the test user
+#         response = requests.post(self.base_url + "/login", json=data)
+        
+#         # Check if the user registration was successful (status code 200)
+#         # self.assertEqual(response.status_code, 200, "Test user registration failed")
+#         response_data = response.json()
+#         token = response_data["Token"]
+
+#         headers = {
+#             "Authorization": "Bearer " + token
+#         }
+
+#         # Prepare data for creating a task
+#         data = task_1
+
+#         # Make the POST request to the task/create endpoint with authentication headers and data
+#         response = requests.post(self.base_url + "/task/create", headers=headers, json=data)
+
+#         # Check if the request was successful (status code 200)
+#         # self.assertEqual(response.status_code, 200, "Create task request failed")
+
+#         # Extract the token from the login response
+#         response_data = response.json()
+#         task_id = response_data['Task_id']
+#         return token, task_id
+
+#     def test_successful_delete_task(self):
+#         # Prepare the authentication headers with the user token
+#         headers = {
+#             "Authorization": "Bearer " + self.token
+#         }
+
+#         # Assume you have a valid task_id for a task that you want to delete
+#         task_id = self.task_id  # Replace this with a valid task_id
+
+#         # Make the DELETE request to the task/delete/<task_id> endpoint with authentication headers
+#         response = requests.delete(self.base_url + f"/task/delete/{task_id}", headers=headers)
+
+#         # Check if the request was successful (status code 200)
+#         self.assertEqual(response.status_code, 200, "Delete task request failed")
+
+#         # Check if the response contains the expected keys
+#         response_data = response.json()
+#         # Include other expected keys in the response as needed
+
+#         # Check if deleting the task was successful
+#         self.assertTrue(response_data["Success"], "Deleting the task was not successful")
+
+
+
+class GetTaskDetailsEndpointTest(unittest.TestCase):
 
     def setUp(self):
         # Assuming the API is running locally on port 5000
         self.base_url = BASE_URL
-        # Register and login a test user before running the update_task tests
+        # Register and login a test user before running the delete_task tests
         self.token, self.task_id = self.register_and_login_test_user()
-
 
     def register_and_login_test_user(self):
         # Prepare data for registering a test user
@@ -1186,60 +1343,36 @@ class UpdateTaskEndpointTest(unittest.TestCase):
         task_id = response_data['Task_id']
         return token, task_id
 
-    def test_successful_update_task(self):
+
+    def test_successful_get_task_details(self):
         # Prepare the authentication headers with the user token
         headers = {
-            "Authorization": "Bearer " + self.token
+            "Authorization": "Bearer " + self.token,
+            "task_id": self.task_id 
         }
 
-        # Prepare data for updating a task (assuming the task_id exists in the database)
-        task_id = self.task_id  # Replace this with a valid task_id
-        data = task_2
 
-        # Make the PUT request to the task/update/<task_id> endpoint with authentication headers and data
-        response = requests.put(self.base_url + f"/task/update/{task_id}", headers=headers, json=data)
+        # Make the GET request to the task/get endpoint with authentication headers
+        response = requests.get(self.base_url + "/task/get", headers=headers)
 
         # Check if the request was successful (status code 200)
-        self.assertEqual(response.status_code, 200, "Update task request failed")
+        self.assertEqual(response.status_code, 200, "Get task details request failed")
 
         # Check if the response contains the expected keys
         response_data = response.json()
         self.assertIn("Success", response_data, "Success key not found in response")
         self.assertIn("Message", response_data, "Message key not found in response")
         # Include other expected keys in the response as needed
+    
 
-        # Check if updating the task was successful
-        print(response_data['Message'])
-        self.assertTrue(response_data["Success"], "Updating the task was not successful")
+        # Check if getting the task details was successful
+        self.assertTrue(response_data["Success"], "Getting the task details was not successful")
 
-    # def test_unauthorized_update_task(self):
-    #     # Prepare the authentication headers with an invalid token (intentionally causing an unauthorized attempt)
-    #     headers = {
-    #         "Authorization": "Bearer InvalidToken"
-    #     }
+        # Check if the response contains the task details (assuming the "Data" key exists in the response)
+        self.assertIn("Data", response_data, "Data key not found in response")
+        task_details = response_data["Data"]
+        # Optionally, check if the task_details have the expected keys and values
 
-    #     # Prepare data for updating a task (assuming the task_id exists in the database)
-    #     task_id = "task123"  # Replace this with a valid task_id
-    #     data = {
-    #         "title": "Updated Task Title",
-    #         "description": "Updated task description.",
-    #         "deadline": "2023-08-10",
-    #         # Include other fields that you want to update for the task
-    #     }
-
-    #     # Make the PUT request to the task/update/<task_id> endpoint with an invalid token (unauthorized)
-    #     response = requests.put(self.base_url + f"/task/update/{task_id}", headers=headers, json=data)
-
-    #     # Check if the request was unsuccessful (status code 401 - Unauthorized)
-    #     self.assertEqual(response.status_code, 401, "Update task request should fail with unauthorized token")
-
-    #     # Check if the response contains the expected keys
-    #     response_data = response.json()
-    #     self.assertIn("Success", response_data, "Success key not found in response")
-    #     self.assertIn("Message", response_data, "Message key not found in response")
-
-    #     # Check if updating the task was not successful
-    #     self.assertFalse(response_data["Success"], "Updating the task should not be successful with unauthorized token")
 
 if __name__ == "__main__":
     unittest.main()

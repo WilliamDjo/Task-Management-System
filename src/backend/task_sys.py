@@ -7,10 +7,10 @@ from datetime import datetime
 # parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # sys.path.append(parent_folder)
 import account
-from account import getAccountInfo
 import tokens
 from database import db_tasks, db
 
+from db_tasks import deleteTask
 # from database.db import checkUser, getSingleUserInformation
 
 
@@ -361,7 +361,8 @@ def delete_task(token: str, task_id: str):
     token_result = tokens.check_jwt_token(token)
     if not token_result["Success"]:
         return {"Success": False, "Message": "No user logged in"}
-
+    else:
+        return deleteTask(task_id)
 
 """
 Assignee 

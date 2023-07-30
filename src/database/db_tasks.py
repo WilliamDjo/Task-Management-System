@@ -68,7 +68,7 @@ def getTaskFromID(task_id: str) -> dict:
     # Get the collection object for 'TaskSystem' from the database
     TaskSystemCollection = getTaskInfoCollection(db)
 
-    task = TaskSystemCollection.find_one({"id": task_id})
+    task = TaskSystemCollection.find_one({"task_id": task_id})
 
     task_details = json.loads(json_util.dumps(task))
 
@@ -86,7 +86,7 @@ def updateTaskInfo(task_id: str, data: dict) -> dict:
     # Get the collection object for 'UserInfo' from the database
     TaskSystemCollection = getTaskInfoCollection(db)
 
-    task = TaskSystemCollection.find_one({"id": task_id})
+    task = TaskSystemCollection.find_one({"task_id": task_id})
 
     if task is None:
         return {"Success": False, "Message": "No task found with given id"}
@@ -94,7 +94,7 @@ def updateTaskInfo(task_id: str, data: dict) -> dict:
     if "token" in data:
         del data["token"]
 
-    TaskSystemCollection.update_one({"id": task_id}, {"$set": data})
+    TaskSystemCollection.update_one({"task_id": task_id}, {"$set": data})
 
     return {"Success": True, "Message": "Update successful"}
 
@@ -106,14 +106,14 @@ def deleteTask(task_id: str) -> dict:
     # Get the collection object database
     TaskSystemCollection = getTaskInfoCollection(db)
     # Attempt to retrieve the task with the given task_id
-    task = TaskSystemCollection.find_one({"id": task_id})
+    task = TaskSystemCollection.find_one({"task_id": task_id})
 
     # If no task was found, return a dictionary indicating failure
     if task is None:
         return {"Success": False, "Message": "No task found"}
 
     # If a task was found, delete the task
-    TaskSystemCollection.delete_one({"id": task_id})
+    TaskSystemCollection.delete_one({"task_id": task_id})
 
     # Return a dictionary indicating success
     return {"Success": True, "Message": "Task deleted successfully"}
