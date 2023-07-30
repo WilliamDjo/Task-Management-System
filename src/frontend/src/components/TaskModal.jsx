@@ -31,6 +31,7 @@ const TaskModal = props => {
     task,
     onSubmit,
     userFullName,
+    userEmail,
     assignedTo,
     setAssignedTo,
     connections,
@@ -177,15 +178,14 @@ const TaskModal = props => {
               </Stack>
 
               {/* {console.log('task modal: ' + connections)} */}
-              {connections && (
+              {connections && connections.size > 0 && (
                 <Select
                   placeholder="Assign To"
                   value={assignedTo}
                   onChange={e => setAssignedTo(e.target.value)}
                   size="sm"
                 >
-                  {/* <option value="">Select Assignee</option> */}
-                  <option value={userFullName}>
+                  <option value={userEmail}>
                     {userFullName} {'(Yourself)'}
                   </option>
                   {connections.map(connection => (
@@ -193,6 +193,30 @@ const TaskModal = props => {
                       {connection.first_name} {connection.last_name}
                     </option>
                   ))}
+                </Select>
+              )}
+              {connections && (
+                <Select
+                  placeholder="Assign To"
+                  value={assignedTo}
+                  onChange={e => setAssignedTo(e.target.value)}
+                  size="sm"
+                >
+                  <option value={userEmail}>
+                    {userFullName} {'(Yourself)'}
+                  </option>
+                </Select>
+              )}
+              {!connections && (
+                <Select
+                  placeholder="Assign To"
+                  value={assignedTo}
+                  onChange={e => setAssignedTo(e.target.value)}
+                  size="sm"
+                >
+                  <option value={userEmail}>
+                    {userFullName} {'(Yourself)'}
+                  </option>
                 </Select>
               )}
               {/* {console.log('A: ' + assignedTo)} */}
