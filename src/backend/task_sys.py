@@ -2,10 +2,12 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from datetime import datetime
+import os
+import sys
 
 # # Try removing this maybe?
-# parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-# sys.path.append(parent_folder)
+parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(parent_folder)
 import account
 import tokens
 from database import db_tasks, db
