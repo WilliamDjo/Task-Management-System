@@ -288,7 +288,10 @@ def update_priority(task_id: str, new_priority: int):
 
 def update_details(token: str, task_id: str, new_data: dict):
     user_details = account.getAccountInfo(token)
-    task_master = user_details["email"]
+
+    task_master = user_details['Data']["email"]
+    print("TASK MASTER: ")
+    print(task_master)
     # title
     if not is_title_valid(new_data["title"]):
         return {
@@ -307,8 +310,11 @@ def update_details(token: str, task_id: str, new_data: dict):
         return {"Success": False, "Message": "Invalid Progress status"}
 
     task_assignee = new_data["assignee"]
-    if not is_assignee_valid(new_data["assignee"]):
-        return {"Success": False, "Message": "Invalid assignee"}
+    if task_assignee == "":
+        task_assignee = task_master
+    else:
+        if not is_assignee_valid(new_data["assignee"]):
+            return {"Success": False, "Message": "Invalid assignee"}
 
     if task_assignee == "":
         task_assignee = task_master
@@ -341,7 +347,7 @@ def update_details(token: str, task_id: str, new_data: dict):
     task_labels = new_data["labels"]
     valid_labels = [label for label in task_labels if is_label_valid(label)]
 
-    send_task_notification()
+    # send_task_notification()
 
     return db_tasks.updateTaskInfo(task_id, new_data)
 
