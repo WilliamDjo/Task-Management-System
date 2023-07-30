@@ -4,6 +4,7 @@ from flask_cors import CORS, cross_origin
 import account
 import task_sys
 import connections
+import chat
 
 # """ Accessing Other Files"""
 # parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -540,6 +541,50 @@ def get_specific_connection(email):
         "Message": status["Message"],
         "Data": status["Data"],
         "Tasks": status["Tasks"],
+    }
+    return jsonify(to_return)
+
+
+@app.route("/chat/<email>", methods=["GET"])
+def get_chats(email):
+    token = ""
+    auth_header = request.headers.get("Authorization")
+    if auth_header:
+        bearer, _, token = auth_header.partition(" ")
+        if bearer.lower() != "bearer":
+            return {"Success": False, "Message": "Invalid token format"}, 400
+        # Now, the variable 'token' contains the token passed in the 'Authorization' header.
+        # You can use this token to perform your operations.
+    else:
+        return {"Success": False, "Message": "No token provided"}, 401
+    status = chat.getChats(token, email)
+    to_return = {
+        "Success": status["Success"],
+        "Message": status["Message"],
+        "Data": status["Data"],
+    }
+    return jsonify(to_return)
+
+
+@app.route("/chat/<email>", methods=["POST"])
+def get_chats(email):
+    token = ""
+    auth_header = request.headers.get("Authorization")
+    if auth_header:
+        bearer, _, token = auth_header.partition(" ")
+        if bearer.lower() != "bearer":
+            return {"Success": False, "Message": "Invalid token format"}, 400
+        # Now, the variable 'token' contains the token passed in the 'Authorization' header.
+        # You can use this token to perform your operations.
+    else:
+        return {"Success": False, "Message": "No token provided"}, 401
+
+    message = request.json["message"]
+    status = chat.updateChat(token, email, message)
+    to_return = {
+        "Success": status["Success"],
+        "Message": status["Message"],
+        "Timestamp": status["Timestamp"],
     }
     return jsonify(to_return)
 
