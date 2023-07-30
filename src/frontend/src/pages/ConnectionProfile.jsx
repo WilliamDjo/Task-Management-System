@@ -14,8 +14,13 @@ import {
   InputRightElement,
   Spinner,
   Stack,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
   Table,
   TableContainer,
+  Tabs,
   Tbody,
   Td,
   Text,
@@ -62,6 +67,8 @@ const ConnectionProfile = () => {
   const { email } = useParams();
 
   const toast = useToast();
+
+  const tabSelectedStyle = { bg: 'black', color: 'blue.50' };
 
   React.useEffect(() => {
     const token = localStorage.getItem('token');
@@ -251,9 +258,24 @@ const ConnectionProfile = () => {
   return (
     <ConnectionsBar myConnections>
       <Box>
-        {loaded ? connectionProfileLoaded() : (<Center><Spinner /></Center>)}
-        {loaded && chatCardLoaded()}
-        {loaded && connectionAssignedTaskListLoaded()}
+        <Tabs variant='unstyled' colorScheme='black'>
+          <TabList bg='gray.200' p='1' rounded='full'>
+            <Tab _selected={tabSelectedStyle} rounded='full' fontWeight='bold' color='gray.800' pt='1' pb='1'>Profile</Tab>
+            <Tab _selected={tabSelectedStyle} rounded='full' fontWeight='bold' color='gray.800' pt='1' pb='1'>Chat</Tab>
+            <Tab _selected={tabSelectedStyle} rounded='full' fontWeight='bold' color='gray.800' pt='1' pb='1'>Assigned Tasks</Tab>
+          </TabList>
+          <TabPanels>
+            <TabPanel>
+              {loaded ? connectionProfileLoaded() : (<Center><Spinner /></Center>)}
+            </TabPanel>
+            <TabPanel>
+              {loaded ? chatCardLoaded() : (<Center><Spinner /></Center>)}
+            </TabPanel>
+            <TabPanel>
+              {loaded ? connectionAssignedTaskListLoaded() : (<Center><Spinner /></Center>)}
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
       </Box>
     </ConnectionsBar>
   );
