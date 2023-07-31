@@ -3,14 +3,14 @@ from pymongo.collection import Collection
 from bson import json_util
 import json
 import re
-import sys
 import os
-# Assuming you are running the script from the parent directory of 'project'
-parent_dir = os.path.dirname(os.path.join(os.path.dirname(__file__), ".."))
-sys.path.append(parent_dir)
+import sys
+
+parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(parent_folder)
 
 
-from database.db_helper import getDB
+from .db_helper import getDB
 
 """
 Returns the entire collection
