@@ -188,7 +188,7 @@ const TaskModal = props => {
                   <option value={userEmail}>
                     {userFullName} {'(Yourself)'}
                   </option>
-                  {connections.map(connection => (
+                  {connections.connections.map(connection => (
                     <option key={connection.id} value={connection.email}>
                       {connection.first_name} {connection.last_name}
                     </option>
@@ -205,6 +205,11 @@ const TaskModal = props => {
                   <option value={userEmail}>
                     {userFullName} {'(Yourself)'}
                   </option>
+                  {connections.map(connection => (
+                    <option key={connection.id} value={connection.email}>
+                      {connection.first_name} {connection.last_name}
+                    </option>
+                  ))}
                 </Select>
               )}
               {!connections && (
