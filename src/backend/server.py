@@ -12,7 +12,6 @@ import sys
 parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_folder)
 import account
-from backend.task_sys import get_tasks_assigned_to_curr
 import task_sys
 import connections
 
@@ -614,6 +613,23 @@ def get_report(start_date, end_date):
         return {"Success": False, "Message": "No token provided"}, 401
     return
 
+
+
+@app.route("/user/getWorkload", methods=["GET"])
+def get_workload_for_user():
+    
+    token = ""
+    auth_header = request.headers.get("Authorization")
+    if auth_header:
+        bearer, _, token = auth_header.partition(" ")
+        if bearer.lower() != "bearer":
+            return {"Success": False, "Message": "Invalid token format"}, 400
+
+    else:
+        return {"Success": False, "Message": "No token provided"}, 401
+    
+
+    
 
 if __name__ == "__main__":
     app.run()

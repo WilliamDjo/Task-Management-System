@@ -26,6 +26,7 @@ def addNewUser(data: dict) -> dict:
         "first_name": "",
         "last_name": "",
         "SystemAdmin": False,
+        "workload": 0,
     }
 
     # Loop over the keys in the input data
@@ -238,11 +239,13 @@ def getSingleUserInformation(email: str) -> dict:
         "last_name": userInfo["last_name"],
         "email": userInfo["email"],
         "username": userInfo["user"],
+        "workload": userInfo['workload'],
         "SystemAdmin": userInfo["SystemAdmin"],
         "emailNotifications": userProfile["notifications"],
         "organization": userProfile["organization_name"],
         "connections": userProfile["connections"],
     }
+
     return {"Success": True, "Message": "", "Data": user}
 
 

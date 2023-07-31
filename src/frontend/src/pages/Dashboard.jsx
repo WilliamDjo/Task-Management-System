@@ -101,7 +101,7 @@ const Dashboard = () => {
       actual_time_hr: 10,
       priority: 1,
       labels: [],
-      assignee: '',
+      assignee: email,
       token
     }
     fetchBackend(`/task/update/${id}`, 'PUT', body, toast, success);

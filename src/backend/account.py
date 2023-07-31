@@ -1,12 +1,14 @@
-
-import os
-import sys
-parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(parent_folder)
-
 import hashlib
 import re
-from database import db
+import os
+import sys
+
+
+
+parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(parent_folder)
+# from src.database import db_helper
+from database import db, db_tasks, db_helper
 import tokens
 import password
 
@@ -230,6 +232,7 @@ Logs in a user with the provided email and password.
 
 def account_login(email, password):
     # Check if email/pw combo matches || Existence is checked in the databse
+
     password = generate_password_hash(password)
     email_password_match = db.isValidUser(email, password)
 
@@ -362,9 +365,12 @@ def getAccountInfo(token):
     if not valid_jwt["Success"]:
         return {"Success": False, "Message": "User not logged in", "Data": ""}
     email = valid_jwt["Data"]["email"]
+
     userInformation = db.getSingleUserInformation(email)
     data = userInformation["Data"]
-    del data["connections"]
+
+    #todo: rem
+    # del data["connections"]
     return {
         "Success": True,
         "Message": "Account info retrieved",
@@ -486,6 +492,40 @@ def add_sys_admin():
     return account_register(first_name, last_name, username, email, password, sys_admin)
 
 
-if __name__ == "__main__":
-    result = add_sys_admin()
-    print(result)
+'''
+Workload Computation
+'''
+
+def get_workload(token, email):
+    
+    # check active token
+    #TODO: CHECK WHAT"SUP
+    # valid_jwt = tokens.check_jwt_token(token)
+    # if not valid_jwt["Success"]:
+    #     return {"Success": False, "Message": "Error in active token!"}
+    
+    account = db.getSingleUserInformation(email)
+
+    print("BBABABABABABABABBA\n\n\n\n\n\n\n\n\n")
+
+    curr_workload = account['Data']['workload']
+    return curr_workload
+
+
+def get_workload_curr(token):
+
+    # check active token
+    #TODO: CHECK WHAT"SUP
+    # valid_jwt = tokens.check_jwt_token(token)
+    # if not valid_jwt["Success"]:
+    #     return {"Success": False, "Message": "Error in active token!"}
+    
+    user_info = getAccountInfo(token)
+
+    if not user_info['Success']:
+        return {'Success': False, 'Message': "User not found"}
+
+    email = user_info['Data']['email']
+
+    return user_info['Data']['workload']
+
