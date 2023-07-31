@@ -3,9 +3,12 @@ import re
 import os
 import sys
 
+
+
+
 parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_folder)
-from database import db
+from database import db, db_tasks
 import tokens
 import password
 
@@ -485,6 +488,42 @@ def add_sys_admin():
     return account_register(first_name, last_name, username, email, password, sys_admin)
 
 
+'''
+Workload Computation
+'''
+
+def compute_workload(token, email):
+    
+    # check active token
+    #TODO: CHECK WHAT"SUP
+    # valid_jwt = tokens.check_jwt_token(token)
+    # if not valid_jwt["Success"]:
+    #     return {"Success": False, "Message": "Error in active token!"}
+    
+    # Get all assigned tasks
+
+    database_response = db_tasks.getTasksAssigned(email)
+
+    tasks_assigned = database_response['Data']
+
+    curr_workload = 0
+
+    for task in tasks_assigned:
+       curr_workload += task['priority']
+    
+    return curr_workload
+
+    
+
+    
 if __name__ == "__main__":
-    result = add_sys_admin()
-    print(result)
+
+    login_email = 'willbur@gmail.com'
+    login_pw = 'Testpass123'
+
+
+    token = account_login(login_email, login_pw)
+
+    workload = compute_workload(token, login_email)
+
+    print(workload)
