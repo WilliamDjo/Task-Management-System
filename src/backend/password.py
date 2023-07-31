@@ -4,6 +4,13 @@ from email.mime.text import MIMEText
 from threading import Thread
 import random
 import threading
+import os
+import sys
+
+# # Try removing this maybe?
+parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(parent_folder)
+
 from database import db
 
 reset_otps = []

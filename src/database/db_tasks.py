@@ -3,8 +3,8 @@ from pymongo.collection import Collection
 from bson import json_util
 import json
 import re
-import sys
 import os
+import sys
 
 # Assuming you are running the script from the parent directory of 'project'
 parent_dir = os.path.dirname(os.path.join(os.path.dirname(__file__), ".."))

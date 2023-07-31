@@ -6,8 +6,6 @@ sys.path.append(parent_folder)
 
 import hashlib
 import re
-
-
 from database import db
 import tokens
 import password

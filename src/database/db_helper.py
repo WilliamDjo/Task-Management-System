@@ -1,5 +1,12 @@
 from pymongo import MongoClient
+from pymongo.database import Database
+from pymongo.collection import Collection
 
+import os
+import sys
+
+parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(parent_folder)
 
 url = "mongodb+srv://z5272191:QuyvHWVdlycdF84R@zombies.x0az3q5.mongodb.net/?retryWrites=true&w=majority"
 
@@ -10,6 +17,18 @@ def getDB():
     db = client["TaskSystem"]
 
     return db
+
+
+def getUserInfoCollection(db: Database) -> Collection:
+    return db["user_info"]
+
+
+def getUserProfileCollection(db: Database) -> Collection:
+    return db["user_profile"]
+
+
+def getChatCollection(db: Database) -> Collection:
+    return db["task_chats"]
 
 
 # FOR TESTING ONLY
@@ -52,3 +71,11 @@ def reset_counter():
 
     # Update the sequence counter to reset it
     sequence_collection.update_one({"_id": sequence_name}, {"$set": {"seq_value": 0}})
+
+
+if __name__ == "__main__":
+    clear_collection("task_system")
+    clear_collection("user_info")
+    clear_collection("user_profile")
+    clear_collection("task_chats")
+    reset_counter()
