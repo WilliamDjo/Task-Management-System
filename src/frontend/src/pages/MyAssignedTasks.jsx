@@ -16,7 +16,7 @@ import {
   Tr,
   useToast
 } from '@chakra-ui/react';
-import { fetchBackend } from '../fetch';
+import { fetchBackend, isNone } from '../fetch';
 
 const MyAssignedTasks = () => {
   const [loaded, setLoaded] = React.useState(false);
@@ -33,7 +33,27 @@ const MyAssignedTasks = () => {
   React.useEffect(() => {
     const token = localStorage.getItem('token');
     const successGetTasks = (data) => {
-      setTasks(data.Data);
+      const newTasks = [...data.Data];
+      newTasks.sort((a, b) => {
+        if ((isNone(a.deadline) || a.deadline === '') && (isNone(b.deadline) || b.deadline === '')) {
+          return 0;
+        } else if (isNone(a.deadline) || a.deadline === '') {
+          return 1;
+        } else if (isNone(b.deadline) || b.deadline === '') {
+          return -1;
+        }
+
+        const aDate = new Date(a.deadline);
+        const bDate = new Date(b.deadline);
+        if (aDate < bDate) {
+          return -1;
+        } else if (aDate > bDate) {
+          return 1;
+        } else {
+          return 0;
+        }
+      })
+      setTasks(newTasks);
       setLoaded(true);
     }
 
