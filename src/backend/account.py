@@ -232,6 +232,7 @@ Logs in a user with the provided email and password.
 
 def account_login(email, password):
     # Check if email/pw combo matches || Existence is checked in the databse
+
     password = generate_password_hash(password)
     email_password_match = db.isValidUser(email, password)
 

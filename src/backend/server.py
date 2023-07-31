@@ -12,7 +12,6 @@ import sys
 parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_folder)
 import account
-from backend.task_sys import get_tasks_assigned_to_curr
 import task_sys
 import connections
 
