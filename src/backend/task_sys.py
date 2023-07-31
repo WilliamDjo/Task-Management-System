@@ -1,28 +1,20 @@
-from email.message import Message
-import hashlib
-from json.tool import main
-from pickle import NONE
-import sys
-import os
-import re
-from account import is_email_valid
-from backend.account import getAccountInfo
-from backend.password import send_email
-import tokens
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-import ssl
+from datetime import datetime
+import os
+import sys
 
+# # Try removing this maybe?
 parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_folder)
-
+import account
+import tokens
 from database import db_tasks, db
-from tokens import active_tokens
-from datetime import datetime
-from account import is_email_valid, active_users
-from database.db import checkUser, getSingleUserInformation, isValidUser
-from database.db import clear_collection
+
+from db_tasks import deleteTask
+
+# from database.db import checkUser, getSingleUserInformation
 
 
 """
@@ -79,7 +71,7 @@ def is_label_valid(label: str):
 
 
 def is_assignee_valid(assignee: str):
-    res = checkUser(assignee)
+    res = db.checkUser(assignee)
     if res["Success"]:
         return False
 
@@ -105,7 +97,7 @@ def create_task(token: str, data: dict):
         return {"Success": False, "Message": "No user logged in"}
 
     # Get Task Master Details
-    user = getAccountInfo(token)
+    user = account.getAccountInfo(token)
     task_title = data["title"]
 
     if not is_title_valid(task_title):
@@ -299,7 +291,7 @@ def update_priority(task_id: str, new_priority: int):
 
 def update_details(token: str, task_id: str, new_data: dict):
     user_details = getAccountInfo(token)
-    task_master = user_details["Data"]["email"]
+    task_master = user_details["email"]
     # title
     if not is_title_valid(new_data["title"]):
         return {
@@ -366,6 +358,8 @@ def delete_task(token: str, task_id: str):
     token_result = tokens.check_jwt_token(token)
     if not token_result["Success"]:
         return {"Success": False, "Message": "No user logged in"}
+    else:
+        return deleteTask(task_id)
 
 
 """
@@ -492,12 +486,29 @@ def get_all_tasks_assigned_to(token: str, email: str):
         return {"Success": False, "Message": "No user logged in"}
 
     # check if email exists
-    db_result = getSingleUserInformation(email)
+    db_result = db.getSingleUserInformation(email)
 
     if not (db_result["Success"]):
         return {"Success": False, "Message": "Email Does not exist"}
 
     return db_tasks.getTasksAssigned(email)
+
+
+def get_tasks_assigned_to_curr(token: str):
+    # check token
+    token_result = tokens.check_jwt_token(token)
+    if not token_result["Success"]:
+        return {"Success": False, "Message": "No user logged in"}
+
+    # Get active user details
+    acc_info = getAccountInfo(token)
+
+    # db_result = db.getSingleUserInformation(acc_info['email'])
+
+    # if not (db_result["Success"]):
+    #     return {"Success": False, "Message": "Email Does not exist"}
+
+    return db_tasks.getTasksAssigned(acc_info["Data"]["email"])
 
 
 def get_tasks_given_by(token: str, email: str):
@@ -507,7 +518,7 @@ def get_tasks_given_by(token: str, email: str):
         return {"Success": False, "Message": "No user logged in"}
 
     # check if email exists
-    db_result = getSingleUserInformation(email)
+    db_result = db.getSingleUserInformation(email)
 
     if not (db_result["Success"]):
         return {"Success": False, "Message": "Email Does not exist"}

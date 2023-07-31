@@ -1,28 +1,17 @@
-from re import X
-import re
-from pymongo import MongoClient
 from pymongo.database import Database
 from pymongo.collection import Collection
 from bson import Binary, json_util
 import json
 
-url = "mongodb+srv://z5272191:QuyvHWVdlycdF84R@zombies.x0az3q5.mongodb.net/?retryWrites=true&w=majority"
+from bson import Binary, json_util
+import json
+import os
+import sys
 
+parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(parent_folder)
 
-def getDB():
-    client = MongoClient(url)
-
-    db = client["TaskSystem"]
-
-    return db
-
-
-def getUserInfoCollection(db: Database) -> Collection:
-    return db["user_info"]
-
-
-def getUserProfileCollection(db: Database) -> Collection:
-    return db["user_profile"]
+from .db_helper import getDB, getUserInfoCollection, getUserProfileCollection
 
 
 def addNewUser(data: dict) -> dict:
@@ -614,43 +603,3 @@ def searchUser(search_string: str) -> list:
     results = list(UserInfoCollection.aggregate(query))
 
     return results
-
-
-# FOR TESTING ONLY
-def clear_collection(collection_name: str) -> dict:
-    # Get the database
-    db = getDB()
-
-    # Get the collection object from the database
-    collection = db[collection_name]
-
-    # Delete all documents from the collection
-    collection.delete_many({})
-
-    # Return a dictionary indicating success
-    return {
-        "Success": True,
-        "Message": f"All documents from {collection_name} deleted successfully",
-    }
-
-
-def print_all_from_collection(collection_name: str):
-    # Get the database
-    db = getDB()
-
-    # Get the collection object from the database
-    collection = db[collection_name]
-
-    # Find all documents in the collection
-    documents = collection.find()
-
-    # Loop through the documents and print each one
-    for document in documents:
-        print(document)
-
-
-if __name__ == "__main__":
-    clear_collection("sequence_collection")
-    clear_collection("task_system")
-    clear_collection("user_info")
-    clear_collection("user_profile")
