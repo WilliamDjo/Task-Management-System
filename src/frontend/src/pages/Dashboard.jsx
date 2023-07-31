@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Flex } from '@chakra-ui/react';
 import NavigationBar from '../components/NavigationBar';
 import KanbanBoard from '../components/KanbanBoard';
+import GenerateReportButton from '../components/GenerateReportButton';
 
 const Dashboard = () => {
   return (
@@ -11,6 +12,7 @@ const Dashboard = () => {
         {/* <ChakraProvider> */}
         <KanbanBoard />
         {/* </ChakraProvider> */}
+        <GenerateReportButton />
       </Flex>
     </Box>
   );
