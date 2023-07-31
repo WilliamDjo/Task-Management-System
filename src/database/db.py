@@ -24,6 +24,7 @@ def addNewUser(data: dict) -> dict:
         "first_name": "",
         "last_name": "",
         "SystemAdmin": False,
+        "workload": 0,
     }
 
     # Loop over the keys in the input data
