@@ -2,9 +2,6 @@ from pymongo.database import Database
 from pymongo.collection import Collection
 from bson import Binary, json_util
 import json
-
-from bson import Binary, json_util
-import json
 import os
 import sys
 
