@@ -1,6 +1,4 @@
-from atexit import register
 import email
-from lib2to3.pgen2 import token
 from re import A
 import unittest
 import requests
