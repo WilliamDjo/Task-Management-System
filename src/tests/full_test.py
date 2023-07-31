@@ -12,7 +12,7 @@ sys.path.append(parent_dir)
 
 
 
-from database.db_helper import clear_collection
+from database import db_helper
 
 BASE_URL = "http://127.0.0.1:5000"  # adjust if your app runs on different settings
 
@@ -71,10 +71,10 @@ task_2 = {
 
 
 def clear_db():
-    clear_collection("user_info")
-    clear_collection("user_profile")
-    clear_collection("task_system")
-    clear_collection("sequence_collection")
+    db_helper.clear_collection("user_info")
+    db_helper.clear_collection("user_profile")
+    db_helper.clear_collection("task_system")
+    db_helper.clear_collection("sequence_collection")
 
 
 
