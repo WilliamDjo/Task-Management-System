@@ -303,6 +303,7 @@ def update_priority(task_id: str, new_priority: int):
 def update_details(token: str, task_id: str, new_data: dict):
     user_details = getAccountInfo(token)
     task_master = user_details["email"]
+    print("user details " + user_details)
     # title
     if not is_title_valid(new_data["title"]):
         return {
