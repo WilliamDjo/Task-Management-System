@@ -3,15 +3,16 @@ from pymongo.collection import Collection
 from bson import json_util
 import json
 import re
-
 import os
 import sys
 
-parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(parent_folder)
+# Assuming you are running the script from the parent directory of 'project'
+parent_dir = os.path.dirname(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.append(parent_dir)
+
+import db_helper
 
 
-from .db_helper import getDB
 
 """
 Returns the entire collection
@@ -28,7 +29,7 @@ Adds a new task to the task system
 
 
 def addNewTask(data: dict) -> dict:
-    db = getDB()
+    db = db_helper.getDB()
 
     # Get the collection object for 'TaskSystem' from the database
     TaskSystemCollection = getTaskInfoCollection(db)
@@ -64,28 +65,30 @@ def addNewTask(data: dict) -> dict:
 
 
 def getTaskFromID(task_id: str) -> dict:
-    db = getDB()
+    db = db_helper.getDB()
 
     # Get the collection object for 'TaskSystem' from the database
     TaskSystemCollection = getTaskInfoCollection(db)
 
-    task = TaskSystemCollection.find_one({"id": task_id})
+    task = TaskSystemCollection.find_one({"task_id": task_id})
+
+    task_details = json.loads(json_util.dumps(task))
 
     # If no user was found, return a dictionary indicating failure
     if task is None:
         return {"Success": False, "Message": "Incorrect task id"}
 
-    return {"Success": True, "Message": "Task Found", "Data": task}
+    return {"Success": True, "Message": "Task Found", "Data": task_details}
 
 
 def updateTaskInfo(task_id: str, data: dict) -> dict:
     # Get the database
-    db = getDB()
+    db = db_helper.getDB()
 
     # Get the collection object for 'UserInfo' from the database
     TaskSystemCollection = getTaskInfoCollection(db)
 
-    task = TaskSystemCollection.find_one({"id": task_id})
+    task = TaskSystemCollection.find_one({"task_id": task_id})
 
     if task is None:
         return {"Success": False, "Message": "No task found with given id"}
@@ -93,26 +96,26 @@ def updateTaskInfo(task_id: str, data: dict) -> dict:
     if "token" in data:
         del data["token"]
 
-    TaskSystemCollection.update_one({"id": task_id}, {"$set": data})
+    TaskSystemCollection.update_one({"task_id": task_id}, {"$set": data})
 
     return {"Success": True, "Message": "Update successful"}
 
 
 def deleteTask(task_id: str) -> dict:
     # Get the database
-    db = getDB()
+    db = db_helper.getDB()
 
     # Get the collection object database
     TaskSystemCollection = getTaskInfoCollection(db)
     # Attempt to retrieve the task with the given task_id
-    task = TaskSystemCollection.find_one({"id": task_id})
+    task = TaskSystemCollection.find_one({"task_id": task_id})
 
     # If no task was found, return a dictionary indicating failure
     if task is None:
         return {"Success": False, "Message": "No task found"}
 
     # If a task was found, delete the task
-    TaskSystemCollection.delete_one({"id": task_id})
+    TaskSystemCollection.delete_one({"task_id": task_id})
 
     # Return a dictionary indicating success
     return {"Success": True, "Message": "Task deleted successfully"}
@@ -120,7 +123,7 @@ def deleteTask(task_id: str) -> dict:
 
 def getAllTasks() -> dict:
     # Get the database
-    db = getDB()
+    db = db_helper.getDB()
 
     TaskSystemCollection = getTaskInfoCollection(db)
     # Get the collection object for 'UserInfo' from the database
@@ -132,7 +135,7 @@ def getAllTasks() -> dict:
 
 # Return all tasks given out by the master
 def getTasksGiven(task_master) -> dict:
-    db = getDB()
+    db = db_helper.getDB()
     TaskSystemCollection = getTaskInfoCollection(db)
     task_infos = TaskSystemCollection.find({"task_master": task_master})
 
@@ -146,30 +149,32 @@ def getTasksGiven(task_master) -> dict:
             "Data": [],
             "Message": "No tasks given out by task master",
         }
-    return {"Success": True, "Data": tasks_given, "Message": "Successfully Returned"}
+
+    tasks_given_json  = json.loads(json_util.dumps(tasks_given))
+    return {"Success": True, "Data": tasks_given_json, "Message": "Successfully Returned"}
 
 
 # Return all tasks assigned to an assignee
 def getTasksAssigned(task_assignee) -> dict:
-    db = getDB()
+    db = db_helper.getDB()
     TaskSystemCollection = getTaskInfoCollection(db)
     task_infos = TaskSystemCollection.find({"assignee": task_assignee})
 
-    tasks_given = []
+    tasks_assigned_to = []
     for task_info in task_infos:
-        tasks_given.append(task_info)
+         tasks_assigned_to .append(task_info)
 
-    if len(tasks_given) == 0:
+    if len( tasks_assigned_to ) == 0:
         return {
             "Success": False,
             "Data": [],
             "Message": "No tasks given to by task assignee",
         }
-    return {"Success": True, "Data": tasks_given, "Message": "Successfully Returned"}
+    return {"Success": True, "Data":  tasks_assigned_to , "Message": "Successfully Returned"}
 
 
 def searchTasks(search_string):
-    db = getDB()
+    db = db_helper.getDB()
     TaskSystemCollection = getTaskInfoCollection(db)
 
     search_regex = re.compile(f".*{search_string}.*", re.IGNORECASE)
@@ -202,7 +207,7 @@ Helper function to generate IDs
 
 
 def get_next_task_id() -> str:
-    db = getDB()
+    db = db_helper.getDB()
     sequence_collection = db["sequence_collection"]
 
     sequence_name = "task_id"
