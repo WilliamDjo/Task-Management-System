@@ -29,6 +29,8 @@ const GenerateReportButton = () => {
   const handleModalOpen = () => {
     setReportGenerated(false);
     onOpen();
+    setFromDate('');
+    setToDate('');
   }
 
   const handleSubmit = () => {
@@ -39,6 +41,26 @@ const GenerateReportButton = () => {
 
     const failSubmit = () => {
       setButtonLoading(false);
+    }
+
+    if (fromDate === '' || toDate === '') {
+      toast({
+        title: 'Both dates must be provided.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    if (new Date(fromDate) >= new Date(toDate)) {
+      toast({
+        title: 'Starting date must be earlier than finish date.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+      return;
     }
 
     setButtonLoading(true);
