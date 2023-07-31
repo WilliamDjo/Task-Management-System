@@ -162,9 +162,9 @@ def getTasksAssigned(task_assignee) -> dict:
 
     tasks_assigned_to = []
     for task_info in task_infos:
-         tasks_assigned_to .append(task_info)
+        tasks_assigned_to.append(task_info)
 
-    if len( tasks_assigned_to ) == 0:
+    if len(tasks_assigned_to) == 0:
         return {
             "Success": False,
             "Data": [],

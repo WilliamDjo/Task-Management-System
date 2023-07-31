@@ -86,10 +86,11 @@ const TaskCard = props => {
         <GridItem>
           <Text fontSize="sm" fontWeight="bold">
             Deadline:
+            {console.log('deadline: ' + task.deadline)}
           </Text>
-          <Text fontSize="sm" color="gray.500">
+          {/* <Text fontSize="sm" color="gray.500">
             {task.deadline}
-          </Text>
+          </Text> */}
         </GridItem>
       </Grid>
       <Box mb={2}>

@@ -4,7 +4,7 @@ from flask_cors import CORS, cross_origin
 import account
 import task_sys
 import connections
-import sys 
+import sys
 import os
 import sys
 
@@ -358,9 +358,8 @@ def server_delete_task(task_id):
     return jsonify(result)
 
 
-@app.route("/task/get", methods=["GET"])
-def server_get_task_details():
-    task_id = request.headers.get("task_id")
+@app.route("/task/get/<task_id>", methods=["GET"])
+def server_get_task_details(task_id):
     token = ""
     auth_header = request.headers.get("Authorization")
     if auth_header:
@@ -413,7 +412,6 @@ def server_get_all_tasks_assigned_to(email):
 
 @app.route("/task/getAllAssignedTocurr", methods=["GET"])
 def server_get_tasks_assigned_to_current():
-    
     token = ""
     auth_header = request.headers.get("Authorization")
     if auth_header:
@@ -422,11 +420,11 @@ def server_get_tasks_assigned_to_current():
             return {"Success": False, "Message": "Invalid token format"}, 400
     else:
         return {"Success": False, "Message": "No token provided"}, 401
-    
-    
+
+    result = get_tasks_assigned_to_curr(token)
+
     result = task_sys.get_tasks_assigned_to_curr(token)
     return jsonify(result)
-
 
 
 @app.route("/task/getTasksGivenBy/<email>", methods=["GET"])

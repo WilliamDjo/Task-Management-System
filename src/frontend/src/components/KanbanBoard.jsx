@@ -1,3 +1,4 @@
+/* eslint-disable object-shorthand */
 /* eslint-disable no-unused-vars */
 /* eslint-disable camelcase */
 /* eslint-disable react/prop-types */
@@ -52,10 +53,10 @@ const KanbanBoard = () => {
   const [connections, setConnections] = useState([]);
   // State to store the user's full name
   const [userFullName, setUserFullName] = useState('');
-  const [priority, setPriority] = useState(''); // New state for priority
-  const [costPerHour, setCostPerHour] = useState(''); // New state for cost per hour
-  const [timeEstimate, setTimeEstimate] = useState(''); // New state for time estimate
-  const [actualTimeSpent, setActualTimeSpent] = useState({});
+  const [priority, setPriority] = useState(); // New state for priority
+  const [costPerHour, setCostPerHour] = useState(); // New state for cost per hour
+  const [timeEstimate, setTimeEstimate] = useState(); // New state for time estimate
+  const [actualTimeSpent, setActualTimeSpent] = useState(0);
 
   // Function to reset the actual time spent in TaskModal
   const handleResetActualTime = () => {
@@ -63,28 +64,52 @@ const KanbanBoard = () => {
   };
 
   // Function to fetch user's connections from the backend
-  //   const fetchConnections = () => {
-  //     try {
-  //       const successGetConnections = data => {
-  //         setConnections(data.Data);
-  //       };
+  const fetchConnections = () => {
+    const successGetConnections = data => {
+      setConnections(data.Data);
+    };
+    const token = localStorage.getItem('token');
+    fetchBackend(
+      '/user/connections',
+      'POST',
+      { token },
+      toast,
+      successGetConnections
+    );
+    // console.log('hello connections ' + connections);
+    // console.log(response);
+    //   setConnections(response.Data);
 
-  //       const response = fetchBackend(
-  //         '/user/connections/',
-  //         'POST',
-  //         null,
-  //         toast,
-  //         successGetConnections
-  //       );
-  //       console.log('hello connections ' + connections);
-  //       console.log(response);
-  //       //   setConnections(response.Data);
-  //     } catch (error) {
-  //       // Handle error if fetching connections fails
-  //       console.error('Failed to fetch connections:', error);
-  //     }
-  //     // console.log('baba');
-  //   };
+    // console.log('baba');
+    // console.log(connections);
+  };
+
+  const fetchTasks = email => {
+    try {
+      // Retrieve the token from the localStorage
+      const token = localStorage.getItem('token');
+      const successGetTasks = data => {
+        setTasks(data.Data);
+      };
+
+      const body = {
+        token,
+      };
+      fetchBackend(
+        `/task/getTasksGivenBy/${email}`,
+        'GET',
+        body,
+        toast,
+        successGetTasks
+      );
+      console.log('email ' + email);
+      console.log('task ' + tasks);
+    } catch (error) {
+      // Handle error if fetching user profile fails
+      console.error('Failed to fetch tasks', error);
+    }
+    // console.log('baba');
+  };
 
   // Function to fetch user's profile from the backend
   const fetchUserProfile = () => {
@@ -107,9 +132,11 @@ const KanbanBoard = () => {
         setOrganization(data.Data.organization);
         // setLoaded(true);
         // console.log(data);
+        fetchTasks(data.Data.email);
+        console.log('name: ' + name);
       };
 
-      const response = fetchBackend(
+      fetchBackend(
         '/getuserprofile',
         'POST',
         { token },
@@ -117,7 +144,7 @@ const KanbanBoard = () => {
         successGetProfile
       );
 
-      console.log('response: ' + name);
+      // console.log('response: ' + name);
 
       //   if (response) {
       //     // const { first_name, last_name } = response.Data;
@@ -129,23 +156,30 @@ const KanbanBoard = () => {
       console.error('Failed to fetch user profile:', error);
     }
   };
-  // Fetch the user's connections on component mount
-  useEffect(() => {}, []);
 
   // Fetch the user's profile on component mount
   useEffect(() => {
     fetchUserProfile();
-    //   fetchConnections();
   }, []);
+  // Fetch the user's connections on component mount
+  useEffect(() => {
+    fetchConnections();
+  }, []);
+
+  // // Fetch the user's connections on component mount
+  // useEffect(() => {
+
+  // }, []);
 
   const handleAddTask = () => {
     if (newTask && assignedTo) {
+      const token = localStorage.getItem('token');
       const task = {
-        id: Date.now(),
+        // id: Date.now(),
         title: newTask,
         description,
         deadline,
-        progress: 'To Do',
+        progress: 'Not Started',
         assignee: assignedTo,
         cost_per_hr: costPerHour ? parseFloat(costPerHour) : null,
         estimation_spent_hrs: timeEstimate ? parseFloat(timeEstimate) : null,
@@ -153,33 +187,54 @@ const KanbanBoard = () => {
         priority: priority ? parseInt(priority) : 1,
         task_master: name,
         labels: tags.slice(0, 5),
+        token,
       };
 
+      // For the case when we're updating an existing task
       if (editingTask) {
-        setTasks(prevTasks =>
-          prevTasks.map(prevTask =>
-            prevTask.id === editingTask.id
-              ? { ...task, progress: prevTask.progress }
-              : prevTask
-          )
+        const successUpdateTask = data => {
+          if (data.Success) {
+            setTasks(prevTasks =>
+              prevTasks.map(prevTask =>
+                prevTask.id === editingTask.id
+                  ? { ...task, progress: prevTask.progress }
+                  : prevTask
+              )
+            );
+            toast({
+              title: 'Task Updated',
+              description: 'Task has been updated successfully.',
+              status: 'success',
+              duration: 3000,
+              isClosable: true,
+            });
+          }
+        };
+
+        fetchBackend(
+          `/task/update/${editingTask.id}`,
+          'PUT',
+          { token, ...task },
+          toast,
+          successUpdateTask
         );
-        setEditingTask(null);
-        toast({
-          title: 'Task Updated',
-          description: 'Task has been updated successfully.',
-          status: 'success',
-          duration: 3000,
-          isClosable: true,
-        });
+
+        // For the case when we're creating a new task
       } else {
-        setTasks([...tasks, task]);
-        toast({
-          title: 'Task Added',
-          description: 'Task has been added successfully.',
-          status: 'success',
-          duration: 3000,
-          isClosable: true,
-        });
+        const successCreateTask = data => {
+          // setTasks([...tasks, data.Data]);
+          // toast({
+          //   title: 'Task Added',
+          //   description: 'Task has been added successfully.',
+          //   status: 'success',
+          //   duration: 3000,
+          //   isClosable: true,
+          // });
+          toast({ title: data.message });
+        };
+
+        fetchBackend('/task/create', 'POST', task, toast, successCreateTask);
+        console.log('task: ' + task);
       }
 
       setNewTask('');
@@ -201,160 +256,21 @@ const KanbanBoard = () => {
         isClosable: true,
       });
     }
-
-    // if (newTask && assignedTo) {
-    //   const task = {
-    //     title: newTask,
-    //     description,
-    //     deadline,
-    //     progress: 'To Do',
-    //     assignee: assignedTo,
-    //     cost_per_hr: costPerHour ? parseFloat(costPerHour) : null,
-    //     estimation_spent_hrs: timeEstimate ? parseFloat(timeEstimate) : null,
-    //     actual_time_hr: null,
-    //     priority: priority ? parseInt(priority) : 1,
-    //     task_master: 'User123',
-    //     labels: tags.slice(0, 5),
-    //   };
-
-    //   if (editingTask) {
-    //     // Call the backend function to update the task
-    //     fetchBackend(
-    //       `/task/update/${editingTask.id}`, // Use the appropriate route to update the task based on the ID
-    //       'PUT',
-    //       task,
-    //       toast,
-    //       data => {
-    //         // onSuccess: Task updated successfully
-    //         // Update the state with the updated task
-    //         setTasks(prevTasks =>
-    //           prevTasks.map(prevTask =>
-    //             prevTask.id === editingTask.id ? data : prevTask
-    //           )
-    //         );
-    //         // Show success message
-    //         toast({
-    //           title: 'Task Updated',
-    //           description: 'Task has been updated successfully.',
-    //           status: 'success',
-    //           duration: 3000,
-    //           isClosable: true,
-    //         });
-    //         // Clear the input fields and close the modal
-    //         setNewTask('');
-    //         setDescription('');
-    //         setAssignedTo('');
-    //         setDeadline('');
-    //         setTags([]);
-    //         setPriority(''); // Reset priority state for new task
-    //         setCostPerHour(''); // Reset costPerHour state for new task
-    //         setTimeEstimate(''); // Reset timeEstimate state for new task
-    //         setEditingTask(null);
-    //         onClose();
-    //       },
-    //       () => {
-    //         // onFailure: Task update failed
-    //         // Show error message
-    //         toast({
-    //           title: 'Error',
-    //           description: 'Task update failed. Please try again later.',
-    //           status: 'error',
-    //           duration: 3000,
-    //           isClosable: true,
-    //         });
-    //       }
-    //     );
-    //   } else {
-    //     // Call the backend function to create the task
-    //     fetchBackend(
-    //       '/task/create',
-    //       'POST',
-    //       task,
-    //       toast,
-    //       data => {
-    //         // onSuccess: Task created successfully
-    //         // Update the state with the newly created task
-    //         setTasks(prevTasks => [...prevTasks, data.task]);
-    //         // Show success message
-    //         toast({
-    //           title: 'Task Added',
-    //           description: 'Task has been added successfully.',
-    //           status: 'success',
-    //           duration: 3000,
-    //           isClosable: true,
-    //         });
-    //         // Clear the input fields and close the modal
-    //         setNewTask('');
-    //         setDescription('');
-    //         setAssignedTo('');
-    //         setDeadline('');
-    //         setTags([]);
-    //         setPriority(''); // Reset priority state for new task
-    //         setCostPerHour(''); // Reset costPerHour state for new task
-    //         setTimeEstimate(''); // Reset timeEstimate state for new task
-    //         setEditingTask(null);
-    //         onClose();
-    //       },
-    //       () => {
-    //         // onFailure: Task creation failed
-    //         // Show error message
-    //         toast({
-    //           title: 'Error',
-    //           description: 'Task creation failed. Please try again later.',
-    //           status: 'error',
-    //           duration: 3000,
-    //           isClosable: true,
-    //         });
-    //       }
-    //     );
-    //   }
-    // } else {
-    //   toast({
-    //     title: 'Error',
-    //     description: 'Please enter a task and assign it to someone.',
-    //     status: 'error',
-    //     duration: 3000,
-    //     isClosable: true,
-    //   });
-    // }
   };
 
   const handleRemoveTask = taskId => {
     setTasks(tasks.filter(task => task.id !== taskId));
-    // Call the backend function to delete the task
-    // fetchBackend(
-    //   `/task/delete/${taskId}`, // Use the appropriate route to delete the task based on the ID
-    //   'DELETE',
-    //   null,
-    //   toast,
-    //   () => {
-    //     // onSuccess: Task deleted successfully
-    //     // Update the state by removing the deleted task from the tasks list
-    //     setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
-    //     // Show success message
-    //     toast({
-    //       title: 'Task Deleted',
-    //       description: 'Task has been deleted successfully.',
-    //       status: 'success',
-    //       duration: 3000,
-    //       isClosable: true,
-    //     });
-    //   },
-    //   () => {
-    //     // onFailure: Task deletion failed
-    //     // Show error message
-    //     toast({
-    //       title: 'Error',
-    //       description: 'Task deletion failed. Please try again later.',
-    //       status: 'error',
-    //       duration: 3000,
-    //       isClosable: true,
-    //     });
-    //   }
-    // );
   };
 
   const handleStatusChange = (taskId, progress) => {
+    // if (progress === 'In Progress' || progress === 'Not Started') {
+    //   // Reset actual time spent to null when changing the status to In Progress or To Do
+    //   setActualTimeSpent(prevState => ({
+    //     ...prevState,
+    //     [taskId]: null,
+    //   }));
+    // }
+
     // setTasks(prevTasks =>
     //   prevTasks.map(task => {
     //     if (task.id === taskId) {
@@ -363,21 +279,45 @@ const KanbanBoard = () => {
     //     return task;
     //   })
     // );
-    if (progress === 'In Progress' || progress === 'To Do') {
+    if (progress === 'In Progress' || progress === 'Not Started') {
       // Reset actual time spent to null when changing the status to In Progress or To Do
       setActualTimeSpent(prevState => ({
         ...prevState,
-        [taskId]: null,
+        [taskId]: 0,
       }));
     }
+    let id = 0;
+    let updatedTask = {};
+    const updatedTasks = tasks.map(task => {
+      if (task.id === taskId) {
+        id = task.id;
+        updatedTask = { ...task, progress };
+        return updatedTask;
+      }
+      return task;
+    });
 
-    setTasks(prevTasks =>
-      prevTasks.map(task => {
-        if (task.id === taskId) {
-          return { ...task, progress };
-        }
-        return task;
-      })
+    setTasks(updatedTasks);
+    // Retrieve the token from the localStorage
+    const token = localStorage.getItem('token');
+    updatedTask = { ...updatedTask, token };
+    // const body = { updatedTask, token }; // assuming you have the token available in the scope
+    const onSuccess = data => {
+      toast({ title: data });
+    };
+    const onFailure = () => {
+      console.log('Failed to update task');
+      console.log('id: ' + id);
+      console.log('task: ' + JSON.stringify(updatedTask));
+    };
+
+    fetchBackend(
+      `/task/update/${id}`,
+      'PUT',
+      updatedTask,
+      toast,
+      onSuccess,
+      onFailure
     );
   };
 
@@ -404,45 +344,6 @@ const KanbanBoard = () => {
       onOpen();
       //   onOpen();
     }
-    // // Call the backend function to get the task details
-    // fetchBackend(
-    //   '/task/get',
-    //   'GET',
-    //   null,
-    //   toast,
-    //   data => {
-    //     // onSuccess: Task details fetched successfully
-    //     // Set the state with the fetched task details
-    //     const taskToEdit = data.Data;
-    //     setEditingTask(taskToEdit);
-    //     setNewTask(taskToEdit.title);
-    //     setDescription(taskToEdit.description);
-    //     setAssignedTo(taskToEdit.assignee);
-    //     setDeadline(taskToEdit.deadline);
-    //     setTags(taskToEdit.labels);
-    //     setPriority(taskToEdit.priority.toString());
-    //     setCostPerHour(
-    //       taskToEdit.cost_per_hr ? taskToEdit.cost_per_hr.toString() : ''
-    //     );
-    //     setTimeEstimate(
-    //       taskToEdit.estimation_spent_hrs
-    //         ? taskToEdit.estimation_spent_hrs.toString()
-    //         : ''
-    //     );
-    //     onOpen();
-    //   },
-    //   () => {
-    //     // onFailure: Failed to fetch task details
-    //     // Show error message
-    //     toast({
-    //       title: 'Error',
-    //       description: 'Failed to fetch task details. Please try again later.',
-    //       status: 'error',
-    //       duration: 3000,
-    //       isClosable: true,
-    //     });
-    //   }
-    // );
   };
 
   const handleCloseModal = () => {
@@ -473,7 +374,7 @@ const KanbanBoard = () => {
             </Heading>
             <Stack spacing={4} w="300px">
               {tasks
-                .filter(task => task.progress === 'To Do')
+                .filter(task => task.progress === 'Not Started')
                 .map(task => (
                   <TaskCard
                     key={task.id}
@@ -515,7 +416,7 @@ const KanbanBoard = () => {
             </Heading>
             <Stack spacing={4} w="300px">
               {tasks
-                .filter(task => task.progress === 'Done')
+                .filter(task => task.progress === 'Completed')
                 .map(task => (
                   <TaskCard
                     key={task.id}
@@ -555,6 +456,7 @@ const KanbanBoard = () => {
         task={editingTask}
         onSubmit={handleAddTask}
         userFullName={name}
+        userEmail={email}
         assignedTo={assignedTo}
         setAssignedTo={setAssignedTo}
         connections={connections} // Pass the user's connections to the modal
