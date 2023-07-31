@@ -192,31 +192,79 @@ const KanbanBoard = () => {
 
       // For the case when we're updating an existing task
       if (editingTask) {
-        const successUpdateTask = data => {
-          if (data.Success) {
-            setTasks(prevTasks =>
-              prevTasks.map(prevTask =>
-                prevTask.id === editingTask.id
-                  ? { ...task, progress: prevTask.progress }
-                  : prevTask
-              )
-            );
-            toast({
-              title: 'Task Updated',
-              description: 'Task has been updated successfully.',
-              status: 'success',
-              duration: 3000,
-              isClosable: true,
-            });
-          }
+        // const successUpdateTask = data => {
+        //   if (data.Success) {
+        //     setTasks(prevTasks =>
+        //       prevTasks.map(prevTask =>
+        //         prevTask.id === editingTask.id
+        //           ? { ...task, progress: prevTask.progress }
+        //           : prevTask
+        //       )
+        //     );
+        //     toast({ß
+        //       title: 'Task Updated',
+        //       description: 'Task has been updated successfully.',
+        //       status: 'success',
+        //       duration: 3000,
+        //       isClosable: true,
+        //     });
+        //   }
+        // };
+        const successUpdateTask = () => {
+          let updatedTask;
+
+          const updatedTasks = tasks.map(prevTask => {
+            if (prevTask.id === editingTask.id) {
+              updatedTask = { ...task, progress: prevTask.progress };
+              return updatedTask;
+            }
+            return prevTask;
+          });
+
+          setTasks(updatedTasks);
+
+          // toast({
+          //   title: 'Task Updated',
+          //   description: 'Task has been updated successfully.',
+          //   status: 'success',
+          //   duration: 3000,
+          //   isClosable: true,
+          // });
+
+          return { updatedTask, editingTaskId: editingTask.id };
+        };
+
+        const { updatedTask, editingTaskId } = successUpdateTask();
+        // title: 'This is a new title',
+        // description: 'Description',
+        // deadline: '2023-09-09',
+        // progress: 'Not Started',
+        // cost_per_hr: 10,
+        // estimation_spent_hrs: 10,
+        // actual_time_hr: 10,
+        // priority: 1,
+        // labels: [],
+        // assignee: email,
+        // token
+        delete updatedTask.task_master;
+        console.log('up ' + JSON.stringify(updatedTask));
+        const onSuccess = () => {
+          // toast({ title: data });
+          console.log('Success ' + updatedTask);
+          fetchTasks(email);
+        };
+
+        const onFailure = () => {
+          console.error('Failed to update' + updatedTask);
         };
 
         fetchBackend(
-          `/task/update/${editingTask.id}`,
+          `/task/update/${editingTaskId}`,
           'PUT',
-          { token, ...task },
+          updatedTask,
           toast,
-          successUpdateTask
+          onSuccess,
+          onFailure
         );
 
         // For the case when we're creating a new task
@@ -230,7 +278,7 @@ const KanbanBoard = () => {
           //   duration: 3000,
           //   isClosable: true,
           // });
-          toast({ title: data.message });
+          fetchTasks(email);
         };
 
         fetchBackend('/task/create', 'POST', task, toast, successCreateTask);
@@ -300,10 +348,15 @@ const KanbanBoard = () => {
     setTasks(updatedTasks);
     // Retrieve the token from the localStorage
     const token = localStorage.getItem('token');
+    // Remove the properties
+    delete updatedTask._id;
+    delete updatedTask.id;
+
     updatedTask = { ...updatedTask, token };
     // const body = { updatedTask, token }; // assuming you have the token available in the scope
     const onSuccess = data => {
-      toast({ title: data });
+      // toast({ title: data });
+      fetchTasks(email);
     };
     const onFailure = () => {
       console.log('Failed to update task');
@@ -319,10 +372,12 @@ const KanbanBoard = () => {
       onSuccess,
       onFailure
     );
+    console.log('baba');
   };
 
   const handleEditTask = taskId => {
     const taskToEdit = tasks.find(task => task.id === taskId);
+    // console.log('id: ' + JSON.stringify(taskToEdit));
     if (taskToEdit) {
       //   console.log('editing: ' + taskToEdit.progress);
       setEditingTask(taskToEdit);

@@ -115,9 +115,9 @@ const TaskCard = props => {
           size="sm"
           width="120px"
         >
-          <option value="To Do">To Do</option>
+          <option value="Not Started">To Do</option>
           <option value="In Progress">In Progress</option>
-          <option value="Done">Done</option>
+          <option value="Completed">Done</option>
           <option value="Blocked">Blocked</option>
         </Select>
       </Box>

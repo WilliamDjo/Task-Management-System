@@ -13,7 +13,6 @@ sys.path.append(parent_dir)
 import db_helper
 
 
-
 """
 Returns the entire collection
 """
@@ -150,8 +149,12 @@ def getTasksGiven(task_master) -> dict:
             "Message": "No tasks given out by task master",
         }
 
-    tasks_given_json  = json.loads(json_util.dumps(tasks_given))
-    return {"Success": True, "Data": tasks_given_json, "Message": "Successfully Returned"}
+    tasks_given_json = json.loads(json_util.dumps(tasks_given))
+    return {
+        "Success": True,
+        "Data": tasks_given_json,
+        "Message": "Successfully Returned",
+    }
 
 
 # Return all tasks assigned to an assignee
@@ -162,7 +165,22 @@ def getTasksAssigned(task_assignee) -> dict:
 
     tasks_assigned_to = []
     for task_info in task_infos:
-        tasks_assigned_to.append(task_info)
+        tasks_assigned_to.append(
+            {
+                "id": task_info["id"],
+                "title": task_info["title"],
+                "description": task_info["description"],
+                "deadline": task_info["deadline"],
+                "progress": task_info["progress"],
+                "assignee": task_info["assignee"],
+                "cost_per_hr": task_info["cost_per_hr"],
+                "estimation_spent_hrs": task_info["estimation_spent_hrs"],
+                "actual_time_hr": task_info["actual_time_hr"],
+                "priority": task_info["priority"],
+                "task_master": task_info["task_master"],
+                "labels": task_info["labels"],
+            }
+        )
 
     if len(tasks_assigned_to) == 0:
         return {
@@ -170,7 +188,11 @@ def getTasksAssigned(task_assignee) -> dict:
             "Data": [],
             "Message": "No tasks given to by task assignee",
         }
-    return {"Success": True, "Data":  tasks_assigned_to , "Message": "Successfully Returned"}
+    return {
+        "Success": True,
+        "Data": tasks_assigned_to,
+        "Message": "Successfully Returned",
+    }
 
 
 def searchTasks(search_string):

@@ -105,6 +105,7 @@ const Dashboard = () => {
       token
     }
     fetchBackend(`/task/update/${id}`, 'PUT', body, toast, success);
+    console.log(body);
   }
 
   // Console logs the tasks assigned to the inputted email.
