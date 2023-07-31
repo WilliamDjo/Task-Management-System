@@ -506,6 +506,8 @@ def get_workload(token, email):
     
     account = db.getSingleUserInformation(email)
 
+    print("BBABABABABABABABBA\n\n\n\n\n\n\n\n\n")
+
     curr_workload = account['Data']['workload']
     return curr_workload
 

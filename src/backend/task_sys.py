@@ -196,6 +196,8 @@ def create_task(token: str, data: dict):
 
     curr_workload = account.get_workload(token, email=task_assignee)
 
+    print("task created \n\n\n\n\n")
+
     updated_workload = curr_workload+ data["priority"]*10
 
     workload_update = {
