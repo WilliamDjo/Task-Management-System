@@ -5,12 +5,14 @@ import json
 import re
 import sys
 import os
+
 # Assuming you are running the script from the parent directory of 'project'
 parent_dir = os.path.dirname(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.append(parent_dir)
 
+import db_helper
 
-from database.db_helper import getDB
+
 
 """
 Returns the entire collection
@@ -27,7 +29,7 @@ Adds a new task to the task system
 
 
 def addNewTask(data: dict) -> dict:
-    db = getDB()
+    db = db_helper.getDB()
 
     # Get the collection object for 'TaskSystem' from the database
     TaskSystemCollection = getTaskInfoCollection(db)
@@ -63,7 +65,7 @@ def addNewTask(data: dict) -> dict:
 
 
 def getTaskFromID(task_id: str) -> dict:
-    db = getDB()
+    db = db_helper.getDB()
 
     # Get the collection object for 'TaskSystem' from the database
     TaskSystemCollection = getTaskInfoCollection(db)
@@ -81,7 +83,7 @@ def getTaskFromID(task_id: str) -> dict:
 
 def updateTaskInfo(task_id: str, data: dict) -> dict:
     # Get the database
-    db = getDB()
+    db = db_helper.getDB()
 
     # Get the collection object for 'UserInfo' from the database
     TaskSystemCollection = getTaskInfoCollection(db)
@@ -101,7 +103,7 @@ def updateTaskInfo(task_id: str, data: dict) -> dict:
 
 def deleteTask(task_id: str) -> dict:
     # Get the database
-    db = getDB()
+    db = db_helper.getDB()
 
     # Get the collection object database
     TaskSystemCollection = getTaskInfoCollection(db)
@@ -121,7 +123,7 @@ def deleteTask(task_id: str) -> dict:
 
 def getAllTasks() -> dict:
     # Get the database
-    db = getDB()
+    db = db_helper.getDB()
 
     TaskSystemCollection = getTaskInfoCollection(db)
     # Get the collection object for 'UserInfo' from the database
@@ -133,7 +135,7 @@ def getAllTasks() -> dict:
 
 # Return all tasks given out by the master
 def getTasksGiven(task_master) -> dict:
-    db = getDB()
+    db = db_helper.getDB()
     TaskSystemCollection = getTaskInfoCollection(db)
     task_infos = TaskSystemCollection.find({"task_master": task_master})
 
@@ -154,7 +156,7 @@ def getTasksGiven(task_master) -> dict:
 
 # Return all tasks assigned to an assignee
 def getTasksAssigned(task_assignee) -> dict:
-    db = getDB()
+    db = db_helper.getDB()
     TaskSystemCollection = getTaskInfoCollection(db)
     task_infos = TaskSystemCollection.find({"assignee": task_assignee})
 
@@ -172,7 +174,7 @@ def getTasksAssigned(task_assignee) -> dict:
 
 
 def searchTasks(search_string):
-    db = getDB()
+    db = db_helper.getDB()
     TaskSystemCollection = getTaskInfoCollection(db)
 
     search_regex = re.compile(f".*{search_string}.*", re.IGNORECASE)
@@ -205,7 +207,7 @@ Helper function to generate IDs
 
 
 def get_next_task_id() -> str:
-    db = getDB()
+    db = db_helper.getDB()
     sequence_collection = db["sequence_collection"]
 
     sequence_name = "task_id"

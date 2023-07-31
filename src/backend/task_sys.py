@@ -10,7 +10,6 @@ import account
 import tokens
 from database import db_tasks, db
 
-from db_tasks import deleteTask
 # from database.db import checkUser, getSingleUserInformation
 
 
@@ -362,7 +361,7 @@ def delete_task(token: str, task_id: str):
     if not token_result["Success"]:
         return {"Success": False, "Message": "No user logged in"}
     else:
-        return deleteTask(task_id)
+        return db_tasks.deleteTask(task_id)
 
 """
 Assignee 
