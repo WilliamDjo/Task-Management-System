@@ -1,5 +1,10 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS, cross_origin
+
+import account
+import task_sys
+import connections
+import sys
 import os
 import sys
 
@@ -418,6 +423,8 @@ def server_get_tasks_assigned_to_current():
         return {"Success": False, "Message": "No token provided"}, 401
 
     result = get_tasks_assigned_to_curr(token)
+
+    result = task_sys.get_tasks_assigned_to_curr(token)
     return jsonify(result)
 
 
