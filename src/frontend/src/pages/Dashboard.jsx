@@ -1,30 +1,36 @@
 import React from 'react';
-import {
-  Box,
-  Button,
-  Flex,
-  FormControl,
-  FormLabel,
-  Input,
-  useToast,
-} from '@chakra-ui/react';
+import { Box, Button, Flex, FormControl, FormLabel, Input, useToast } from '@chakra-ui/react';
 import NavigationBar from '../components/NavigationBar';
 import KanbanBoard from '../components/KanbanBoard';
 import { fetchBackend } from '../fetch';
 
 const Dashboard = () => {
-  const [tasks, setTasks] = React.useState([
-    {
-      title: 'Hello',
-    },
-  ]);
+  const [tasks, setTasks] = React.useState([]);
   const [email, setEmail] = React.useState('');
   const toast = useToast();
 
+  const sortTasks = (a, b) => {
+    const taskA = Number(a.id.replace('TASK', ''));
+    const taskB = Number(b.id.replace('TASK', ''));
+    if (taskA < taskB) {
+      return -1
+    } else if (taskA > taskB) {
+      return 1;
+    } else {
+      return 0;
+    }
+  }
+
+  // This runs when clicking the new task button.
   const newTask = () => {
-    const success = data => {
-      toast({ title: data.message });
-    };
+    const success = (data) => {
+      toast({
+        title: 'New task created!',
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
+    }
     const title = 'Title';
     const description = 'This is a description';
     const deadline = '2023-12-31';
@@ -48,68 +54,103 @@ const Dashboard = () => {
       priority,
       labels,
       assignee,
-      token,
-    };
+      token
+    }
 
     fetchBackend('/task/create', 'POST', body, toast, success);
-  };
+  }
 
+  // This runs when clicking the show task button (replaces the current tasks on the Dashboard with an up to date version).
   const showTasks = () => {
-    const success = data => {
-      setTasks(data.Data);
-    };
+    const success = (data) => {
+      const newTasks = [...data.Data];
+      newTasks.sort(sortTasks);
+      setTasks(newTasks);
+      toast({
+        title: 'Showing all tasks!',
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
+    }
 
     const token = localStorage.getItem('token');
     fetchBackend('/task/getAll', 'GET', { token }, toast, success);
-  };
+  }
 
-  const consoleLogTask = id => {
-    const success = data => {
+  // On clicking a task, it updates it with the following content.
+  const updateTask = (id) => {
+    const success = (data) => {
       console.log(data);
-    };
+      toast({
+        title: `Task ${id} updated!`,
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
+    }
 
     const token = localStorage.getItem('token');
-    fetchBackend(`/task/get/${id}`, 'GET', { token }, toast, success);
-  };
+    const body = {
+      title: 'This is a new title',
+      description: 'Description',
+      deadline: '2023-09-09',
+      progress: 'Not Started',
+      cost_per_hr: 10,
+      estimation_spent_hrs: 10,
+      actual_time_hr: 10,
+      priority: 1,
+      labels: [],
+      assignee: '',
+      token
+    }
+    fetchBackend(`/task/update/${id}`, 'PUT', body, toast, success);
+  }
 
+  // Console logs the tasks assigned to the inputted email.
   const tasksAssigned = () => {
-    const success = data => {
+    const success = (data) => {
       console.log(data);
-    };
+      toast({
+        title: 'Tasks assigned shown in console log!',
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
+    }
 
     const token = localStorage.getItem('token');
-    fetchBackend(
-      `/task/getAllAssignedTo/${email}`,
-      'GET',
-      { token },
-      toast,
-      success
-    );
-  };
+    fetchBackend(`/task/getAllAssignedTo/${email}`, 'GET', { token }, toast, success);
+  }
 
+  // Console logs the tasks given the inputted email.
   const tasksGiven = () => {
-    const success = data => {
+    const success = (data) => {
       console.log(data);
-    };
+      toast({
+        title: 'Tasks given shown in console log!',
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
+    }
 
     const token = localStorage.getItem('token');
-    fetchBackend(
-      `/task/getTasksGivenBy/${email}`,
-      'GET',
-      { token },
-      toast,
-      success
-    );
-  };
+    fetchBackend(`/task/getTasksGivenBy/${email}`, 'GET', { token }, toast, success);
+  }
 
+  // On loading the page, it sets the tasks to be all tasks.
   React.useEffect(() => {
-    const success = data => {
+    const success = (data) => {
       console.log(data);
-      setTasks(data.Data);
-    };
+      const newTasks = [...data.Data];
+      newTasks.sort(sortTasks);
+      setTasks(newTasks);
+    }
     const token = localStorage.getItem('token');
     fetchBackend('/task/getAll', 'GET', { token }, toast, success);
   }, []);
+
   return (
     <Box minH="100vh" h="100vh">
       <Flex h="100%" flexFlow="column">
@@ -117,21 +158,17 @@ const Dashboard = () => {
         <Button onClick={showTasks}>Click here to show all tasks</Button>
         <FormControl>
           <FormLabel>Email:</FormLabel>
-          <Input value={email} onChange={e => setEmail(e.target.value)}></Input>
+          <Input value={email} onChange={(e) => setEmail(e.target.value)}></Input>
         </FormControl>
-        <Button onClick={tasksAssigned}>
-          Click here to console log all tasks assigned to email
-        </Button>
-        <Button onClick={tasksGiven}>
-          Click here to console log all tasks given by email
-        </Button>
+        <Button onClick={tasksAssigned}>Click here to console log all tasks assigned to email</Button>
+        <Button onClick={tasksGiven}>Click here to console log all tasks given by email</Button>
         <Box>
           {tasks.map((x, index) => {
             return (
-              <Box key={index} onClick={() => consoleLogTask(x.id)}>
+              <Box key={index} onClick={() => updateTask(x.id)}>
                 {x.title} - {x.id}
               </Box>
-            );
+            )
           })}
         </Box>
         <NavigationBar />
