@@ -71,6 +71,7 @@ def getUserConnections(token):
                     "last_name": userInfo["Data"]["last_name"],
                     "email": userInfo["Data"]["email"],
                     "username": userInfo["Data"]["username"],
+                    "workload": userInfo["Data"]["workload"],
                 }
             )
     return {"Success": True, "Message": "Connections Retrieved", "Data": to_return}
@@ -140,7 +141,12 @@ def getConnections(token, email_to_see):
         if all_tasks["Success"]:
             for i in all_tasks["Data"]:
                 tasks.append(
-                    {"id": i["id"], "title": i["title"], "deadline": i["deadline"]}
+                    {
+                        "id": i["id"],
+                        "title": i["title"],
+                        "deadline": i["deadline"],
+                        "workload": i["workload"],
+                    }
                 )
             tasks = sorted(tasks, key=lambda i: (i["deadline"] is None, i["deadline"]))
 

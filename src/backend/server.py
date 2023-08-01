@@ -206,7 +206,6 @@ def getuserprofile():
         "Message": status["Message"],
         "Data": status["Data"],
     }
-    print(to_return)
     return jsonify(to_return)
 
 
@@ -615,19 +614,6 @@ def get_report(start_date, end_date):
     to_return = task_sys.generate_report(token, start_date, end_date)
 
     return {"Succes": True, "Message": "Report Sent"}
-
-
-@app.route("/user/getWorkload", methods=["GET"])
-def get_workload_for_user():
-    token = ""
-    auth_header = request.headers.get("Authorization")
-    if auth_header:
-        bearer, _, token = auth_header.partition(" ")
-        if bearer.lower() != "bearer":
-            return {"Success": False, "Message": "Invalid token format"}, 400
-
-    else:
-        return {"Success": False, "Message": "No token provided"}, 401
 
 
 @app.route("/search/<search_word>", methods=["GET"])

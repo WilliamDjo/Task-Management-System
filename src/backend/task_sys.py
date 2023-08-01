@@ -209,9 +209,7 @@ def create_task(token: str, data: dict):
 
     curr_workload = account.get_workload(token, email=task_assignee)
 
-    print("task created \n\n\n\n\n")
-
-    updated_workload = curr_workload + data["priority"] * 10
+    updated_workload = int(curr_workload["Data"]) + int(data["priority"]) * 10
 
     workload_update = {"workload": updated_workload}
 
@@ -321,7 +319,9 @@ def update_priority(task_id: str, new_priority: int):
 def update_details(token: str, task_id: str, new_data: dict):
     user_details = account.getAccountInfo(token)
 
-    # task_master = user_details['Data']["email"]
+    old_data_response = get_task_details(token, task_id)
+    old_data = old_data_response["Data"]
+
     task_master = user_details["Data"]["email"]
 
     if not is_title_valid(new_data["title"]):
@@ -330,13 +330,9 @@ def update_details(token: str, task_id: str, new_data: dict):
             "Message": "Invalid Title Format, needs to be > 2 and  < 100",
         }
 
-    # description
     if not is_description_valid(new_data["description"]):
         return {"Success": False, "Message": "Invalid Description, too long"}
 
-    # deadline #TODO
-
-    # Progress
     if not is_progress_status(new_data["progress"]):
         return {"Success": False, "Message": "Invalid Progress status"}
 
@@ -347,38 +343,46 @@ def update_details(token: str, task_id: str, new_data: dict):
         if not is_assignee_valid(new_data["assignee"]):
             return {"Success": False, "Message": "Invalid assignee"}
 
-    if task_assignee == "":
-        task_assignee = task_master
-
-    else:
-        if not is_assignee_valid(task_assignee):
-            return {"Success": False, "Message": "Assignee is not valid"}
-
-        # Check if both users are connected
         if not db.checkConnection(task_master, task_assignee):
             return {"Success": False, "Message": "Users not connected"}
 
-    # cost_pr_hr
     if new_data["cost_per_hr"] < 0:
         return {"Success": False, "Message": "Cost/hr cannot be negative"}
 
-    # Estimate
     if new_data["estimation_spent_hrs"] < 0:
         return {"Success": False, "Message": "estimation_spent_hrs cannot be negative"}
 
-    # Actual Time
     if new_data["actual_time_hr"] < 0:
         return {"Success": False, "Message": "actual_time_hr cannot be negative"}
 
-    # Priority
     if new_data["priority"] < 1 or new_data["priority"] > 3:
         return {"Success": False, "Message": "Priority is randked on 3, update failed"}
 
-    # labels
     task_labels = new_data["labels"]
     valid_labels = [label for label in task_labels if is_label_valid(label)]
 
-    # send_task_notification()
+    old_priority = old_data["priority"]
+
+    prev_assignee_email = old_data["assignee"]
+    old_details = db.getSingleUserInformation(prev_assignee_email)
+    prev_user_workload = old_details["Data"]["workload"]
+    updated_workload = prev_user_workload - 10 * old_priority
+    new_workload_details = {"workload": updated_workload}
+    db.updateUserInfo(prev_assignee_email, new_workload_details)
+
+    new_priority = new_data["priority"]
+    new_assignee = task_assignee
+    curr_details = db.getSingleUserInformation(task_assignee)
+    curr_user_workload = curr_details["Data"]["workload"]
+    new_updated_workload = curr_user_workload + 10 * new_priority
+    new_workload_details_assignee = {"workload": new_updated_workload}
+
+    if new_data["progress"] == "Completed":
+        completed_workload = curr_user_workload - 10 * new_priority
+        completed_workload_details_assignee = {"workload": completed_workload}
+        db.updateUserInfo(new_data["assignee"], completed_workload_details_assignee)
+
+    db.updateUserInfo(task_assignee, new_workload_details_assignee)
 
     return db_tasks.updateTaskInfo(task_id, new_data)
 
@@ -389,11 +393,24 @@ Delete
 
 
 def delete_task(token: str, task_id: str):
-    token_result = tokens.check_jwt_token(token)
-    if not token_result["Success"]:
-        return {"Success": False, "Message": "No user logged in"}
-    else:
-        return db_tasks.deleteTask(task_id)
+    # token_result = tokens.check_jwt_token(token)
+    # if not token_result["Success"]:
+    #     return {"Success": False, "Message": "No user logged in"}
+
+    # user_details = account.getAccountInfo(token)
+    data_repsonse = get_task_details(token, task_id)
+    task_data = data_repsonse["Data"]
+    task_assignee = task_data["assignee"]
+    curr_details = db.getSingleUserInformation(task_assignee)
+    curr_user_workload = curr_details["Data"]["workload"]
+
+    updated_workload = curr_user_workload - 10 * task_data["priority"]
+
+    completed_workload_details_assignee = {"workload": updated_workload}
+
+    db.updateUserInfo(task_assignee, completed_workload_details_assignee)
+
+    return db_tasks.deleteTask(task_id)
 
 
 """

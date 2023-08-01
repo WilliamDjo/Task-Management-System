@@ -4,7 +4,6 @@ import os
 import sys
 
 
-
 parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_folder)
 # from src.database import db_helper
@@ -369,7 +368,7 @@ def getAccountInfo(token):
     userInformation = db.getSingleUserInformation(email)
     data = userInformation["Data"]
 
-    #todo: rem
+    # todo: rem
     # del data["connections"]
     return {
         "Success": True,
@@ -492,40 +491,35 @@ def add_sys_admin():
     return account_register(first_name, last_name, username, email, password, sys_admin)
 
 
-'''
+"""
 Workload Computation
-'''
+"""
+
 
 def get_workload(token, email):
-    
     # check active token
-    #TODO: CHECK WHAT"SUP
+    # TODO: CHECK WHAT"SUP
     # valid_jwt = tokens.check_jwt_token(token)
     # if not valid_jwt["Success"]:
     #     return {"Success": False, "Message": "Error in active token!"}
-    
+
     account = db.getSingleUserInformation(email)
 
-    print("BBABABABABABABABBA\n\n\n\n\n\n\n\n\n")
-
-    curr_workload = account['Data']['workload']
-    return curr_workload
+    curr_workload = account["Data"]["workload"]
+    return {"Success": True, "Data": curr_workload}
 
 
+# NOT NEEDED
 def get_workload_curr(token):
-
     # check active token
-    #TODO: CHECK WHAT"SUP
+    # TODO: CHECK WHAT"SUP
     # valid_jwt = tokens.check_jwt_token(token)
     # if not valid_jwt["Success"]:
     #     return {"Success": False, "Message": "Error in active token!"}
-    
+
     user_info = getAccountInfo(token)
 
-    if not user_info['Success']:
-        return {'Success': False, 'Message': "User not found"}
+    if not user_info["Success"]:
+        return {"Success": False, "Message": "User not found"}
 
-    email = user_info['Data']['email']
-
-    return user_info['Data']['workload']
-
+    result = {"Success": True, "Data": user_info["Data"]["workload"]}
