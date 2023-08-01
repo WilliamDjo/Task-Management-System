@@ -71,6 +71,8 @@ const SearchEverything = () => {
       }
 
       const successGetProfile = data => {
+        setName(`${data.Data.first_name} ${data.Data.last_name}`);
+        setUsername(data.Data.username);
         setEmail(data.Data.email);
         setConnections(data.Data.connections.connections);
         fetchTasks(data.Data.email, data.Data.connections.connections);
@@ -113,6 +115,7 @@ const SearchEverything = () => {
 
         // Now filteredTasks array contains only the tasks that matches your condition
         setTasks(filteredTasks);
+        setIsLoadingTwo(false);
         console.log(filteredTasks);
       };
 
@@ -230,6 +233,7 @@ const SearchEverything = () => {
           // toast({ title: data });
           console.log('Success ' + updatedTask);
           // fetchAllTasks(email);
+          fetchTasks(email, connections);
         };
 
         const onFailure = () => {
@@ -323,7 +327,7 @@ const SearchEverything = () => {
       overflow="auto"
     >
       <NavigationBar />
-      {isLoading ? (
+      {isLoading && isLoadingTwo ? (
         <Flex justifyContent="center" alignItems="center" h="full">
           <Spinner size="xl" />
         </Flex>
