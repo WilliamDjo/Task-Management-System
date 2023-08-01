@@ -18,6 +18,7 @@ const MyProfile = () => {
   const [connections, setConnections] = React.useState(1);
   const [organization, setOrganization] = React.useState('Example Company');
   const [emailNotifications, setEmailNotifications] = React.useState(true);
+  const [workload, setWorkload] = React.useState(0);
 
   const [loaded, setLoaded] = React.useState(false);
 
@@ -47,7 +48,9 @@ const MyProfile = () => {
       setName(`${data.Data.first_name} ${data.Data.last_name}`);
       setUsername(data.Data.username);
       setOrganization(data.Data.organization);
+      setWorkload(data.Data.workload);
       setLoaded(true);
+
       console.log(data)
     }
     const token = localStorage.getItem('token');
@@ -61,6 +64,7 @@ const MyProfile = () => {
         username={username}
         email={email}
         info={info}
+        workload={workload}
       />
     );
   }
