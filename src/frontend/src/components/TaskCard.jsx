@@ -67,7 +67,14 @@ const TaskCard = props => {
     getPriorityLabelAndColor(task.priority);
 
   return (
-    <Box bg="white" p={4} borderRadius="md" boxShadow="md" w="100%">
+    <Box
+      key={task.id}
+      bg="white"
+      p={4}
+      borderRadius="md"
+      boxShadow="md"
+      w="100%"
+    >
       <Text fontSize="lg" fontWeight="bold" mb={2}>
         {task.title}
       </Text>
