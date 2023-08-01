@@ -11,6 +11,7 @@ import {
 } from '@chakra-ui/react';
 import NavigationBar from '../components/NavigationBar';
 import KanbanBoard from '../components/KanbanBoard';
+import GenerateReportButton from '../components/GenerateReportButton';
 import { fetchBackend } from '../fetch';
 
 const Dashboard = () => {
@@ -197,6 +198,7 @@ const Dashboard = () => {
         {/* <ChakraProvider> */}
         <KanbanBoard />
         {/* </ChakraProvider> */}
+        <GenerateReportButton />
       </Flex>
     </Box>
   );
