@@ -215,7 +215,7 @@ const KanbanBoard = () => {
         assignee: assignedTo,
         cost_per_hr: costPerHour ? parseFloat(costPerHour) : 0,
         estimation_spent_hrs: timeEstimate ? parseFloat(timeEstimate) : 0,
-        actual_time_hr: actualTimeSpent,
+        actual_time_hr: actualTimeSpent ? parseFloat(timeEstimate) : 0,
         priority: priority ? parseInt(priority) : 1,
         task_master: name,
         labels: tags.slice(0, 5),
