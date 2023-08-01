@@ -1,4 +1,5 @@
 /* eslint-disable multiline-ternary */
+/* eslint-disable multiline-ternary */
 import React from 'react';
 import {
   Box,
@@ -69,6 +70,7 @@ const ConnectionProfile = () => {
         workload={workload}
       />
     );
+
   };
 
   const connectionAssignedTaskListLoaded = () => {
