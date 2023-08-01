@@ -1,21 +1,27 @@
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from datetime import datetime
 import os
 import sys
+import time
+import smtplib
 import plotly.graph_objects as go
 import plotly.io as pio
-from reportlab.lib.pagesizes import letter
+from datetime import datetime
+from threading import Thread
+from email import encoders
+from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
+from email.mime.multipart import MIMEMultipart
 from reportlab.lib import colors
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image
+from reportlab.lib.pagesizes import letter, landscape
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.enums import TA_CENTER
-import time
-import plotly.graph_objects as go
-from reportlab.platypus import Table, TableStyle
-from reportlab.lib.pagesizes import landscape
-from reportlab.platypus import PageBreak
+from reportlab.platypus import (
+    SimpleDocTemplate,
+    Paragraph,
+    Spacer,
+    Image,
+    Table,
+    TableStyle,
+    PageBreak,
+)
 
 
 # # Try removing this maybe?
@@ -810,7 +816,7 @@ def generate_report(token, start_date_str, end_date_str):
 
     doc.build(story)
     print(f"PDF generated successfully: {pdf_file_name}")
-
+    send_email(email, pdf_file_name)
     return {"Success": True, "Message": "Done!"}
 
 
@@ -867,3 +873,52 @@ def plot_estimated_vs_actual_time(tasks):
         title_text="Tasks completed within estimated time vs those which were not"
     )
     return fig
+
+
+def send_email(email, pdf_file_name):
+    # Create a new thread to send the email
+    def run():
+        # Your email credentials
+        username = "zombies3900w11a@gmx.com"
+        password = "wEvZ28Xm9b3uviN"
+        smtp_server = "mail.gmx.com"
+        smtp_port = 587
+
+        # Creating the message
+        msg = MIMEMultipart()
+        msg["From"] = username
+        msg["To"] = email
+        msg["Subject"] = "Your Task Report"
+
+        # The actual message
+        message = "Please find attached your task report."
+        msg.attach(MIMEText(message, "plain"))
+
+        # Attach the PDF
+        with open(pdf_file_name, "rb") as attachment:
+            part = MIMEBase("application", "octet-stream")
+            part.set_payload(attachment.read())
+
+        encoders.encode_base64(part)
+        part.add_header(
+            "Content-Disposition",
+            f"attachment; filename= {pdf_file_name}",
+        )
+
+        msg.attach(part)
+
+        # Login and send the email
+        try:
+            server = smtplib.SMTP(smtp_server, smtp_port)
+            server.starttls()
+            server.login(username, password)
+            text = msg.as_string()
+            server.sendmail(username, email, text)
+            server.quit()
+            print("Email sent successfully!")
+        except Exception as e:
+            print(f"Error: {e}")
+
+    # Start the thread
+    thread = Thread(target=run)
+    thread.start()
