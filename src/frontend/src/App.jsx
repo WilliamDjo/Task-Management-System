@@ -24,6 +24,7 @@ import PendingProfile from './pages/PendingProfile';
 import VerifyEmail from './pages/VerifyEmail';
 import ResetPassword from './pages/ResetPassword';
 import SearchEverything from './pages/SearchEverything';
+import MyAssignedTasks from './pages/MyAssignedTasks';
 // import Connections from './pages/Connections';
 // import AddConnection from './pages/AddConnection';
 // import MyConnections from './pages/MyConnections';
@@ -46,6 +47,7 @@ const App = () => {
             <Route index element={<Profile />} />
             <Route path="my" element={<MyProfile />} />
             <Route path="edit" element={<EditAccount />} />
+            <Route path="assigned" element={<MyAssignedTasks />} />
           </Route>
           <Route path="admin" element={<Outlet />}>
             <Route index element={<AdminDashboard />} />

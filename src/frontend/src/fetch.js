@@ -68,7 +68,7 @@ export const fetchBackend = async (route, method, body, toast, onSuccess, onFail
     }
 
     if (!isNone(onFailure)) {
-      onFailure();
+      onFailure(data);
     }
     return
   }

@@ -11,8 +11,8 @@ const ProfileBar = (props) => {
 
   const tabs = [
     {
-      screenName: 'Pending Tasks',
-      link: '',
+      screenName: 'Assigned Tasks',
+      link: '/profile/assigned',
       active: props.pendingTasks
     }, {
       screenName: 'My Profile',

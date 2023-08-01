@@ -1,28 +1,22 @@
-from email.message import Message
-import hashlib
-from json.tool import main
-from pickle import NONE
-import sys
-import os
-import re
-from account import is_email_valid
-from backend.account import getAccountInfo
-from backend.password import send_email
-import tokens
+from email.policy import default
+import json
+from marshal import dumps
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-import ssl
+from datetime import datetime
+import os
+import sys
 
+
+# # Try removing this maybe?
 parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_folder)
+import account
+import tokens
+from database import db_tasks, db, db_helper
 
-from database import db_tasks, db
-from tokens import active_tokens
-from datetime import datetime
-from account import is_email_valid, active_users
-from database.db import checkUser, getSingleUserInformation, isValidUser
-from database.db import clear_collection
+# from database.db import checkUser, getSingleUserInformation
 
 
 """
@@ -79,11 +73,9 @@ def is_label_valid(label: str):
 
 
 def is_assignee_valid(assignee: str):
-    res = checkUser(assignee)
+    res = db.checkUser(assignee)
     if res["Success"]:
         return False
-
-    
 
     return True
 
@@ -99,7 +91,7 @@ Create tasks
 """
 
 
-def create_task(token:str, data: dict):
+def create_task(token: str, data: dict):
     token = token
     # Verify account login - check the token
     token_result = tokens.check_jwt_token(token)
@@ -107,7 +99,7 @@ def create_task(token:str, data: dict):
         return {"Success": False, "Message": "No user logged in"}
 
     # Get Task Master Details
-    user = getAccountInfo(token)
+    user = account.getAccountInfo(token)
     task_title = data["title"]
 
     if not is_title_valid(task_title):
@@ -126,10 +118,11 @@ def create_task(token:str, data: dict):
 
     try:
         task_deadline_dt = datetime.strptime(task_deadline, "%Y-%m-%d")
-        print(task_deadline_dt)
 
         if not is_deadline_valid(task_deadline_dt):
             return {"Success": False, "Message": "Deadline cannot be in the past"}
+        else:
+            task_deadline_dt = task_deadline_dt.strftime("%Y-%m-%d %H:%M:%S")
 
     except ValueError:
         pass
@@ -192,18 +185,20 @@ def create_task(token:str, data: dict):
     if task_assignee == "":
         task_assignee = task_master
     else:
-
         if not is_assignee_valid(task_assignee):
-            return {
-                "Success": False,
-                "Message": "Assignee is not valid"
-            }
+            return {"Success": False, "Message": "Assignee is not valid"}
 
-        #Check if both users are connected
+        # Check if both users are connected
         if not db.checkConnection(task_master, task_assignee):
+            return {"Success": False, "Message": "Task Master not connected to Task "}
 
-            print("p\n\n\n\npp")
-    
+    curr_workload = account.get_workload(token, email=task_assignee)
+
+    print("task created \n\n\n\n\n")
+
+    updated_workload = curr_workload + data["priority"] * 10
+
+    workload_update = {"workload": updated_workload}
 
     valid_labels = [label for label in task_labels if is_label_valid(label)]
 
@@ -223,7 +218,10 @@ def create_task(token:str, data: dict):
 
     result = db_tasks.addNewTask(new_dict)
 
-    send_task_notification(task_assignee, task_title)
+    # send_task_notification(task_assignee, task_title)
+
+    # update workload of the assignee
+    db.updateUserInfo(task_assignee, workload_update)
 
     return result
 
@@ -258,12 +256,10 @@ def update_task_progress(task_id: str, progress: str):
 
 
 def update_task_assignee(task_id: str, email: str):
-    
     if not is_assignee_valid(email):
         return {"Success": False, "Message": "Invalid assignee"}
-    
-    #Check connections TODO
-    
+
+    # Check connections TODO
 
     return db_tasks.updateTaskInfo(task_id, {"assignee": email})
 
@@ -307,11 +303,12 @@ def update_priority(task_id: str, new_priority: int):
         }
 
 
-def update_details(token:str, task_id: str, new_data: dict):
+def update_details(token: str, task_id: str, new_data: dict):
+    user_details = account.getAccountInfo(token)
 
-    user_details = getAccountInfo(token)
-    task_master = user_details['email']
-    # title
+    # task_master = user_details['Data']["email"]
+    task_master = user_details["Data"]["email"]
+
     if not is_title_valid(new_data["title"]):
         return {
             "Success": False,
@@ -328,32 +325,23 @@ def update_details(token:str, task_id: str, new_data: dict):
     if not is_progress_status(new_data["progress"]):
         return {"Success": False, "Message": "Invalid Progress status"}
 
-    task_assignee = new_data['assignee']
-    if not is_assignee_valid(new_data['assignee']):
-        return {
-            "Success": False,
-            "Message": "Invalid assignee"
-        }
-    
+    task_assignee = new_data["assignee"]
     if task_assignee == "":
         task_assignee = task_master
-        
     else:
+        if not is_assignee_valid(new_data["assignee"]):
+            return {"Success": False, "Message": "Invalid assignee"}
 
+    if task_assignee == "":
+        task_assignee = task_master
+
+    else:
         if not is_assignee_valid(task_assignee):
-            return {
-                "Success": False,
-                "Message": "Assignee is not valid"
-            }
+            return {"Success": False, "Message": "Assignee is not valid"}
 
-        #Check if both users are connected
+        # Check if both users are connected
         if not db.checkConnection(task_master, task_assignee):
-
-            return {
-                "Success": False,
-                "Message": "Users not connected"
-            }
-
+            return {"Success": False, "Message": "Users not connected"}
 
     # cost_pr_hr
     if new_data["cost_per_hr"] < 0:
@@ -375,8 +363,7 @@ def update_details(token:str, task_id: str, new_data: dict):
     task_labels = new_data["labels"]
     valid_labels = [label for label in task_labels if is_label_valid(label)]
 
-
-    send_task_notification()
+    # send_task_notification()
 
     return db_tasks.updateTaskInfo(task_id, new_data)
 
@@ -390,6 +377,8 @@ def delete_task(token: str, task_id: str):
     token_result = tokens.check_jwt_token(token)
     if not token_result["Success"]:
         return {"Success": False, "Message": "No user logged in"}
+    else:
+        return db_tasks.deleteTask(task_id)
 
 
 """
@@ -516,12 +505,29 @@ def get_all_tasks_assigned_to(token: str, email: str):
         return {"Success": False, "Message": "No user logged in"}
 
     # check if email exists
-    db_result = getSingleUserInformation(email)
+    db_result = db.getSingleUserInformation(email)
 
     if not (db_result["Success"]):
         return {"Success": False, "Message": "Email Does not exist"}
 
     return db_tasks.getTasksAssigned(email)
+
+
+def get_tasks_assigned_to_curr(token: str):
+    # check token
+    token_result = tokens.check_jwt_token(token)
+    if not token_result["Success"]:
+        return {"Success": False, "Message": "No user logged in"}
+
+    # Get active user details
+    acc_info = account.getAccountInfo(token)
+
+    # db_result = db.getSingleUserInformation(acc_info['email'])
+
+    # if not (db_result["Success"]):
+    #     return {"Success": False, "Message": "Email Does not exist"}
+
+    return db_tasks.getTasksAssigned(acc_info["Data"]["email"])
 
 
 def get_tasks_given_by(token: str, email: str):
@@ -531,7 +537,7 @@ def get_tasks_given_by(token: str, email: str):
         return {"Success": False, "Message": "No user logged in"}
 
     # check if email exists
-    db_result = getSingleUserInformation(email)
+    db_result = db.getSingleUserInformation(email)
 
     if not (db_result["Success"]):
         return {"Success": False, "Message": "Email Does not exist"}
@@ -546,3 +552,29 @@ def get_all_tasks(token: str):
         return {"Success": False, "Message": "No user logged in"}
 
     return db_tasks.getAllTasks()
+
+
+def search_task(token: str, search_word: str):
+    # # check token
+    # token_result = tokens.check_jwt_token(token)
+
+    # if not token_result["Success"]:
+    #     return {"Success": False, "Message": "No user logged in"}
+
+    dummy_data = [
+        {
+            "id": "123",
+            "title": "ABC",
+            "description": "Task",
+            "deadline": "2023-09-09",
+            "progress": "Not Started",
+            "assignee": "",
+            "cost_per_hr": 10,
+            "estimation_spent_hrs": 10,
+            "actual_time_hr": 10,
+            "priority": 1,
+            "task_master": "test@test.com",
+            "labels": [],
+        }
+    ]
+    return {"Success": True, "Message": "Tasks found", "Data": dummy_data}
