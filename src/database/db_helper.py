@@ -75,7 +75,7 @@ def reset_counter():
 
 if __name__ == "__main__":
     clear_collection("task_system")
-    clear_collection("user_info")
-    clear_collection("user_profile")
-    clear_collection("task_chats")
-    reset_counter()
+    # clear_collection("user_info")
+    # clear_collection("user_profile")
+    # clear_collection("task_chats")
+    # reset_counter()

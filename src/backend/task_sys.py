@@ -1,3 +1,6 @@
+from email.policy import default
+import json
+from marshal import dumps
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -5,12 +8,13 @@ from datetime import datetime
 import os
 import sys
 
+
 # # Try removing this maybe?
 parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_folder)
 import account
 import tokens
-from database import db_tasks, db
+from database import db_tasks, db, db_helper
 
 # from database.db import checkUser, getSingleUserInformation
 
@@ -114,10 +118,11 @@ def create_task(token: str, data: dict):
 
     try:
         task_deadline_dt = datetime.strptime(task_deadline, "%Y-%m-%d")
-        print(task_deadline_dt)
 
         if not is_deadline_valid(task_deadline_dt):
             return {"Success": False, "Message": "Deadline cannot be in the past"}
+        else:
+            task_deadline_dt = task_deadline_dt.strftime("%Y-%m-%d %H:%M:%S")
 
     except ValueError:
         pass
@@ -185,7 +190,15 @@ def create_task(token: str, data: dict):
 
         # Check if both users are connected
         if not db.checkConnection(task_master, task_assignee):
-            print("p\n\n\n\npp")
+            return {"Success": False, "Message": "Task Master not connected to Task "}
+
+    curr_workload = account.get_workload(token, email=task_assignee)
+
+    print("task created \n\n\n\n\n")
+
+    updated_workload = curr_workload + data["priority"] * 10
+
+    workload_update = {"workload": updated_workload}
 
     valid_labels = [label for label in task_labels if is_label_valid(label)]
 
@@ -205,7 +218,10 @@ def create_task(token: str, data: dict):
 
     result = db_tasks.addNewTask(new_dict)
 
-    send_task_notification(task_assignee, task_title)
+    # send_task_notification(task_assignee, task_title)
+
+    # update workload of the assignee
+    db.updateUserInfo(task_assignee, workload_update)
 
     return result
 
@@ -290,10 +306,9 @@ def update_priority(task_id: str, new_priority: int):
 def update_details(token: str, task_id: str, new_data: dict):
     user_details = account.getAccountInfo(token)
 
-    task_master = user_details['Data']["email"]
-    print("TASK MASTER: ")
-    print(task_master)
-    # title
+    # task_master = user_details['Data']["email"]
+    task_master = user_details["Data"]["email"]
+
     if not is_title_valid(new_data["title"]):
         return {
             "Success": False,
@@ -364,6 +379,7 @@ def delete_task(token: str, task_id: str):
         return {"Success": False, "Message": "No user logged in"}
     else:
         return db_tasks.deleteTask(task_id)
+
 
 """
 Assignee 
@@ -496,14 +512,14 @@ def get_all_tasks_assigned_to(token: str, email: str):
 
     return db_tasks.getTasksAssigned(email)
 
+
 def get_tasks_assigned_to_curr(token: str):
     # check token
     token_result = tokens.check_jwt_token(token)
     if not token_result["Success"]:
         return {"Success": False, "Message": "No user logged in"}
-    
-    
-    #Get active user details
+
+    # Get active user details
     acc_info = getAccountInfo(token)
 
     # db_result = db.getSingleUserInformation(acc_info['email'])
@@ -511,9 +527,7 @@ def get_tasks_assigned_to_curr(token: str):
     # if not (db_result["Success"]):
     #     return {"Success": False, "Message": "Email Does not exist"}
 
-    return db_tasks.getTasksAssigned(acc_info['Data']['email'])
-
-
+    return db_tasks.getTasksAssigned(acc_info["Data"]["email"])
 
 
 def get_tasks_given_by(token: str, email: str):

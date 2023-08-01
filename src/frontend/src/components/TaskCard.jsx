@@ -77,6 +77,14 @@ const TaskCard = props => {
       <Grid templateColumns="repeat(2, 1fr)" gap={2} mb={2}>
         <GridItem>
           <Text fontSize="sm" fontWeight="bold">
+            Assigned By:
+          </Text>
+          <Text fontSize="sm" color="gray.500">
+            {task.task_master}
+          </Text>
+        </GridItem>
+        <GridItem>
+          <Text fontSize="sm" fontWeight="bold">
             Assigned To:
           </Text>
           <Text fontSize="sm" color="gray.500">
@@ -86,9 +94,11 @@ const TaskCard = props => {
         <GridItem>
           <Text fontSize="sm" fontWeight="bold">
             Deadline:
+            {/* {console.log('deadline: ' + task.deadline)} */}
           </Text>
           <Text fontSize="sm" color="gray.500">
-            {task.deadline}
+            {/* {task.deadline} */}
+            {new Date(task.deadline).toISOString().split('T')[0]}
           </Text>
         </GridItem>
       </Grid>
@@ -114,9 +124,9 @@ const TaskCard = props => {
           size="sm"
           width="120px"
         >
-          <option value="To Do">To Do</option>
+          <option value="Not Started">To Do</option>
           <option value="In Progress">In Progress</option>
-          <option value="Done">Done</option>
+          <option value="Completed">Done</option>
           <option value="Blocked">Blocked</option>
         </Select>
       </Box>
