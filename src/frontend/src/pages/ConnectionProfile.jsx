@@ -1,5 +1,3 @@
-/* eslint-disable multiline-ternary */
-/* eslint-disable multiline-ternary */
 import React from 'react';
 import {
   Box,
@@ -9,8 +7,13 @@ import {
   Heading,
   Hide,
   Spinner,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
   Table,
   TableContainer,
+  Tabs,
   Tbody,
   Td,
   Th,
@@ -23,6 +26,7 @@ import { useParams } from 'react-router-dom';
 import ConnectionsBar from '../components/ConnectionsBar';
 import { fetchBackend } from '../fetch';
 import ProfileCard from '../components/ProfileCard';
+import ConnectionChat from './ConnectionChat';
 
 const ConnectionProfile = () => {
   const [name, setName] = React.useState('Name');
@@ -41,16 +45,18 @@ const ConnectionProfile = () => {
 
   const toast = useToast();
 
+  const tabSelectedStyle = { bg: 'black', color: 'blue.50' };
+
   React.useEffect(() => {
-    const successGetConnectionProfile = data => {
+    const token = localStorage.getItem('token');
+
+    const successGetConnectionProfile = (data) => {
       setName(`${data.Data.first_name} ${data.Data.last_name}`);
       setUsername(data.Data.username);
       setWorkload(data.Data.workload);
       setTasks(data.Tasks);
-
       setLoaded(true);
     };
-    const token = localStorage.getItem('token');
 
     fetchBackend(
       `/user/getconnection/${email}`,
@@ -70,7 +76,6 @@ const ConnectionProfile = () => {
         workload={workload}
       />
     );
-
   };
 
   const connectionAssignedTaskListLoaded = () => {
@@ -114,14 +119,24 @@ const ConnectionProfile = () => {
   return (
     <ConnectionsBar myConnections>
       <Box>
-        {loaded ? (
-          connectionProfileLoaded()
-        ) : (
-          <Center>
-            <Spinner />
-          </Center>
-        )}
-        {loaded && connectionAssignedTaskListLoaded()}
+        <Tabs variant='unstyled' colorScheme='black'>
+          <TabList bg='gray.200' p='1' rounded='full'>
+            <Tab _selected={tabSelectedStyle} rounded='full' fontWeight='bold' color='gray.800' pt='1' pb='1'>Profile</Tab>
+            <Tab _selected={tabSelectedStyle} rounded='full' fontWeight='bold' color='gray.800' pt='1' pb='1'>Chat</Tab>
+            <Tab _selected={tabSelectedStyle} rounded='full' fontWeight='bold' color='gray.800' pt='1' pb='1'>Assigned Tasks</Tab>
+          </TabList>
+          <TabPanels>
+            <TabPanel>
+              {loaded ? connectionProfileLoaded() : (<Center><Spinner /></Center>)}
+            </TabPanel>
+            <TabPanel>
+              <ConnectionChat email={email} />
+            </TabPanel>
+            <TabPanel>
+              {loaded ? connectionAssignedTaskListLoaded() : (<Center><Spinner /></Center>)}
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
       </Box>
     </ConnectionsBar>
   );
