@@ -520,7 +520,7 @@ def get_tasks_assigned_to_curr(token: str):
         return {"Success": False, "Message": "No user logged in"}
 
     # Get active user details
-    acc_info = getAccountInfo(token)
+    acc_info = account.getAccountInfo(token)
 
     # db_result = db.getSingleUserInformation(acc_info['email'])
 
@@ -552,3 +552,29 @@ def get_all_tasks(token: str):
         return {"Success": False, "Message": "No user logged in"}
 
     return db_tasks.getAllTasks()
+
+
+def search_task(token: str, search_word: str):
+    # # check token
+    # token_result = tokens.check_jwt_token(token)
+
+    # if not token_result["Success"]:
+    #     return {"Success": False, "Message": "No user logged in"}
+
+    dummy_data = [
+        {
+            "id": "123",
+            "title": "ABC",
+            "description": "Task",
+            "deadline": "2023-09-09",
+            "progress": "Not Started",
+            "assignee": "",
+            "cost_per_hr": 10,
+            "estimation_spent_hrs": 10,
+            "actual_time_hr": 10,
+            "priority": 1,
+            "task_master": "test@test.com",
+            "labels": [],
+        }
+    ]
+    return {"Success": True, "Message": "Tasks found", "Data": dummy_data}

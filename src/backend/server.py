@@ -614,10 +614,8 @@ def get_report(start_date, end_date):
     return
 
 
-
 @app.route("/user/getWorkload", methods=["GET"])
 def get_workload_for_user():
-    
     token = ""
     auth_header = request.headers.get("Authorization")
     if auth_header:
@@ -627,9 +625,25 @@ def get_workload_for_user():
 
     else:
         return {"Success": False, "Message": "No token provided"}, 401
-    
 
-    
+
+@app.route("/search/<search_word>", methods=["GET"])
+def server_search(search_word):
+    token = ""
+    auth_header = request.headers.get("Authorization")
+    if auth_header:
+        bearer, _, token = auth_header.partition(" ")
+        if bearer.lower() != "bearer":
+            return {"Success": False, "Message": "Invalid token format"}, 400
+        # Now, the variable 'token' contains the token passed in the 'Authorization' header.
+        # You can use this token to perform your operations.
+    else:
+        return {"Success": False, "Message": "No token provided"}, 401
+
+    result = task_sys.search_task(token, search_word)
+
+    return jsonify(result)
+
 
 if __name__ == "__main__":
     app.run()
