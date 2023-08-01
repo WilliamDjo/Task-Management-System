@@ -55,7 +55,7 @@ const ConnectionProfile = () => {
       setUsername(data.Data.username);
       setWorkload(data.Data.workload);
 
-      const newTasks = [...tasks];
+      const newTasks = [...data.Tasks];
 
       for (const task of newTasks) {
         const deadline = task.deadline;
