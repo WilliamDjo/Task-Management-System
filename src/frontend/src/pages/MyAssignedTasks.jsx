@@ -53,14 +53,38 @@ const MyAssignedTasks = () => {
           return 0;
         }
       })
+
+      for (const task of newTasks) {
+        const deadline = task.deadline;
+        const dateDeadline = new Date(deadline)
+        const monthOptions = { month: 'short' };
+        const month = dateDeadline.toLocaleDateString('en-US', monthOptions);
+
+        const dateOptions = { day: 'numeric' };
+        const date = dateDeadline.toLocaleDateString('en-US', dateOptions);
+
+        const yearOptions = { year: 'numeric' };
+        const year = dateDeadline.toLocaleDateString('en-US', yearOptions);
+
+        task.deadline = `${date} ${month} ${year}`
+      }
       setTasks(newTasks);
       setLoaded(true);
+    }
+
+    const failGetTasks = (data) => {
+      if (!isNone(data)) {
+        if (data.Message === 'No tasks given to by task assignee') {
+          setTasks([]);
+          setLoaded(true);
+        }
+      }
     }
 
     const successGetProfile = (data) => {
       const email = data.Data.email;
 
-      fetchBackend(`/task/getAllAssignedTo/${email}`, 'GET', { token }, toast, successGetTasks);
+      fetchBackend(`/task/getAllAssignedTo/${email}`, 'GET', { token }, toast, successGetTasks, failGetTasks);
     }
     fetchBackend('/getuserprofile', 'POST', { token }, toast, successGetProfile);
   }, [])
