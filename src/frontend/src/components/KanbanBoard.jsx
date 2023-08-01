@@ -331,13 +331,13 @@ const KanbanBoard = () => {
   };
 
   const handleStatusChange = (taskId, progress) => {
-    if (progress === 'In Progress' || progress === 'Not Started') {
-      // Reset actual time spent to null when changing the status to In Progress or To Do
-      setActualTimeSpent(prevState => ({
-        ...prevState,
-        [taskId]: 0,
-      }));
-    }
+    // if (progress === 'In Progress' || progress === 'Not Started') {
+    //   // Reset actual time spent to null when changing the status to In Progress or To Do
+    //   setActualTimeSpent(prevState => ({
+    //     ...prevState,
+    //     [taskId]: 0,
+    //   }));
+    // }
     let id = 0;
     let updatedTask = {};
     const updatedTasks = tasks.map(task => {

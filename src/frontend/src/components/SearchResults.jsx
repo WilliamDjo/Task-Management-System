@@ -1,12 +1,13 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
 import {
-  //   Box,
+  Box,
   Text,
   Grid,
   GridItem,
   Flex,
   Tag,
+  Select,
   //   Input,
   //   InputGroup,
   IconButton,
@@ -14,7 +15,7 @@ import {
 } from '@chakra-ui/react';
 import { EditIcon } from '@chakra-ui/icons';
 
-const SearchResult = ({ task }) => {
+const SearchResult = ({ task, onStatusChange, onEdit }) => {
   const getPriorityLabelAndColor = priority => {
     switch (priority) {
       case 1:
@@ -26,6 +27,18 @@ const SearchResult = ({ task }) => {
       default:
         return { label: '', color: 'gray' };
     }
+  };
+
+  const handleStatusChange = e => {
+    const status = e.target.value;
+    // if (status === 'Done') {
+    //   setActualTimeSpent(''); // Reset actualTimeSpent when status is set to 'Done'
+    // }
+    onStatusChange(task.id, status);
+  };
+
+  const handleEdit = () => {
+    onEdit(task.id);
   };
 
   // Get the priority label and color based on the task's priority
@@ -80,12 +93,22 @@ const SearchResult = ({ task }) => {
           {tag}
         </Tag>
       ))}
-      <Text fontSize="sm" fontWeight="bold">
-        Status:
-      </Text>
-      <Text fontSize="sm" color="gray.500">
-        {task.progress}
-      </Text>
+      <Box mb={2}>
+        <Text fontSize="sm" fontWeight="bold">
+          Status:
+        </Text>
+        <Select
+          value={task.progress}
+          onChange={handleStatusChange}
+          size="sm"
+          width="120px"
+        >
+          <option value="Not Started">To Do</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Completed">Done</option>
+          <option value="Blocked">Blocked</option>
+        </Select>
+      </Box>
       <Text fontSize="sm" fontWeight="bold">
         Priority:
       </Text>
@@ -120,7 +143,7 @@ const SearchResult = ({ task }) => {
       <Flex align="center" justifyContent="flex-end" mt={4}>
         <IconButton
           icon={<EditIcon />}
-          // onClick={handleEdit}
+          onClick={handleEdit}
           aria-label="Edit Task"
           colorScheme="teal"
           size="sm"

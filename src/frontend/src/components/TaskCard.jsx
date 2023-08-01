@@ -62,18 +62,6 @@ const TaskCard = props => {
     onStatusChange(task.id, status);
   };
 
-  const handleActualTimeChange = e => {
-    // const actualTime = e.target.value;
-    // setActualTimeSpent(actualTime);
-    const timeSpent = parseFloat(e.target.value);
-    if (!isNaN(timeSpent) && task.progress === 'Done') {
-      setActualTimeSpent(prevState => ({
-        ...prevState,
-        [task.id]: timeSpent,
-      }));
-    }
-  };
-
   // Function to get the priority label and color based on the priority value
   const getPriorityLabelAndColor = priority => {
     switch (priority) {
@@ -203,23 +191,6 @@ const TaskCard = props => {
       </Grid>
       {/* </Box> */}
 
-      {task.progress === 'Done' && (
-        <Box mb={2}>
-          <Text fontSize="sm" fontWeight="bold">
-            Actual Time Spent (hrs):
-          </Text>
-          <InputGroup>
-            <Input
-              type="number"
-              placeholder="Actual Time Spent"
-              value={actualTimeSpent[task.id] || ''}
-              onChange={handleActualTimeChange}
-              min={0}
-            />
-            <InputRightAddon children="hrs" />
-          </InputGroup>
-        </Box>
-      )}
       <Flex align="center">
         <IconButton
           icon={<EditIcon />}
