@@ -5,6 +5,9 @@ import OptionsScreen from '../components/OptionsScreen';
 const Profile = () => {
   const tabs = [
     {
+      screenName: 'Assigned Tasks',
+      link: '/profile/assigned'
+    }, {
       screenName: 'My Profile',
       link: '/profile/my',
     },
