@@ -26,15 +26,11 @@ def getChats(token, receiverEmail):
 
     chats = []
     for chat in sorted_chats:
-        timestamp_str = datetime.utcfromtimestamp(chat["timestamp"]).strftime(
-            "%d %b %Y %I:%M %p"
-        )
-
         isSender = chat["sender"] == senderEmail
         chats.append(
             {
                 "message": chat["message"],
-                "timestamp": timestamp_str,
+                "timestamp": chat["timestamp"],
                 "sender": isSender,
             }
         )

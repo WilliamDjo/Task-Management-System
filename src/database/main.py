@@ -6,4 +6,5 @@ if __name__ == "__main__":
     db_helper.clear_collection("task_system")
     db_helper.clear_collection("user_info")
     db_helper.clear_collection("user_profile")
+    db_helper.clear_collection("task_chats")
     db_helper.reset_counter()

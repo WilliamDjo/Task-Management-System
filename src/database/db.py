@@ -54,7 +54,7 @@ def addNewUser(data: dict) -> dict:
         "notifications": False,
         "image": Binary(bytes(0)),
         "organization_name": "",
-        "connectionCount": 1,
+        "connectionCount": 0,
         "connections": {
             "connections": [],
             "connectionRequests": [],
@@ -239,11 +239,11 @@ def getSingleUserInformation(email: str) -> dict:
         "last_name": userInfo["last_name"],
         "email": userInfo["email"],
         "username": userInfo["user"],
-        "workload": userInfo['workload'],
+        "workload": userInfo["workload"],
         "SystemAdmin": userInfo["SystemAdmin"],
         "emailNotifications": userProfile["notifications"],
         "organization": userProfile["organization_name"],
-        "connections": userProfile["connections"],
+        "connections": userProfile["connectionCount"],
     }
 
     return {"Success": True, "Message": "", "Data": user}
