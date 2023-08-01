@@ -1,22 +1,21 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS, cross_origin
+
+import account
+import task_sys
+import connections
 import sys
 import os
-import account
-from backend.task_sys import (
-    create_task,
-    delete_task,
-    get_all_tasks,
-    get_all_tasks_assigned_to,
-    get_task_details,
-    get_tasks_given_by,
-    update_details,
-)
-import connections
+import sys
 
-""" Accessing Other Files"""
+# """ Accessing Other Files"""
 parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_folder)
+import account
+import task_sys
+import connections
+
+import chat
 
 """Flask Set up"""
 app = Flask(__name__)
@@ -320,8 +319,9 @@ def server_create_task():
             return {"Success": False, "Message": "Invalid token format"}, 400
     else:
         return {"Success": False, "Message": "No token provided"}, 401
+
     data = request.json
-    result = create_task(token, data)
+    result = task_sys.create_task(token, data)
     return jsonify(result)
 
 
@@ -337,7 +337,7 @@ def server_update_task(task_id):
         return {"Success": False, "Message": "No token provided"}, 401
 
     data = request.json
-    result = update_details(token, task_id, data)
+    result = task_sys.update_details(token, task_id, data)
     return jsonify(result)
 
 
@@ -354,13 +354,12 @@ def server_delete_task(task_id):
     else:
         return {"Success": False, "Message": "No token provided"}, 401
 
-    result = delete_task(token, task_id)
+    result = task_sys.delete_task(token, task_id)
     return jsonify(result)
 
 
-@app.route("/task/get", methods=["GET"])
-def server_get_task_details():
-    task_id = request.headers.get("task_id")
+@app.route("/task/get/<task_id>", methods=["GET"])
+def server_get_task_details(task_id):
     token = ""
     auth_header = request.headers.get("Authorization")
     if auth_header:
@@ -372,7 +371,7 @@ def server_get_task_details():
     else:
         return {"Success": False, "Message": "No token provided"}, 401
 
-    result = get_task_details(token, task_id)
+    result = task_sys.get_task_details(token, task_id)
 
     return jsonify(result)
 
@@ -389,12 +388,12 @@ def server_get_all():
         # You can use this token to perform your operations.
     else:
         return {"Success": False, "Message": "No token provided"}, 401
-    result = get_all_tasks(token)
+    result = task_sys.get_all_tasks(token)
     return jsonify(result)
 
 
-@app.route("/task/getAllAssignedTo", methods=["GET"])
-def server_get_all_tasks_assigned_to():
+@app.route("/task/getAllAssignedTo/<email>", methods=["GET"])
+def server_get_all_tasks_assigned_to(email):
     token = ""
     auth_header = request.headers.get("Authorization")
     if auth_header:
@@ -405,15 +404,31 @@ def server_get_all_tasks_assigned_to():
         # You can use this token to perform your operations.
     else:
         return {"Success": False, "Message": "No token provided"}, 401
-    email = request.headers.get("email")
 
-    result = get_all_tasks_assigned_to(token, email)
+    result = task_sys.get_all_tasks_assigned_to(token, email)
 
     return jsonify(result)
 
 
-@app.route("/task/getTasksGivenBy", methods=["GET"])
-def server_get_all_tasks():
+@app.route("/task/getAllAssignedTocurr", methods=["GET"])
+def server_get_tasks_assigned_to_current():
+    token = ""
+    auth_header = request.headers.get("Authorization")
+    if auth_header:
+        bearer, _, token = auth_header.partition(" ")
+        if bearer.lower() != "bearer":
+            return {"Success": False, "Message": "Invalid token format"}, 400
+    else:
+        return {"Success": False, "Message": "No token provided"}, 401
+
+    result = task_sys.get_tasks_assigned_to_curr(token)
+
+    result = task_sys.get_tasks_assigned_to_curr(token)
+    return jsonify(result)
+
+
+@app.route("/task/getTasksGivenBy/<email>", methods=["GET"])
+def server_get_all_tasks(email):
     token = ""
     auth_header = request.headers.get("Authorization")
     if auth_header:
@@ -424,9 +439,8 @@ def server_get_all_tasks():
         # You can use this token to perform your operations.
     else:
         return {"Success": False, "Message": "No token provided"}, 401
-    email = request.headers.get("email")
 
-    result = get_tasks_given_by(token, email)
+    result = task_sys.get_tasks_given_by(token, email)
 
     return jsonify(result)
 
@@ -551,6 +565,84 @@ def get_specific_connection(email):
         "Tasks": status["Tasks"],
     }
     return jsonify(to_return)
+
+
+@app.route("/chat/<email>", methods=["GET", "POST"])
+def get_chats(email):
+    token = ""
+    auth_header = request.headers.get("Authorization")
+    if auth_header:
+        bearer, _, token = auth_header.partition(" ")
+        if bearer.lower() != "bearer":
+            return {"Success": False, "Message": "Invalid token format"}, 400
+        # Now, the variable 'token' contains the token passed in the 'Authorization' header.
+        # You can use this token to perform your operations.
+    else:
+        return {"Success": False, "Message": "No token provided"}, 401
+
+    if request.method == "POST":
+        message = request.json["message"]
+        status = chat.updateChat(token, email, message)
+        to_return = {
+            "Success": status["Success"],
+            "Message": status["Message"],
+            "Timestamp": status["Timestamp"],
+        }
+        return jsonify(to_return)
+
+    status = chat.getChats(token, email)
+    to_return = {
+        "Success": status["Success"],
+        "Message": status["Message"],
+        "Data": status["Data"],
+    }
+    return jsonify(to_return)
+
+
+@app.route("/report/<start_date>/<end_date>", methods=["GET"])
+def get_report(start_date, end_date):
+    token = ""
+    auth_header = request.headers.get("Authorization")
+    if auth_header:
+        bearer, _, token = auth_header.partition(" ")
+        if bearer.lower() != "bearer":
+            return {"Success": False, "Message": "Invalid token format"}, 400
+        # Now, the variable 'token' contains the token passed in the 'Authorization' header.
+        # You can use this token to perform your operations.
+    else:
+        return {"Success": False, "Message": "No token provided"}, 401
+    return
+
+
+@app.route("/user/getWorkload", methods=["GET"])
+def get_workload_for_user():
+    token = ""
+    auth_header = request.headers.get("Authorization")
+    if auth_header:
+        bearer, _, token = auth_header.partition(" ")
+        if bearer.lower() != "bearer":
+            return {"Success": False, "Message": "Invalid token format"}, 400
+
+    else:
+        return {"Success": False, "Message": "No token provided"}, 401
+
+
+@app.route("/search/<search_word>", methods=["GET"])
+def server_search(search_word):
+    token = ""
+    auth_header = request.headers.get("Authorization")
+    if auth_header:
+        bearer, _, token = auth_header.partition(" ")
+        if bearer.lower() != "bearer":
+            return {"Success": False, "Message": "Invalid token format"}, 400
+        # Now, the variable 'token' contains the token passed in the 'Authorization' header.
+        # You can use this token to perform your operations.
+    else:
+        return {"Success": False, "Message": "No token provided"}, 401
+
+    result = task_sys.search_task(token, search_word)
+
+    return jsonify(result)
 
 
 if __name__ == "__main__":

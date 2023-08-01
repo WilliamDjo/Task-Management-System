@@ -3,6 +3,7 @@ import {
   Card,
   CardBody,
   Center,
+  Flex,
   Heading,
   LinkBox,
   LinkOverlay,
@@ -23,13 +24,15 @@ const MyConnections = () => {
       username: 'Jonathan',
       first_name: 'Jonathan Sinani',
       last_name: 'Sinani',
-      email: 'jonathan@jonathan.com'
+      email: 'jonathan@jonathan.com',
+      workload: 120
     },
     {
       username: 'Jonathan2',
       first_name: 'Jonathan2 Sinani',
       last_name: 'Sinani',
-      email: 'jonathan2@jonathan.com'
+      email: 'jonathan2@jonathan.com',
+      workload: 75
     }
   ]);
   const [loaded, setLoaded] = React.useState(false);
@@ -60,6 +63,10 @@ const MyConnections = () => {
                   </Heading>
                   <Text>{connection.username}</Text>
                   <Text>{connection.email}</Text>
+                  <Flex>
+                    <Text>Workload:&nbsp;</Text>
+                    <Text fontWeight={connection.workload > 100 ? 'bold' : 'normal'} color={connection.workload > 100 && 'red'}>{connection.workload}%</Text>
+                  </Flex>
                 </CardBody>
               </Card>
             </LinkBox>

@@ -37,6 +37,26 @@ def check_jwt_token(token):
     return {"Success": False, "Data": None}
 
 
+def remove_jwt_token(token):
+    try:
+        # Verify the JWT token using the provided secret key
+        decoded_data = jwt.decode(token, secret_key, algorithms=["HS256"])
+        if token in active_tokens:
+            active_tokens.remove(token)
+            return {"Success": True, "Message": "Token has been removed successfully"}
+    except jwt.ExpiredSignatureError:
+        # Handle token expiration error
+        print("Token has expired.")
+    except jwt.InvalidTokenError:
+        # Handle invalid token error
+        print("Invalid token.")
+    except Exception as e:
+        # Handle other exceptions
+        print(f"Error occurred while decoding token: {e}")
+
+    return {"Success": False, "Message": "Failed to remove token"}
+
+
 if __name__ == "__main__":
     t1 = generate_jwt_token("sanyam")
     t2 = generate_jwt_token("sanyam")
