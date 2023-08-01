@@ -1,5 +1,14 @@
+/* eslint-disable no-unused-vars */
 import React from 'react';
-import { Box, Button, Flex, FormControl, FormLabel, Input, useToast } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Flex,
+  FormControl,
+  FormLabel,
+  Input,
+  useToast,
+} from '@chakra-ui/react';
 import NavigationBar from '../components/NavigationBar';
 import KanbanBoard from '../components/KanbanBoard';
 import { fetchBackend } from '../fetch';
@@ -13,24 +22,24 @@ const Dashboard = () => {
     const taskA = Number(a.id.replace('TASK', ''));
     const taskB = Number(b.id.replace('TASK', ''));
     if (taskA < taskB) {
-      return -1
+      return -1;
     } else if (taskA > taskB) {
       return 1;
     } else {
       return 0;
     }
-  }
+  };
 
   // This runs when clicking the new task button.
   const newTask = () => {
-    const success = (data) => {
+    const success = data => {
       toast({
         title: 'New task created!',
         status: 'success',
         duration: 5000,
         isClosable: true,
       });
-    }
+    };
     const title = 'Title';
     const description = 'This is a description';
     const deadline = '2023-12-31';
@@ -54,15 +63,15 @@ const Dashboard = () => {
       priority,
       labels,
       assignee,
-      token
-    }
+      token,
+    };
 
     fetchBackend('/task/create', 'POST', body, toast, success);
-  }
+  };
 
   // This runs when clicking the show task button (replaces the current tasks on the Dashboard with an up to date version).
   const showTasks = () => {
-    const success = (data) => {
+    const success = data => {
       const newTasks = [...data.Data];
       newTasks.sort(sortTasks);
       setTasks(newTasks);
@@ -72,15 +81,15 @@ const Dashboard = () => {
         duration: 5000,
         isClosable: true,
       });
-    }
+    };
 
     const token = localStorage.getItem('token');
     fetchBackend('/task/getAll', 'GET', { token }, toast, success);
-  }
+  };
 
   // On clicking a task, it updates it with the following content.
-  const updateTask = (id) => {
-    const success = (data) => {
+  const updateTask = id => {
+    const success = data => {
       console.log(data);
       toast({
         title: `Task ${id} updated!`,
@@ -88,7 +97,7 @@ const Dashboard = () => {
         duration: 5000,
         isClosable: true,
       });
-    }
+    };
 
     const token = localStorage.getItem('token');
     const body = {
@@ -102,15 +111,15 @@ const Dashboard = () => {
       priority: 1,
       labels: [],
       assignee: email,
-      token
-    }
+      token,
+    };
     fetchBackend(`/task/update/${id}`, 'PUT', body, toast, success);
     console.log(body);
-  }
+  };
 
   // Console logs the tasks assigned to the inputted email.
   const tasksAssigned = () => {
-    const success = (data) => {
+    const success = data => {
       console.log(data);
       toast({
         title: 'Tasks assigned shown in console log!',
@@ -118,15 +127,21 @@ const Dashboard = () => {
         duration: 5000,
         isClosable: true,
       });
-    }
+    };
 
     const token = localStorage.getItem('token');
-    fetchBackend(`/task/getAllAssignedTo/${email}`, 'GET', { token }, toast, success);
-  }
+    fetchBackend(
+      `/task/getAllAssignedTo/${email}`,
+      'GET',
+      { token },
+      toast,
+      success
+    );
+  };
 
   // Console logs the tasks given the inputted email.
   const tasksGiven = () => {
-    const success = (data) => {
+    const success = data => {
       console.log(data);
       toast({
         title: 'Tasks given shown in console log!',
@@ -134,20 +149,26 @@ const Dashboard = () => {
         duration: 5000,
         isClosable: true,
       });
-    }
+    };
 
     const token = localStorage.getItem('token');
-    fetchBackend(`/task/getTasksGivenBy/${email}`, 'GET', { token }, toast, success);
-  }
+    fetchBackend(
+      `/task/getTasksGivenBy/${email}`,
+      'GET',
+      { token },
+      toast,
+      success
+    );
+  };
 
   // On loading the page, it sets the tasks to be all tasks.
   React.useEffect(() => {
-    const success = (data) => {
+    const success = data => {
       console.log(data);
       const newTasks = [...data.Data];
       newTasks.sort(sortTasks);
       setTasks(newTasks);
-    }
+    };
     const token = localStorage.getItem('token');
     fetchBackend('/task/getAll', 'GET', { token }, toast, success);
   }, []);
@@ -155,7 +176,7 @@ const Dashboard = () => {
   return (
     <Box minH="100vh" h="100vh">
       <Flex h="100%" flexFlow="column">
-        <Button onClick={newTask}>Click here for new tasks</Button>
+        {/* <Button onClick={newTask}>Click here for new tasks</Button>
         <Button onClick={showTasks}>Click here to show all tasks</Button>
         <FormControl>
           <FormLabel>Email:</FormLabel>
@@ -171,7 +192,7 @@ const Dashboard = () => {
               </Box>
             )
           })}
-        </Box>
+        </Box> */}
         <NavigationBar />
         {/* <ChakraProvider> */}
         <KanbanBoard />
