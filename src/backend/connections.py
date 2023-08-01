@@ -1,15 +1,12 @@
-import hashlib
-import sys
 import os
-import re
+import sys
 
+# # Try removing this maybe?
 parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_folder)
 
 from database import db
 import tokens
-import password
-import account
 from database import db_tasks
 
 """
@@ -26,10 +23,12 @@ def getPendingConnections(token):
     email = valid_jwt["Data"]["email"]
 
     connections = db.getUserConnections(email)
-    pendingConnections = (
-        connections["Connections"]["connectionRequests"]
-        + connections["Connections"]["connectionReceived"]
-    )
+    # pendingConnections = (
+    #     connections["Connections"]["connectionRequests"]
+    #     + connections["Connections"]["connectionReceived"]
+    # )
+
+    pendingConnections = connections["Connections"]["connectionReceived"]
 
     to_return = []
     for i in pendingConnections:
@@ -42,7 +41,7 @@ def getPendingConnections(token):
                 "username": userInfo["Data"]["username"],
             }
         )
-    print(to_return)
+    # print(to_return)
     return {
         "Success": True,
         "Message": "Pending Connections Retrieved",
