@@ -1,12 +1,21 @@
-from email.policy import default
-import json
-from marshal import dumps
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from datetime import datetime
 import os
 import sys
+import plotly.graph_objects as go
+import plotly.io as pio
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.enums import TA_CENTER
+import time
+import plotly.graph_objects as go
+from reportlab.platypus import Table, TableStyle
+from reportlab.lib.pagesizes import landscape
+from reportlab.platypus import PageBreak
 
 
 # # Try removing this maybe?
@@ -146,7 +155,7 @@ def create_task(token: str, data: dict):
         task_cost = 0
 
     if task_cost < 0:
-        return {"Success": False, "Message": "Cost per hour cannot be negative"}
+        return {"Success": False, "Message": "Cost/H cannot be negative"}
 
     task_estimate = data["estimation_spent_hrs"]
     task_estimate = int(task_estimate)
@@ -578,3 +587,283 @@ def search_task(token: str, search_word: str):
         }
     ]
     return {"Success": True, "Message": "Tasks found", "Data": dummy_data}
+
+
+def convert_date_format(date_str, in_format, out_format):
+    # Converts a date string from one format to another
+    date_obj = datetime.strptime(date_str, in_format)
+    return date_obj.strftime(out_format)
+
+
+def process_tasks(temp, start_date, end_date):
+    tasks = []
+    for i in temp:
+        created_date_str = convert_date_format(
+            i.get("created", ""), "%d-%m-%Y", "%Y-%m-%d"
+        )
+        deadline_date_str = convert_date_format(
+            i.get("deadline", "").split(" ")[0], "%Y-%m-%d", "%Y-%m-%d"
+        )
+
+        # Convert to datetime for comparison
+        created_date = datetime.strptime(created_date_str, "%Y-%m-%d")
+
+        # Check if created_date falls in the range
+        if start_date <= created_date <= end_date:
+            task_info = {
+                "id": i.get("task_id", ""),
+                "title": i.get("title", ""),
+                "description": i.get("description", ""),
+                "created": created_date_str,
+                "deadline": deadline_date_str,
+                "progress": i.get("progress", ""),
+                "assignee": i.get("assignee", ""),
+                "cost_per_hr": i.get("cost_per_hr", ""),
+                "estimation_spent_hrs": i.get("estimation_spent_hrs", ""),
+                "actual_time_hr": i.get("actual_time_hr", ""),
+                "priority": i.get("priority", ""),
+                "task_master": i.get("task_master", ""),
+                "labels": i.get("labels", []),
+            }
+            tasks.append(task_info)
+    return tasks
+
+
+def generate_report(token, start_date_str, end_date_str):
+    valid_jwt = tokens.check_jwt_token(token)
+
+    if not valid_jwt["Success"]:
+        return {"Success": False, "Message": "User not logged in"}
+
+    email = valid_jwt["Data"]["email"]
+    task_master_tasks = db_tasks.getTasksGiven(email)
+    assignee_tasks = db_tasks.getTasksAssigned(email)
+
+    if not task_master_tasks["Success"] and not assignee_tasks["Success"]:
+        return {"Success": False, "Message": "No tasks found"}
+
+    tasks = {}
+
+    start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
+    end_date = datetime.strptime(end_date_str, "%Y-%m-%d")
+
+    if task_master_tasks["Success"]:
+        tasks["task_master"] = process_tasks(
+            task_master_tasks["Data"], start_date, end_date
+        )
+
+    if assignee_tasks["Success"]:
+        tasks["assignee"] = process_tasks(assignee_tasks["Data"], start_date, end_date)
+
+    # Generating the actual PDF
+
+    pdf_file_name = "task_report.pdf"
+    doc = SimpleDocTemplate(pdf_file_name, pagesize=landscape(letter))
+
+    story = []
+    table_style = TableStyle(
+        [
+            ("BACKGROUND", (0, 0), (-1, 0), colors.grey),
+            ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),
+            ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+            (
+                "FONTSIZE",
+                (0, 0),
+                (-1, 0),
+                10,
+            ),  # Reduce the font size to fit more content
+            ("BOTTOMPADDING", (0, 0), (-1, 0), 12),
+            ("BACKGROUND", (0, 1), (-1, -1), colors.beige),
+            ("GRID", (0, 0), (-1, -1), 1, colors.black),
+            ("VALIGN", (0, 0), (-1, -1), "TOP"),  # Align text to top to fit more rows
+            ("INNERGRID", (0, 0), (-1, -1), 0.5, colors.grey),
+            ("BOX", (0, 0), (-1, -1), 0.5, colors.black),
+        ]
+    )
+    styles = getSampleStyleSheet()
+    title_style = styles["Title"]
+    title = Paragraph("Task Report", title_style)
+    story.append(title)
+    story.append(Spacer(1, 12))
+
+    title2 = Paragraph("As TaskMaster", title_style)
+    story.append(title2)
+    story.append(Spacer(1, 12))
+
+    plot_functions = [
+        plot_priority_vs_time,
+        plot_priority_distribution,
+        plot_estimated_vs_actual_time,
+    ]
+
+    for i, plot_func in enumerate(plot_functions):
+        plot = plot_func(tasks["task_master"])
+        plot_file_name = f"./plot_{i}.png"
+        save_plot_to_image(plot, plot_file_name)
+        time.sleep(3)
+        img = Image(plot_file_name, width=500, height=300)
+        story.append(img)
+
+    data = [
+        [
+            "Task ID",
+            "Title",
+            "Description",
+            "Created",
+            "Deadline",
+            "Progress",
+            "Assignee",
+            "Cost/H",
+            "Estd. Time",
+            "Actual Time",
+            "Priority",
+        ]
+    ]  # This is the header row
+
+    for item in tasks["task_master"]:
+        data.append(
+            [
+                item.get("id", ""),
+                item.get("title", ""),
+                item.get("description", ""),
+                item.get("created", ""),
+                item.get("deadline", ""),
+                item.get("progress", ""),
+                item.get("assignee", ""),
+                item.get("cost_per_hr", ""),
+                item.get("estimation_spent_hrs", ""),
+                item.get("actual_time_hr", ""),
+                item.get("priority", ""),
+            ]
+        )
+
+    # Create the table
+    t = Table(data)
+
+    # Apply styles to the table
+    t.setStyle(table_style)
+
+    # Add table to story
+    story.append(t)
+    story.append(PageBreak())
+
+    title2 = Paragraph("As Assignee", title_style)
+    story.append(title2)
+    story.append(Spacer(1, 6))
+
+    plot_functions = [
+        plot_priority_vs_time,
+        plot_priority_distribution,
+        plot_estimated_vs_actual_time,
+    ]
+
+    for i, plot_func in enumerate(plot_functions):
+        plot = plot_func(tasks["assignee"])
+        plot_file_name = f"./plot_{i}.png"
+        save_plot_to_image(plot, plot_file_name)
+        time.sleep(3)
+        img = Image(plot_file_name, width=500, height=300)
+        story.append(img)
+
+    data = [
+        [
+            "Task ID",
+            "Title",
+            "Description",
+            "Created",
+            "Deadline",
+            "Progress",
+            "Cost/H",
+            "Estd. Time",
+            "Actual Time",
+            "Priority",
+            "Task Master",
+        ]
+    ]  # This is the header row
+
+    for item in tasks["assignee"]:
+        data.append(
+            [
+                item.get("id", ""),
+                item.get("title", ""),
+                item.get("description", ""),
+                item.get("created", ""),
+                item.get("deadline", ""),
+                item.get("progress", ""),
+                item.get("cost_per_hr", ""),
+                item.get("estimation_spent_hrs", ""),
+                item.get("actual_time_hr", ""),
+                item.get("priority", ""),
+                item.get("task_master", ""),
+            ]
+        )
+
+    # Create the table
+    t = Table(data)
+
+    # Apply styles to the table
+    t.setStyle(table_style)
+
+    # Add table to story
+    story.append(t)
+
+    doc.build(story)
+    print(f"PDF generated successfully: {pdf_file_name}")
+
+    return {"Success": True, "Message": "Done!"}
+
+
+def save_plot_to_image(plot, file_name):
+    image_bytes = pio.to_image(plot, format="png")
+    with open(file_name, "wb") as f:
+        f.write(image_bytes)
+
+
+def plot_priority_vs_time(tasks):
+    priority_time = {1: 0, 2: 0, 3: 0}
+    for task in tasks:
+        priority = task.get("priority")
+        time = float(task.get("actual_time_hr", 0))
+        priority_time[priority] += time
+
+    labels = ["Low", "Medium", "High"]
+    values = list(priority_time.values())
+
+    fig = go.Figure(data=[go.Pie(labels=labels, values=values, hole=0.3)])
+    fig.update_layout(title_text="Breakdown of actual time by task priority")
+    return fig
+
+
+def plot_priority_distribution(tasks):
+    priority_count = {1: 0, 2: 0, 3: 0}
+    for task in tasks:
+        priority = task.get("priority")
+        priority_count[priority] += 1
+
+    labels = ["Low", "Medium", "High"]
+    values = list(priority_count.values())
+
+    fig = go.Figure(data=[go.Pie(labels=labels, values=values, hole=0.3)])
+    fig.update_layout(title_text="Distribution of tasks by priority")
+    return fig
+
+
+def plot_estimated_vs_actual_time(tasks):
+    within_estimated, not_within_estimated = 0, 0
+    for task in tasks:
+        estimated_time = float(task.get("estimation_spent_hrs", 0))
+        actual_time = float(task.get("actual_time_hr", 0))
+        if actual_time <= estimated_time:
+            within_estimated += 1
+        else:
+            not_within_estimated += 1
+
+    labels = ["Within Estimated Time", "Not Within Estimated Time"]
+    values = [within_estimated, not_within_estimated]
+
+    fig = go.Figure(data=[go.Pie(labels=labels, values=values, hole=0.3)])
+    fig.update_layout(
+        title_text="Tasks completed within estimated time vs those which were not"
+    )
+    return fig

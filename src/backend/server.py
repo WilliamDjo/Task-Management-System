@@ -40,6 +40,7 @@ def server_register():
         "Token": status["token"],
         "Sys_admin": status["sys_admin"],
     }
+    print(to_return)
     return jsonify(to_return)
 
 
@@ -268,7 +269,7 @@ def server_admin_delete_email():
     return jsonify(to_return)
 
 
-@app.route("/reset/password", methods=["PUT"])
+@app.route("/reset/password", methods=["POST"])
 def reset_password():
     email = request.json["email"]
 
@@ -611,7 +612,9 @@ def get_report(start_date, end_date):
         # You can use this token to perform your operations.
     else:
         return {"Success": False, "Message": "No token provided"}, 401
-    return
+    to_return = task_sys.generate_report(token, start_date, end_date)
+
+    return {"Succes": True, "Message": "Report Sent"}
 
 
 @app.route("/user/getWorkload", methods=["GET"])

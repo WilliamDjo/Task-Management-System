@@ -5,6 +5,7 @@ import json
 import re
 import os
 import sys
+from datetime import date
 
 # Assuming you are running the script from the parent directory of 'project'
 parent_dir = os.path.dirname(os.path.join(os.path.dirname(__file__), ".."))
@@ -32,13 +33,15 @@ def addNewTask(data: dict) -> dict:
 
     # Get the collection object for 'TaskSystem' from the database
     TaskSystemCollection = getTaskInfoCollection(db)
-
+    current_date = date.today()
+    formatted_date = current_date.strftime("%d-%m-%Y")
     # Create a dictionary with the structure of a task to be inserted
     task_id = get_next_task_id()
     task_info = {
         "id": task_id,
         "title": "",
         "description": "",
+        "created": formatted_date,
         "deadline": "",
         "progress": "",
         "assignee": "",
@@ -163,34 +166,21 @@ def getTasksAssigned(task_assignee) -> dict:
     TaskSystemCollection = getTaskInfoCollection(db)
     task_infos = TaskSystemCollection.find({"assignee": task_assignee})
 
-    tasks_assigned_to = []
+    tasks_given = []
     for task_info in task_infos:
-        tasks_assigned_to.append(
-            {
-                "id": task_info["id"],
-                "title": task_info["title"],
-                "description": task_info["description"],
-                "deadline": task_info["deadline"],
-                "progress": task_info["progress"],
-                "assignee": task_info["assignee"],
-                "cost_per_hr": task_info["cost_per_hr"],
-                "estimation_spent_hrs": task_info["estimation_spent_hrs"],
-                "actual_time_hr": task_info["actual_time_hr"],
-                "priority": task_info["priority"],
-                "task_master": task_info["task_master"],
-                "labels": task_info["labels"],
-            }
-        )
+        tasks_given.append(task_info)
 
-    if len(tasks_assigned_to) == 0:
+    if len(tasks_given) == 0:
         return {
             "Success": False,
             "Data": [],
             "Message": "No tasks given to by task assignee",
         }
+    tasks_given_json = json.loads(json_util.dumps(tasks_given))
+
     return {
         "Success": True,
-        "Data": tasks_assigned_to,
+        "Data": tasks_given_json,
         "Message": "Successfully Returned",
     }
 
