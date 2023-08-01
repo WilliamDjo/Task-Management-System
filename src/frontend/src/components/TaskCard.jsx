@@ -1,6 +1,7 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/no-children-prop */
 /* eslint-disable react/prop-types */
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   Box,
   Text,
@@ -13,12 +14,37 @@ import {
   Input,
   InputGroup,
   InputRightAddon,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogContent,
+  AlertDialogOverlay,
+  Button,
+  useDisclosure,
 } from '@chakra-ui/react';
 import { EditIcon, CloseIcon } from '@chakra-ui/icons';
 
 const TaskCard = props => {
   const { task, onRemove, onEdit, onStatusChange } = props;
   const [actualTimeSpent, setActualTimeSpent] = useState(task.actual_time_hr);
+  // New state to track the task to be deleted
+  const [taskToDelete, setTaskToDelete] = useState(null);
+  const cancelRef = useRef();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  // Function to handle opening the confirmation modal
+  const handleDeleteConfirmation = taskId => {
+    setTaskToDelete(taskId);
+    onOpen();
+  };
+
+  // Function to handle task removal (with confirmation)
+  const handleRemoveWithConfirmation = () => {
+    // handleRemoveTask(taskToDelete);
+    handleRemove();
+    onClose();
+  };
 
   const handleRemove = () => {
     onRemove(task.id);
@@ -34,18 +60,6 @@ const TaskCard = props => {
     //   setActualTimeSpent(''); // Reset actualTimeSpent when status is set to 'Done'
     // }
     onStatusChange(task.id, status);
-  };
-
-  const handleActualTimeChange = e => {
-    // const actualTime = e.target.value;
-    // setActualTimeSpent(actualTime);
-    const timeSpent = parseFloat(e.target.value);
-    if (!isNaN(timeSpent) && task.progress === 'Done') {
-      setActualTimeSpent(prevState => ({
-        ...prevState,
-        [task.id]: timeSpent,
-      }));
-    }
   };
 
   // Function to get the priority label and color based on the priority value
@@ -156,32 +170,27 @@ const TaskCard = props => {
           </Text>
         </GridItem>
       </Grid>
-      <Box mb={2}>
-        <Text fontSize="sm" fontWeight="bold">
-          Cost Per Hour:
-        </Text>
-        <Text fontSize="sm" color="gray.500">
-          {task.cost_per_hr}
-        </Text>
-      </Box>
-
-      {task.progress === 'Done' && (
-        <Box mb={2}>
+      {/* <Box mb={2}> */}
+      <Grid templateColumns="repeat(2, 1fr)" gap={2}>
+        <GridItem>
           <Text fontSize="sm" fontWeight="bold">
-            Actual Time Spent (hrs):
+            Cost Per Hour:
           </Text>
-          <InputGroup>
-            <Input
-              type="number"
-              placeholder="Actual Time Spent"
-              value={actualTimeSpent[task.id] || ''}
-              onChange={handleActualTimeChange}
-              min={0}
-            />
-            <InputRightAddon children="hrs" />
-          </InputGroup>
-        </Box>
-      )}
+          <Text fontSize="sm" color="gray.500">
+            {task.cost_per_hr}
+          </Text>
+        </GridItem>
+        <GridItem>
+          <Text fontSize="sm" fontWeight="bold">
+            Actual Spent (hrs)
+          </Text>
+          <Text fontSize="sm" color="gray.500">
+            {task.actual_time_hr}
+          </Text>
+        </GridItem>
+      </Grid>
+      {/* </Box> */}
+
       <Flex align="center">
         <IconButton
           icon={<EditIcon />}
@@ -193,12 +202,42 @@ const TaskCard = props => {
         />
         <IconButton
           icon={<CloseIcon />}
-          onClick={handleRemove}
+          onClick={handleDeleteConfirmation}
           aria-label="Remove Task"
           colorScheme="red"
           size="sm"
         />
       </Flex>
+      <AlertDialog
+        isOpen={isOpen}
+        leastDestructiveRef={cancelRef}
+        onClose={onClose}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Delete Task
+            </AlertDialogHeader>
+
+            <AlertDialogBody>
+              Are you sure you want to delete this task?
+            </AlertDialogBody>
+
+            <AlertDialogFooter>
+              <Button ref={cancelRef} onClick={onClose}>
+                Cancel
+              </Button>
+              <Button
+                colorScheme="red"
+                onClick={handleRemoveWithConfirmation}
+                ml={3}
+              >
+                Delete
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
     </Box>
   );
 };

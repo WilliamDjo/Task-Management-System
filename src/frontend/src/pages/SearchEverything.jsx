@@ -7,6 +7,7 @@ import {
   InputGroup,
   InputLeftElement,
   Icon,
+  IconButton,
   Tabs,
   TabList,
   TabPanels,
@@ -20,22 +21,42 @@ import {
   Grid,
   useToast,
   Spinner,
+  useDisclosure,
 } from '@chakra-ui/react';
 import { MdSearch } from 'react-icons/md';
 import { ChevronDownIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import NavigationBar from '../components/NavigationBar';
 import { fetchBackend } from '../fetch';
 import SearchResult from '../components/SearchResults';
+import TaskModal from '../components/TaskModal';
 
 const SearchEverything = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [minimizedTasks, setMinimizedTasks] = useState([]);
-  // const [email, setEmail] = React.useState('email@example.com');
-  // const [connections, setConnections] = useState([]);
+  const [email, setEmail] = React.useState('email@example.com');
+  const [connections, setConnections] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingTwo, setIsLoadingTwo] = useState(true);
   const toast = useToast();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [name, setName] = React.useState('Name');
+  const [username, setUsername] = React.useState('username');
+  const [organization, setOrganization] = React.useState('Example Company');
+  const [emailNotifications, setEmailNotifications] = React.useState(true);
+  const [newTask, setNewTask] = useState('');
+  const [description, setDescription] = useState('');
+  const [assignedTo, setAssignedTo] = useState('');
+  const [deadline, setDeadline] = useState('');
+  const [tags, setTags] = useState([]);
+  const [editingTask, setEditingTask] = useState(null);
+  // State to store the user's connections
+
+  // State to store the user's full name
+  const [userFullName, setUserFullName] = useState('');
+  const [priority, setPriority] = useState(); // New state for priority
+  const [costPerHour, setCostPerHour] = useState(''); // New state for cost per hour
+  const [timeEstimate, setTimeEstimate] = useState(''); // New state for time estimate
+  const [actualTimeSpent, setActualTimeSpent] = useState('');
 
   // Function to fetch user's profile from the backend
   const fetchUserProfile = () => {
@@ -50,20 +71,11 @@ const SearchEverything = () => {
       }
 
       const successGetProfile = data => {
-        // setEmail(data.Data.email);
-        // setEmailNotifications(data.Data.emailNotifications);
-        // setConnections(data.Data.connections);
-
-        // setName(`${data.Data.first_name} ${data.Data.last_name}`);
-        // setUsername(data.Data.username);
-        // setOrganization(data.Data.organization);
-        // setLoaded(true);
-        // console.log(data);
-        // fetchAllTasks(data.Data.email);
-        // setIsLoadingThree(false);
-        // fetchConnections(data.Data.email);
+        setName(`${data.Data.first_name} ${data.Data.last_name}`);
+        setUsername(data.Data.username);
+        setEmail(data.Data.email);
+        setConnections(data.Data.connections.connections);
         fetchTasks(data.Data.email, data.Data.connections.connections);
-        // console.log(JSON.stringify(data.Data));
         setIsLoading(false);
       };
 
@@ -74,14 +86,6 @@ const SearchEverything = () => {
         toast,
         successGetProfile
       );
-
-      // console.log('response: ' + name);
-
-      //   if (response) {
-      //     // const { first_name, last_name } = response.Data;
-      //     setUserFullName({ name });
-      //     console.log('hello1');
-      //   }
     } catch (error) {
       // Handle error if fetching user profile fails
       console.error('Failed to fetch user profile:', error);
@@ -111,6 +115,7 @@ const SearchEverything = () => {
 
         // Now filteredTasks array contains only the tasks that matches your condition
         setTasks(filteredTasks);
+        setIsLoadingTwo(false);
         console.log(filteredTasks);
       };
 
@@ -135,19 +140,183 @@ const SearchEverything = () => {
     task.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleMinimizeTask = taskId => {
-    setMinimizedTasks(prevMinimizedTasks =>
-      prevMinimizedTasks.includes(taskId)
-        ? prevMinimizedTasks.filter(id => id !== taskId)
-        : [...prevMinimizedTasks, taskId]
+  const handleStatusChange = (taskId, progress) => {
+    // if (progress === 'In Progress' || progress === 'Not Started') {
+    //   // Reset actual time spent to null when changing the status to In Progress or To Do
+    //   setActualTimeSpent(prevState => ({
+    //     ...prevState,
+    //     [taskId]: 0,
+    //   }));
+    // }
+    let id = 0;
+    let updatedTask = {};
+    const updatedTasks = tasks.map(task => {
+      if (task.id === taskId) {
+        id = task.id;
+        updatedTask = { ...task, progress };
+        return updatedTask;
+      }
+      return task;
+    });
+
+    setTasks(updatedTasks);
+    // Retrieve the token from the localStorage
+    const token = localStorage.getItem('token');
+    // Remove the properties
+    delete updatedTask._id;
+    delete updatedTask.id;
+
+    updatedTask = { ...updatedTask, token };
+    // const body = { updatedTask, token }; // assuming you have the token available in the scope
+    const onSuccess = data => {
+      // toast({ title: data });
+      fetchTasks(email, connections);
+    };
+    const onFailure = () => {
+      console.log('Failed to update task');
+      console.log('id: ' + id);
+      console.log('task: ' + JSON.stringify(updatedTask));
+    };
+
+    fetchBackend(
+      `/task/update/${id}`,
+      'PUT',
+      updatedTask,
+      toast,
+      onSuccess,
+      onFailure
     );
+    console.log('baba');
+  };
+
+  const handleSubmitTask = () => {
+    if (newTask && assignedTo) {
+      const token = localStorage.getItem('token');
+      const task = {
+        // id: Date.now(),
+        title: newTask,
+        description,
+        deadline,
+        progress: 'Not Started',
+        assignee: assignedTo,
+        cost_per_hr: costPerHour ? parseFloat(costPerHour) : 0,
+        estimation_spent_hrs: timeEstimate ? parseFloat(timeEstimate) : 0,
+        actual_time_hr: actualTimeSpent ? parseFloat(actualTimeSpent) : 0,
+        priority: priority ? parseInt(priority) : 1,
+        task_master: name,
+        labels: tags.slice(0, 5),
+        token,
+      };
+
+      // For the case when we're updating an existing task
+      if (editingTask) {
+        const successUpdateTask = () => {
+          let updatedTask;
+
+          const updatedTasks = tasks.map(prevTask => {
+            if (prevTask.id === editingTask.id) {
+              updatedTask = { ...task, progress: prevTask.progress };
+              return updatedTask;
+            }
+            return prevTask;
+          });
+
+          setTasks(updatedTasks);
+
+          return { updatedTask, editingTaskId: editingTask.id };
+        };
+
+        const { updatedTask, editingTaskId } = successUpdateTask();
+        delete updatedTask.task_master;
+        console.log('up ' + JSON.stringify(updatedTask));
+        const onSuccess = () => {
+          // toast({ title: data });
+          console.log('Success ' + updatedTask);
+          // fetchAllTasks(email);
+          fetchTasks(email, connections);
+        };
+
+        const onFailure = () => {
+          console.error('Failed to update' + updatedTask);
+        };
+
+        fetchBackend(
+          `/task/update/${editingTaskId}`,
+          'PUT',
+          updatedTask,
+          toast,
+          onSuccess,
+          onFailure
+        );
+
+        // For the case when we're creating a new task
+      }
+
+      setNewTask('');
+      setDescription('');
+      setAssignedTo('');
+      setDeadline('');
+      setTags([]);
+      setPriority(''); // Reset priority state for new task
+      setCostPerHour(''); // Reset costPerHour state for new task
+      setTimeEstimate(''); // Reset timeEstimate state for new task
+      setActualTimeSpent(''); // Reset timeEstimate state for new task
+      setEditingTask(null);
+      onClose();
+    } else {
+      toast({
+        title: 'Error',
+        description: 'Please enter a task and assign it to someone.',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
+
+  const handleEditTask = taskId => {
+    const taskToEdit = tasks.find(task => task.id === taskId);
+    // console.log('id: ' + JSON.stringify(taskToEdit));
+    if (taskToEdit) {
+      //   console.log('editing: ' + taskToEdit.progress);
+      setEditingTask(taskToEdit);
+      setNewTask(taskToEdit.title);
+      setDescription(taskToEdit.description);
+      setAssignedTo(taskToEdit.assignee);
+      setDeadline(taskToEdit.deadline);
+      setTags(taskToEdit.labels);
+      setPriority(taskToEdit.priority);
+      setCostPerHour(taskToEdit.cost_per_hr ? taskToEdit.cost_per_hr : 0);
+      setTimeEstimate(
+        taskToEdit.estimation_spent_hrs ? taskToEdit.estimation_spent_hrs : 0
+      );
+      setActualTimeSpent(
+        taskToEdit.actual_time_hr ? taskToEdit.actual_time_hr : 0
+      );
+
+      onOpen();
+      //   onOpen();
+    }
+  };
+
+  const handleCloseModal = () => {
+    setEditingTask(null);
+    setNewTask('');
+    setDescription('');
+    setAssignedTo('');
+    setDeadline('');
+    setTags([]);
+    setPriority('');
+    setCostPerHour('');
+    setTimeEstimate('');
+    setActualTimeSpent('');
+    onClose();
   };
 
   // Fetch the user's profile on component mount
   useEffect(() => {
     fetchUserProfile();
   }, []);
-
   return (
     <Box
       display="flex"
@@ -158,7 +327,7 @@ const SearchEverything = () => {
       overflow="auto"
     >
       <NavigationBar />
-      {isLoading ? (
+      {isLoading && isLoadingTwo ? (
         <Flex justifyContent="center" alignItems="center" h="full">
           <Spinner size="xl" />
         </Flex>
@@ -193,7 +362,11 @@ const SearchEverything = () => {
                     >
                       {filteredTasks.map(task => (
                         // eslint-disable-next-line react/jsx-key
-                        <SearchResult task={task} />
+                        <SearchResult
+                          onStatusChange={handleStatusChange}
+                          onEdit={handleEditTask}
+                          task={task}
+                        />
                       ))}
                     </Grid>
                   ) : (
@@ -213,6 +386,33 @@ const SearchEverything = () => {
           )}
         </>
       )}
+      <TaskModal
+        isOpen={isOpen}
+        onClose={handleCloseModal}
+        task={editingTask}
+        onSubmit={handleSubmitTask}
+        userFullName={name}
+        userEmail={email}
+        assignedTo={assignedTo}
+        setAssignedTo={setAssignedTo}
+        connections={connections} // Pass the user's connections to the modal
+        newTask={newTask}
+        setNewTask={setNewTask}
+        description={description}
+        setDescription={setDescription}
+        deadline={deadline}
+        setDeadline={setDeadline}
+        tags={tags}
+        setTags={setTags}
+        priority={priority}
+        setPriority={setPriority}
+        costPerHour={costPerHour}
+        setCostPerHour={setCostPerHour}
+        timeEstimate={timeEstimate}
+        setTimeEstimate={setTimeEstimate}
+        actualTimeSpent={actualTimeSpent}
+        setActualTimeSpent={setActualTimeSpent}
+      />
     </Box>
   );
 };
