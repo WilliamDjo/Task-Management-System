@@ -21,6 +21,7 @@ import {
   InputGroup,
   Textarea,
   Text,
+  Tooltip,
 } from '@chakra-ui/react';
 import { AddIcon, CloseIcon } from '@chakra-ui/icons';
 
@@ -50,16 +51,9 @@ const TaskModal = props => {
     timeEstimate,
     setTimeEstimate,
     actualTimeSpent,
+    setActualTimeSpent,
     resetActualTime,
   } = props;
-
-  const [actualTime, setActualTime] = useState(actualTimeSpent);
-
-  // Function to handle changes in the actual time spent input
-  const handleActualTimeChange = e => {
-    const actualTimeSpent = e.target.value;
-    setActualTime(actualTimeSpent);
-  };
 
   const handleSubmit = e => {
     e.preventDefault();
@@ -145,7 +139,14 @@ const TaskModal = props => {
                 value={timeEstimate}
                 onChange={e => setTimeEstimate(e.target.value)}
               />
-
+              <Tooltip label="Recommended only to be filled once the task is complete">
+                <Input
+                  type="number"
+                  placeholder="Actual Time (in hours)"
+                  value={actualTimeSpent}
+                  onChange={e => setActualTimeSpent(e.target.value)}
+                />
+              </Tooltip>
               <Stack spacing={2}>
                 {tags.map((tag, index) => (
                   <Flex key={index}>

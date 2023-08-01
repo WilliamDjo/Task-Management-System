@@ -60,9 +60,9 @@ const KanbanBoard = () => {
   // State to store the user's full name
   const [userFullName, setUserFullName] = useState('');
   const [priority, setPriority] = useState(); // New state for priority
-  const [costPerHour, setCostPerHour] = useState(0); // New state for cost per hour
-  const [timeEstimate, setTimeEstimate] = useState(0); // New state for time estimate
-  const [actualTimeSpent, setActualTimeSpent] = useState(0);
+  const [costPerHour, setCostPerHour] = useState(''); // New state for cost per hour
+  const [timeEstimate, setTimeEstimate] = useState(''); // New state for time estimate
+  const [actualTimeSpent, setActualTimeSpent] = useState('');
 
   // Function to reset the actual time spent in TaskModal
   const handleResetActualTime = () => {
@@ -215,7 +215,7 @@ const KanbanBoard = () => {
         assignee: assignedTo,
         cost_per_hr: costPerHour ? parseFloat(costPerHour) : 0,
         estimation_spent_hrs: timeEstimate ? parseFloat(timeEstimate) : 0,
-        actual_time_hr: actualTimeSpent ? parseFloat(timeEstimate) : 0,
+        actual_time_hr: actualTimeSpent ? parseFloat(actualTimeSpent) : 0,
         priority: priority ? parseInt(priority) : 1,
         task_master: name,
         labels: tags.slice(0, 5),
@@ -280,6 +280,7 @@ const KanbanBoard = () => {
       setPriority(''); // Reset priority state for new task
       setCostPerHour(''); // Reset costPerHour state for new task
       setTimeEstimate(''); // Reset timeEstimate state for new task
+      setActualTimeSpent(''); // Reset timeEstimate state for new task
       setEditingTask(null);
       onClose();
     } else {
@@ -413,6 +414,7 @@ const KanbanBoard = () => {
     setPriority('');
     setCostPerHour('');
     setTimeEstimate('');
+    setActualTimeSpent('');
     onClose();
   };
 
@@ -534,6 +536,7 @@ const KanbanBoard = () => {
         timeEstimate={timeEstimate}
         setTimeEstimate={setTimeEstimate}
         actualTimeSpent={actualTimeSpent}
+        setActualTimeSpent={setActualTimeSpent}
         resetActualTime={handleResetActualTime}
       />
     </Box>

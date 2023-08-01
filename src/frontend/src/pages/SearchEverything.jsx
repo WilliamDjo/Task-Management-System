@@ -7,6 +7,7 @@ import {
   InputGroup,
   InputLeftElement,
   Icon,
+  IconButton,
   Tabs,
   TabList,
   TabPanels,
