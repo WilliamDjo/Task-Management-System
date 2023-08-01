@@ -1,11 +1,13 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable multiline-ternary */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Input,
   InputGroup,
   InputLeftElement,
   Icon,
+  IconButton,
   Tabs,
   TabList,
   TabPanels,
@@ -14,120 +16,121 @@ import {
   Text,
   Button,
   Flex,
+  Stack,
+  Badge,
+  Grid,
+  useToast,
+  Spinner,
+  useDisclosure,
 } from '@chakra-ui/react';
+import { MdSearch } from 'react-icons/md';
+import { ChevronDownIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import NavigationBar from '../components/NavigationBar';
+import { fetchBackend } from '../fetch';
+import SearchResult from '../components/SearchResults';
+import TaskModal from '../components/TaskModal';
 
 const SearchEverything = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [minimizedTasks, setMinimizedTasks] = useState([]);
-  const [minimizedConnections, setMinimizedConnections] = useState([]);
+  const [email, setEmail] = React.useState('email@example.com');
+  const [connections, setConnections] = useState([]);
+  const [tasks, setTasks] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingTwo, setIsLoadingTwo] = useState(true);
+  const toast = useToast();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [name, setName] = React.useState('Name');
+  const [username, setUsername] = React.useState('username');
+  const [organization, setOrganization] = React.useState('Example Company');
+  const [emailNotifications, setEmailNotifications] = React.useState(true);
+  const [newTask, setNewTask] = useState('');
+  const [description, setDescription] = useState('');
+  const [assignedTo, setAssignedTo] = useState('');
+  const [deadline, setDeadline] = useState('');
+  const [tags, setTags] = useState([]);
+  const [editingTask, setEditingTask] = useState(null);
+  // State to store the user's connections
 
-  // Dummy data for tasks and connections
-  const tasks = [
-    {
-      id: 1,
-      title: 'Create user authentication system',
-      description: 'Implement user login and registration functionality.',
-      tags: ['software engineering', 'authentication', 'backend'],
-      deadline: '2023-08-15',
-      progress: 25,
-      assignee: 'John Doe',
-      cost_per_hr: 30,
-      estimation_spent_hrs: 12,
-      actual_time_hr: 8,
-      priority: 'High',
-      task_master: 'Akshay',
-    },
-    {
-      id: 2,
-      title: 'Design landing page',
-      description: 'Design a visually appealing landing page for the website.',
-      tags: ['software engineering', 'design', 'frontend'],
-      deadline: '2023-08-10',
-      progress: 75,
-      assignee: 'Jane Smith',
-      cost_per_hr: 25,
-      estimation_spent_hrs: 20,
-      actual_time_hr: 18,
-      priority: 'Medium',
-      task_master: 'William',
-    },
-    {
-      id: 3,
-      title: 'Implement search functionality',
-      description: 'Add search feature to the application.',
-      tags: ['software engineering', 'search', 'frontend', 'backend'],
-      deadline: '2023-08-20',
-      progress: 50,
-      assignee: 'Bob Johnson',
-      cost_per_hr: 28,
-      estimation_spent_hrs: 15,
-      actual_time_hr: 10,
-      priority: 'Medium',
-      task_master: 'Cameron',
-    },
-    {
-      id: 4,
-      title: 'Fix bugs in user profile page',
-      description: 'Resolve issues reported in the user profile section.',
-      tags: ['software engineering', 'bugfix', 'frontend'],
-      deadline: '2023-08-05',
-      progress: 90,
-      assignee: 'Alice Williams',
-      cost_per_hr: 22,
-      estimation_spent_hrs: 30,
-      actual_time_hr: 28,
-      priority: 'High',
-      task_master: 'Jonathan',
-    },
-    {
-      id: 5,
-      title: 'Optimize database queries',
-      description: 'Improve performance by optimizing database queries.',
-      tags: ['software engineering', 'database', 'backend'],
-      deadline: '2023-08-25',
-      progress: 40,
-      assignee: 'John Doe',
-      cost_per_hr: 35,
-      estimation_spent_hrs: 10,
-      actual_time_hr: 8,
-      priority: 'High',
-      task_master: 'Sanyam',
-    },
-  ];
+  // State to store the user's full name
+  const [userFullName, setUserFullName] = useState('');
+  const [priority, setPriority] = useState(); // New state for priority
+  const [costPerHour, setCostPerHour] = useState(''); // New state for cost per hour
+  const [timeEstimate, setTimeEstimate] = useState(''); // New state for time estimate
+  const [actualTimeSpent, setActualTimeSpent] = useState('');
 
-  const connections = [
-    {
-      id: 1,
-      name: 'William Djong',
-      email: 'william.doe@yahoo.com',
-      organization: 'ACME Corporation',
-    },
-    {
-      id: 2,
-      name: 'Akshay Valluri',
-      email: 'akshay.smith@example.com',
-      organization: 'Tech Co',
-    },
-    {
-      id: 3,
-      name: 'Sanyam Jaine',
-      email: 'sanyam.johnson@example.com',
-      organization: 'Software Solutions',
-    },
-    {
-      id: 4,
-      name: 'Jonathan Sinani',
-      email: 'jonatha.williams@example.com',
-      organization: 'Web Services',
-    },
-    {
-      id: 5,
-      name: 'Cameron Pereira',
-      email: 'cameron.brown@example.com',
-      organization: 'Digital Innovations',
-    },
-  ];
+  // Function to fetch user's profile from the backend
+  const fetchUserProfile = () => {
+    try {
+      // Retrieve the token from the localStorage
+      const token = localStorage.getItem('token');
+      //   console.log(token);
+
+      if (!token) {
+        console.error('User token not found in localStorage.');
+        return;
+      }
+
+      const successGetProfile = data => {
+        setName(`${data.Data.first_name} ${data.Data.last_name}`);
+        setUsername(data.Data.username);
+        setEmail(data.Data.email);
+        setConnections(data.Data.connections.connections);
+        fetchTasks(data.Data.email, data.Data.connections.connections);
+        setIsLoading(false);
+      };
+
+      fetchBackend(
+        '/getuserprofile',
+        'POST',
+        { token },
+        toast,
+        successGetProfile
+      );
+    } catch (error) {
+      // Handle error if fetching user profile fails
+      console.error('Failed to fetch user profile:', error);
+    }
+  };
+
+  const fetchTasks = (email, connections) => {
+    try {
+      // Retrieve the token from the localStorage
+      const token = localStorage.getItem('token');
+      const successGetTasks = data => {
+        // setTasks(data.Data);
+        // const newTasks = [...data.Data];
+        // Creating a Set for easier lookup
+        // console.log('con ' + connections);
+        const connectionSet = new Set(connections.map(c => c.email));
+
+        // Filter the tasks
+        const filteredTasks = data.Data.filter(task => {
+          return (
+            task.assignee === email ||
+            connectionSet.has(task.assignee) ||
+            task.task_master === email ||
+            connectionSet.has(task.task_master)
+          );
+        });
+
+        // Now filteredTasks array contains only the tasks that matches your condition
+        setTasks(filteredTasks);
+        setIsLoadingTwo(false);
+        console.log(filteredTasks);
+      };
+
+      const body = {
+        token,
+      };
+      fetchBackend('/task/getAll', 'GET', body, toast, successGetTasks);
+      // console.log('email ' + email);
+      // console.log('task ' + tasks);
+    } catch (error) {
+      // Handle error if fetching user profile fails
+      console.error('Failed to fetch tasks', error);
+    }
+    // console.log('baba');
+  };
 
   const handleSearch = event => {
     setSearchTerm(event.target.value);
@@ -137,175 +140,279 @@ const SearchEverything = () => {
     task.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const filteredConnections = connections.filter(connection =>
-    connection.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleStatusChange = (taskId, progress) => {
+    // if (progress === 'In Progress' || progress === 'Not Started') {
+    //   // Reset actual time spent to null when changing the status to In Progress or To Do
+    //   setActualTimeSpent(prevState => ({
+    //     ...prevState,
+    //     [taskId]: 0,
+    //   }));
+    // }
+    let id = 0;
+    let updatedTask = {};
+    const updatedTasks = tasks.map(task => {
+      if (task.id === taskId) {
+        id = task.id;
+        updatedTask = { ...task, progress };
+        return updatedTask;
+      }
+      return task;
+    });
 
-  const handleMinimizeTask = taskId => {
-    setMinimizedTasks(prevMinimizedTasks =>
-      prevMinimizedTasks.includes(taskId)
-        ? prevMinimizedTasks.filter(id => id !== taskId)
-        : [...prevMinimizedTasks, taskId]
+    setTasks(updatedTasks);
+    // Retrieve the token from the localStorage
+    const token = localStorage.getItem('token');
+    // Remove the properties
+    delete updatedTask._id;
+    delete updatedTask.id;
+
+    updatedTask = { ...updatedTask, token };
+    // const body = { updatedTask, token }; // assuming you have the token available in the scope
+    const onSuccess = data => {
+      // toast({ title: data });
+      fetchTasks(email, connections);
+    };
+    const onFailure = () => {
+      console.log('Failed to update task');
+      console.log('id: ' + id);
+      console.log('task: ' + JSON.stringify(updatedTask));
+    };
+
+    fetchBackend(
+      `/task/update/${id}`,
+      'PUT',
+      updatedTask,
+      toast,
+      onSuccess,
+      onFailure
     );
+    console.log('baba');
   };
 
-  const handleMinimizeConnection = connectionId => {
-    setMinimizedConnections(prevMinimizedConnections =>
-      prevMinimizedConnections.includes(connectionId)
-        ? prevMinimizedConnections.filter(id => id !== connectionId)
-        : [...prevMinimizedConnections, connectionId]
-    );
+  const handleSubmitTask = () => {
+    if (newTask && assignedTo) {
+      const token = localStorage.getItem('token');
+      const task = {
+        // id: Date.now(),
+        title: newTask,
+        description,
+        deadline,
+        progress: 'Not Started',
+        assignee: assignedTo,
+        cost_per_hr: costPerHour ? parseFloat(costPerHour) : 0,
+        estimation_spent_hrs: timeEstimate ? parseFloat(timeEstimate) : 0,
+        actual_time_hr: actualTimeSpent ? parseFloat(actualTimeSpent) : 0,
+        priority: priority ? parseInt(priority) : 1,
+        task_master: name,
+        labels: tags.slice(0, 5),
+        token,
+      };
+
+      // For the case when we're updating an existing task
+      if (editingTask) {
+        const successUpdateTask = () => {
+          let updatedTask;
+
+          const updatedTasks = tasks.map(prevTask => {
+            if (prevTask.id === editingTask.id) {
+              updatedTask = { ...task, progress: prevTask.progress };
+              return updatedTask;
+            }
+            return prevTask;
+          });
+
+          setTasks(updatedTasks);
+
+          return { updatedTask, editingTaskId: editingTask.id };
+        };
+
+        const { updatedTask, editingTaskId } = successUpdateTask();
+        delete updatedTask.task_master;
+        console.log('up ' + JSON.stringify(updatedTask));
+        const onSuccess = () => {
+          // toast({ title: data });
+          console.log('Success ' + updatedTask);
+          // fetchAllTasks(email);
+          fetchTasks(email, connections);
+        };
+
+        const onFailure = () => {
+          console.error('Failed to update' + updatedTask);
+        };
+
+        fetchBackend(
+          `/task/update/${editingTaskId}`,
+          'PUT',
+          updatedTask,
+          toast,
+          onSuccess,
+          onFailure
+        );
+
+        // For the case when we're creating a new task
+      }
+
+      setNewTask('');
+      setDescription('');
+      setAssignedTo('');
+      setDeadline('');
+      setTags([]);
+      setPriority(''); // Reset priority state for new task
+      setCostPerHour(''); // Reset costPerHour state for new task
+      setTimeEstimate(''); // Reset timeEstimate state for new task
+      setActualTimeSpent(''); // Reset timeEstimate state for new task
+      setEditingTask(null);
+      onClose();
+    } else {
+      toast({
+        title: 'Error',
+        description: 'Please enter a task and assign it to someone.',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    }
   };
 
+  const handleEditTask = taskId => {
+    const taskToEdit = tasks.find(task => task.id === taskId);
+    // console.log('id: ' + JSON.stringify(taskToEdit));
+    if (taskToEdit) {
+      //   console.log('editing: ' + taskToEdit.progress);
+      setEditingTask(taskToEdit);
+      setNewTask(taskToEdit.title);
+      setDescription(taskToEdit.description);
+      setAssignedTo(taskToEdit.assignee);
+      setDeadline(taskToEdit.deadline);
+      setTags(taskToEdit.labels);
+      setPriority(taskToEdit.priority);
+      setCostPerHour(taskToEdit.cost_per_hr ? taskToEdit.cost_per_hr : 0);
+      setTimeEstimate(
+        taskToEdit.estimation_spent_hrs ? taskToEdit.estimation_spent_hrs : 0
+      );
+      setActualTimeSpent(
+        taskToEdit.actual_time_hr ? taskToEdit.actual_time_hr : 0
+      );
+
+      onOpen();
+      //   onOpen();
+    }
+  };
+
+  const handleCloseModal = () => {
+    setEditingTask(null);
+    setNewTask('');
+    setDescription('');
+    setAssignedTo('');
+    setDeadline('');
+    setTags([]);
+    setPriority('');
+    setCostPerHour('');
+    setTimeEstimate('');
+    setActualTimeSpent('');
+    onClose();
+  };
+
+  // Fetch the user's profile on component mount
+  useEffect(() => {
+    fetchUserProfile();
+  }, []);
   return (
-    <Box minH="100vh" h="100vh">
+    <Box
+      display="flex"
+      flexDirection="column"
+      minH="100vh"
+      h="100vh"
+      bg="gray.100"
+      overflow="auto"
+    >
       <NavigationBar />
-      <InputGroup>
-        <InputLeftElement pointerEvents="none">
-          <Icon name="search" color="gray.400" />
-        </InputLeftElement>
-        <Input
-          type="text"
-          placeholder="Search for tasks and connections..."
-          value={searchTerm}
-          onChange={handleSearch}
-          focusBorderColor="brand.500"
-        />
-      </InputGroup>
-
-      {searchTerm && (
-        <Flex justifyContent="center">
-          {' '}
-          {/* Center the tabs */}
-          <Tabs mt="4" variant="enclosed">
-            <TabList>
-              <Tab
-                _selected={{ color: 'white', bg: 'gray.600' }}
-                _focus={{ boxShadow: 'none' }}
-              >
-                Tasks
-              </Tab>
-              <Tab
-                _selected={{ color: 'white', bg: 'gray.600' }}
-                _focus={{ boxShadow: 'none' }}
-              >
-                Connections
-              </Tab>
-            </TabList>
-            <TabPanels>
-              <TabPanel>
-                {filteredTasks.length > 0 ? (
-                  filteredTasks.map(task => (
-                    <Box
-                      key={task.id}
-                      p="2"
-                      borderBottom="1px solid"
-                      borderColor="gray.200"
-                    >
-                      <Flex alignItems="center" justifyContent="space-between">
-                        <Text fontWeight="bold">
-                          {!minimizedTasks.includes(task.id)
-                            ? task.title
-                            : task.title}
-                        </Text>
-                        <Button
-                          variant="link"
-                          onClick={() => handleMinimizeTask(task.id)}
-                        >
-                          {!minimizedTasks.includes(task.id) ? '▶' : '▼'}
-                        </Button>
-                      </Flex>
-                      {minimizedTasks.includes(task.id) && (
-                        <>
-                          <Text color="gray.500" fontSize="sm">
-                            Description: {task.description}
-                          </Text>
-                          <Text color="gray.500" fontSize="sm">
-                            Tags: {task.tags.join(', ')}
-                          </Text>
-                          <Text color="gray.500" fontSize="sm">
-                            Deadline: {task.deadline}
-                          </Text>
-                          <Text color="gray.500" fontSize="sm">
-                            Progress: {task.progress}%
-                          </Text>
-                          <Text color="gray.500" fontSize="sm">
-                            Assignee: {task.assignee}
-                          </Text>
-                          <Text color="gray.500" fontSize="sm">
-                            Cost per hour: ${task.cost_per_hr}
-                          </Text>
-                          <Text color="gray.500" fontSize="sm">
-                            Estimation spent hours: {task.estimation_spent_hrs}{' '}
-                            hrs
-                          </Text>
-                          <Text color="gray.500" fontSize="sm">
-                            Actual time spent: {task.actual_time_hr} hrs
-                          </Text>
-                          <Text color="gray.500" fontSize="sm">
-                            Priority: {task.priority}
-                          </Text>
-                          <Text color="gray.500" fontSize="sm">
-                            Task Master: {task.task_master}
-                          </Text>
-                        </>
-                      )}
-                    </Box>
-                  ))
-                ) : (
-                  <Box p="2" color="gray.500">
-                    No tasks found.
-                  </Box>
-                )}
-              </TabPanel>
-              <TabPanel>
-                {filteredConnections.length > 0 ? (
-                  filteredConnections.map(connection => (
-                    <Box
-                      key={connection.id}
-                      p="2"
-                      borderBottom="1px solid"
-                      borderColor="gray.200"
-                    >
-                      <Flex alignItems="center" justifyContent="space-between">
-                        <Text fontWeight="bold">
-                          {!minimizedConnections.includes(connection.id)
-                            ? connection.name
-                            : connection.name}
-                        </Text>
-                        <Button
-                          variant="link"
-                          onClick={() =>
-                            handleMinimizeConnection(connection.id)
-                          }
-                        >
-                          {!minimizedConnections.includes(connection.id)
-                            ? '▶'
-                            : '▼'}
-                        </Button>
-                      </Flex>
-                      {minimizedConnections.includes(connection.id) && (
-                        <>
-                          <Text color="gray.500" fontSize="sm">
-                            Email: {connection.email}
-                          </Text>
-                          <Text color="gray.500" fontSize="sm">
-                            Organization: {connection.organization}
-                          </Text>
-                        </>
-                      )}
-                    </Box>
-                  ))
-                ) : (
-                  <Box p="2" color="gray.500">
-                    No connections found.
-                  </Box>
-                )}
-              </TabPanel>
-            </TabPanels>
-          </Tabs>
+      {isLoading && isLoadingTwo ? (
+        <Flex justifyContent="center" alignItems="center" h="full">
+          <Spinner size="xl" />
         </Flex>
+      ) : (
+        <>
+          <InputGroup size="lg" my={4} shadow="md">
+            <InputLeftElement pointerEvents="none">
+              <MdSearch size="24px" />
+            </InputLeftElement>
+            <Input
+              type="text"
+              placeholder="Search for tasks..."
+              value={searchTerm}
+              onChange={handleSearch}
+              borderRadius="full"
+              focusBorderColor="brand.500"
+              bg="white"
+            />
+          </InputGroup>
+
+          {searchTerm && (
+            <Tabs mt="4" variant="enclosed" isFitted colorScheme="blue">
+              <TabList>
+                <Tab>Tasks</Tab>
+              </TabList>
+              <TabPanels>
+                <TabPanel>
+                  {filteredTasks.length > 0 ? (
+                    <Grid
+                      templateColumns={['repeat(1, 1fr)', 'repeat(3, 1fr)']}
+                      gap={6}
+                    >
+                      {filteredTasks.map(task => (
+                        // eslint-disable-next-line react/jsx-key
+                        <SearchResult
+                          onStatusChange={handleStatusChange}
+                          onEdit={handleEditTask}
+                          task={task}
+                        />
+                      ))}
+                    </Grid>
+                  ) : (
+                    <Box
+                      p="4"
+                      color="gray.500"
+                      borderRadius="md"
+                      bg="white"
+                      shadow="md"
+                    >
+                      No tasks found.
+                    </Box>
+                  )}
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
+          )}
+        </>
       )}
+      <TaskModal
+        isOpen={isOpen}
+        onClose={handleCloseModal}
+        task={editingTask}
+        onSubmit={handleSubmitTask}
+        userFullName={name}
+        userEmail={email}
+        assignedTo={assignedTo}
+        setAssignedTo={setAssignedTo}
+        connections={connections} // Pass the user's connections to the modal
+        newTask={newTask}
+        setNewTask={setNewTask}
+        description={description}
+        setDescription={setDescription}
+        deadline={deadline}
+        setDeadline={setDeadline}
+        tags={tags}
+        setTags={setTags}
+        priority={priority}
+        setPriority={setPriority}
+        costPerHour={costPerHour}
+        setCostPerHour={setCostPerHour}
+        timeEstimate={timeEstimate}
+        setTimeEstimate={setTimeEstimate}
+        actualTimeSpent={actualTimeSpent}
+        setActualTimeSpent={setActualTimeSpent}
+      />
     </Box>
   );
 };

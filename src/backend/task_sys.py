@@ -1,28 +1,37 @@
-from email.message import Message
-import hashlib
-from json.tool import main
-from pickle import NONE
-import sys
 import os
-import re
-from account import is_email_valid
-from backend.account import getAccountInfo
-from backend.password import send_email
-from backend.tokens import check_jwt_token
+import sys
+import time
 import smtplib
-from email.mime.multipart import MIMEMultipart
+import plotly.graph_objects as go
+import plotly.io as pio
+from datetime import datetime
+from threading import Thread
+from email import encoders
 from email.mime.text import MIMEText
-import ssl
+from email.mime.base import MIMEBase
+from email.mime.multipart import MIMEMultipart
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter, landscape
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import (
+    SimpleDocTemplate,
+    Paragraph,
+    Spacer,
+    Image,
+    Table,
+    TableStyle,
+    PageBreak,
+)
 
+
+# # Try removing this maybe?
 parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_folder)
+import account
+import tokens
+from database import db_tasks, db, db_helper
 
-from database import db_tasks, db
-from tokens import active_tokens
-from datetime import datetime
-from account import is_email_valid, active_users
-from database.db import checkUser, getSingleUserInformation, isValidUser
-from database.db import clear_collection
+# from database.db import checkUser, getSingleUserInformation
 
 
 """
@@ -62,8 +71,8 @@ def is_description_valid(description: str):
 def is_deadline_valid(deadline):
     current_datetime = datetime.now()
     try:
-        dt = datetime.strptime(deadline, "%Y-%m-%d")
-        return dt.date() < current_datetime.date()
+        # dt = datetime.strptime(deadline, "%Y-%m-%d")
+        return deadline.date() >= current_datetime.date()
     except ValueError:
         return False
 
@@ -79,11 +88,9 @@ def is_label_valid(label: str):
 
 
 def is_assignee_valid(assignee: str):
-    res = checkUser(assignee)
+    res = db.checkUser(assignee)
     if res["Success"]:
         return False
-
-    
 
     return True
 
@@ -99,15 +106,15 @@ Create tasks
 """
 
 
-def create_task(token:str, data: dict):
+def create_task(token: str, data: dict):
     token = token
     # Verify account login - check the token
-    token_result = check_jwt_token(token)
+    token_result = tokens.check_jwt_token(token)
     if not token_result["Success"]:
         return {"Success": False, "Message": "No user logged in"}
 
     # Get Task Master Details
-    user = getAccountInfo(token)
+    user = account.getAccountInfo(token)
     task_title = data["title"]
 
     if not is_title_valid(task_title):
@@ -129,6 +136,8 @@ def create_task(token:str, data: dict):
 
         if not is_deadline_valid(task_deadline_dt):
             return {"Success": False, "Message": "Deadline cannot be in the past"}
+        else:
+            task_deadline_dt = task_deadline_dt.strftime("%Y-%m-%d %H:%M:%S")
 
     except ValueError:
         pass
@@ -152,7 +161,7 @@ def create_task(token:str, data: dict):
         task_cost = 0
 
     if task_cost < 0:
-        return {"Success": False, "Message": "Cost per hour cannot be negative"}
+        return {"Success": False, "Message": "Cost/H cannot be negative"}
 
     task_estimate = data["estimation_spent_hrs"]
     task_estimate = int(task_estimate)
@@ -191,18 +200,18 @@ def create_task(token:str, data: dict):
     if task_assignee == "":
         task_assignee = task_master
     else:
-
         if not is_assignee_valid(task_assignee):
-            return {
-                "Success": False,
-                "Message": "Assignee is not valid"
-            }
+            return {"Success": False, "Message": "Assignee is not valid"}
 
-        #Check if both users are connected
+        # Check if both users are connected
         if not db.checkConnection(task_master, task_assignee):
+            return {"Success": False, "Message": "Task Master not connected to Task "}
 
-            print("p\n\n\n\npp")
-    
+    curr_workload = account.get_workload(token, email=task_assignee)
+
+    updated_workload = int(curr_workload["Data"]) + int(data["priority"]) * 10
+
+    workload_update = {"workload": updated_workload}
 
     valid_labels = [label for label in task_labels if is_label_valid(label)]
 
@@ -222,7 +231,10 @@ def create_task(token:str, data: dict):
 
     result = db_tasks.addNewTask(new_dict)
 
-    send_task_notification(task_assignee, task_title)
+    # send_task_notification(task_assignee, task_title)
+
+    # update workload of the assignee
+    db.updateUserInfo(task_assignee, workload_update)
 
     return result
 
@@ -257,12 +269,10 @@ def update_task_progress(task_id: str, progress: str):
 
 
 def update_task_assignee(task_id: str, email: str):
-    
     if not is_assignee_valid(email):
         return {"Success": False, "Message": "Invalid assignee"}
-    
-    #Check connections TODO
-    
+
+    # Check connections TODO
 
     return db_tasks.updateTaskInfo(task_id, {"assignee": email})
 
@@ -294,7 +304,7 @@ def update_priority(task_id: str, new_priority: int):
 
     return db_tasks.updateTaskInfo(task_id, {"priority": new_priority})
 
-    token_result = check_jwt_token(new_data["token"])
+    token_result = tokens.check_jwt_token(new_data["token"])
     if not token_result["Success"]:
         return {"Success": False, "Message": "No user logged in"}
 
@@ -306,76 +316,73 @@ def update_priority(task_id: str, new_priority: int):
         }
 
 
-def update_details(token:str, task_id: str, new_data: dict):
+def update_details(token: str, task_id: str, new_data: dict):
+    user_details = account.getAccountInfo(token)
 
-    user_details = getAccountInfo(token)
-    task_master = user_details['email']
-    # title
+    old_data_response = get_task_details(token, task_id)
+    old_data = old_data_response["Data"]
+
+    task_master = user_details["Data"]["email"]
+
     if not is_title_valid(new_data["title"]):
         return {
             "Success": False,
             "Message": "Invalid Title Format, needs to be > 2 and  < 100",
         }
 
-    # description
     if not is_description_valid(new_data["description"]):
         return {"Success": False, "Message": "Invalid Description, too long"}
 
-    # deadline #TODO
-
-    # Progress
     if not is_progress_status(new_data["progress"]):
         return {"Success": False, "Message": "Invalid Progress status"}
 
-    task_assignee = new_data['assignee']
-    if not is_assignee_valid(new_data['assignee']):
-        return {
-            "Success": False,
-            "Message": "Invalid assignee"
-        }
-    
+    task_assignee = new_data["assignee"]
     if task_assignee == "":
         task_assignee = task_master
-        
     else:
+        if not is_assignee_valid(new_data["assignee"]):
+            return {"Success": False, "Message": "Invalid assignee"}
 
-        if not is_assignee_valid(task_assignee):
-            return {
-                "Success": False,
-                "Message": "Assignee is not valid"
-            }
-
-        #Check if both users are connected
         if not db.checkConnection(task_master, task_assignee):
+            return {"Success": False, "Message": "Users not connected"}
 
-            return {
-                "Success": False,
-                "Message": "Users not connected"
-            }
-
-
-    # cost_pr_hr
     if new_data["cost_per_hr"] < 0:
         return {"Success": False, "Message": "Cost/hr cannot be negative"}
 
-    # Estimate
     if new_data["estimation_spent_hrs"] < 0:
         return {"Success": False, "Message": "estimation_spent_hrs cannot be negative"}
 
-    # Actual Time
     if new_data["actual_time_hr"] < 0:
         return {"Success": False, "Message": "actual_time_hr cannot be negative"}
 
-    # Priority
     if new_data["priority"] < 1 or new_data["priority"] > 3:
         return {"Success": False, "Message": "Priority is randked on 3, update failed"}
 
-    # labels
     task_labels = new_data["labels"]
     valid_labels = [label for label in task_labels if is_label_valid(label)]
 
+    old_priority = old_data["priority"]
 
-    send_task_notification()
+    prev_assignee_email = old_data["assignee"]
+    old_details = db.getSingleUserInformation(prev_assignee_email)
+    prev_user_workload = old_details["Data"]["workload"]
+    updated_workload = prev_user_workload - 10 * old_priority
+    new_workload_details = {"workload": updated_workload}
+    db.updateUserInfo(prev_assignee_email, new_workload_details)
+
+    new_priority = new_data["priority"]
+    new_assignee = task_assignee
+    curr_details = db.getSingleUserInformation(task_assignee)
+    curr_user_workload = curr_details["Data"]["workload"]
+    new_updated_workload = curr_user_workload + 10 * new_priority
+    new_workload_details_assignee = {"workload": new_updated_workload}
+
+    if new_data["progress"] == "Completed":
+        completed_workload = curr_user_workload - 10 * new_priority
+        completed_workload_details_assignee = {"workload": completed_workload}
+        db.updateUserInfo(new_data["assignee"], completed_workload_details_assignee)
+
+    db.updateUserInfo(task_assignee, new_workload_details_assignee)
 
     return db_tasks.updateTaskInfo(task_id, new_data)
 
@@ -386,9 +393,24 @@ Delete
 
 
 def delete_task(token: str, task_id: str):
-    token_result = check_jwt_token(token)
-    if not token_result["Success"]:
-        return {"Success": False, "Message": "No user logged in"}
+    # token_result = tokens.check_jwt_token(token)
+    # if not token_result["Success"]:
+    #     return {"Success": False, "Message": "No user logged in"}
+
+    # user_details = account.getAccountInfo(token)
+    data_repsonse = get_task_details(token, task_id)
+    task_data = data_repsonse["Data"]
+    task_assignee = task_data["assignee"]
+    curr_details = db.getSingleUserInformation(task_assignee)
+    curr_user_workload = curr_details["Data"]["workload"]
+
+    updated_workload = curr_user_workload - 10 * task_data["priority"]
+
+    completed_workload_details_assignee = {"workload": updated_workload}
+
+    db.updateUserInfo(task_assignee, completed_workload_details_assignee)
+
+    return db_tasks.deleteTask(task_id)
 
 
 """
@@ -501,7 +523,7 @@ def add_label(task_id: str, new_label: str):
 
 def get_task_details(token: str, task_id: str):
     # check token
-    token_result = check_jwt_token(token)
+    token_result = tokens.check_jwt_token(token)
     if not token_result["Success"]:
         return {"Success": False, "Message": "No user logged in"}
 
@@ -510,12 +532,12 @@ def get_task_details(token: str, task_id: str):
 
 def get_all_tasks_assigned_to(token: str, email: str):
     # check token
-    token_result = check_jwt_token(token)
+    token_result = tokens.check_jwt_token(token)
     if not token_result["Success"]:
         return {"Success": False, "Message": "No user logged in"}
 
     # check if email exists
-    db_result = getSingleUserInformation(email)
+    db_result = db.getSingleUserInformation(email)
 
     if not (db_result["Success"]):
         return {"Success": False, "Message": "Email Does not exist"}
@@ -523,14 +545,31 @@ def get_all_tasks_assigned_to(token: str, email: str):
     return db_tasks.getTasksAssigned(email)
 
 
+def get_tasks_assigned_to_curr(token: str):
+    # check token
+    token_result = tokens.check_jwt_token(token)
+    if not token_result["Success"]:
+        return {"Success": False, "Message": "No user logged in"}
+
+    # Get active user details
+    acc_info = account.getAccountInfo(token)
+
+    # db_result = db.getSingleUserInformation(acc_info['email'])
+
+    # if not (db_result["Success"]):
+    #     return {"Success": False, "Message": "Email Does not exist"}
+
+    return db_tasks.getTasksAssigned(acc_info["Data"]["email"])
+
+
 def get_tasks_given_by(token: str, email: str):
     # check token
-    token_result = check_jwt_token(token)
+    token_result = tokens.check_jwt_token(token)
     if not token_result["Success"]:
         return {"Success": False, "Message": "No user logged in"}
 
     # check if email exists
-    db_result = getSingleUserInformation(email)
+    db_result = db.getSingleUserInformation(email)
 
     if not (db_result["Success"]):
         return {"Success": False, "Message": "Email Does not exist"}
@@ -540,8 +579,363 @@ def get_tasks_given_by(token: str, email: str):
 
 def get_all_tasks(token: str):
     # check token
-    token_result = check_jwt_token(token)
+    token_result = tokens.check_jwt_token(token)
     if not token_result["Success"]:
         return {"Success": False, "Message": "No user logged in"}
 
     return db_tasks.getAllTasks()
+
+
+def search_task(token: str, search_word: str):
+    # # check token
+    # token_result = tokens.check_jwt_token(token)
+
+    # if not token_result["Success"]:
+    #     return {"Success": False, "Message": "No user logged in"}
+
+    dummy_data = [
+        {
+            "id": "123",
+            "title": "ABC",
+            "description": "Task",
+            "deadline": "2023-09-09",
+            "progress": "Not Started",
+            "assignee": "",
+            "cost_per_hr": 10,
+            "estimation_spent_hrs": 10,
+            "actual_time_hr": 10,
+            "priority": 1,
+            "task_master": "test@test.com",
+            "labels": [],
+        }
+    ]
+    return {"Success": True, "Message": "Tasks found", "Data": dummy_data}
+
+
+def convert_date_format(date_str, in_format, out_format):
+    # Converts a date string from one format to another
+    date_obj = datetime.strptime(date_str, in_format)
+    return date_obj.strftime(out_format)
+
+
+def process_tasks(temp, start_date, end_date):
+    tasks = []
+    for i in temp:
+        created_date_str = convert_date_format(
+            i.get("created", ""), "%d-%m-%Y", "%Y-%m-%d"
+        )
+        deadline_date_str = convert_date_format(
+            i.get("deadline", "").split(" ")[0], "%Y-%m-%d", "%Y-%m-%d"
+        )
+
+        # Convert to datetime for comparison
+        created_date = datetime.strptime(created_date_str, "%Y-%m-%d")
+
+        # Check if created_date falls in the range
+        if start_date <= created_date <= end_date:
+            task_info = {
+                "id": i.get("task_id", ""),
+                "title": i.get("title", ""),
+                "description": i.get("description", ""),
+                "created": created_date_str,
+                "deadline": deadline_date_str,
+                "progress": i.get("progress", ""),
+                "assignee": i.get("assignee", ""),
+                "cost_per_hr": i.get("cost_per_hr", ""),
+                "estimation_spent_hrs": i.get("estimation_spent_hrs", ""),
+                "actual_time_hr": i.get("actual_time_hr", ""),
+                "priority": i.get("priority", ""),
+                "task_master": i.get("task_master", ""),
+                "labels": i.get("labels", []),
+            }
+            tasks.append(task_info)
+    return tasks
+
+
+def generate_report(token, start_date_str, end_date_str):
+    valid_jwt = tokens.check_jwt_token(token)
+
+    if not valid_jwt["Success"]:
+        return {"Success": False, "Message": "User not logged in"}
+
+    email = valid_jwt["Data"]["email"]
+    task_master_tasks = db_tasks.getTasksGiven(email)
+    assignee_tasks = db_tasks.getTasksAssigned(email)
+
+    if not task_master_tasks["Success"] and not assignee_tasks["Success"]:
+        return {"Success": False, "Message": "No tasks found"}
+
+    tasks = {}
+
+    start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
+    end_date = datetime.strptime(end_date_str, "%Y-%m-%d")
+
+    if task_master_tasks["Success"]:
+        tasks["task_master"] = process_tasks(
+            task_master_tasks["Data"], start_date, end_date
+        )
+
+    if assignee_tasks["Success"]:
+        tasks["assignee"] = process_tasks(assignee_tasks["Data"], start_date, end_date)
+
+    # Generating the actual PDF
+
+    pdf_file_name = "task_report.pdf"
+    doc = SimpleDocTemplate(pdf_file_name, pagesize=landscape(letter))
+
+    story = []
+    table_style = TableStyle(
+        [
+            ("BACKGROUND", (0, 0), (-1, 0), colors.grey),
+            ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),
+            ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+            (
+                "FONTSIZE",
+                (0, 0),
+                (-1, 0),
+                10,
+            ),  # Reduce the font size to fit more content
+            ("BOTTOMPADDING", (0, 0), (-1, 0), 12),
+            ("BACKGROUND", (0, 1), (-1, -1), colors.beige),
+            ("GRID", (0, 0), (-1, -1), 1, colors.black),
+            ("VALIGN", (0, 0), (-1, -1), "TOP"),  # Align text to top to fit more rows
+            ("INNERGRID", (0, 0), (-1, -1), 0.5, colors.grey),
+            ("BOX", (0, 0), (-1, -1), 0.5, colors.black),
+        ]
+    )
+    styles = getSampleStyleSheet()
+    title_style = styles["Title"]
+    title = Paragraph("Task Report", title_style)
+    story.append(title)
+    story.append(Spacer(1, 12))
+
+    title2 = Paragraph("As TaskMaster", title_style)
+    story.append(title2)
+    story.append(Spacer(1, 12))
+
+    plot_functions = [
+        plot_priority_vs_time,
+        plot_priority_distribution,
+        plot_estimated_vs_actual_time,
+    ]
+
+    for i, plot_func in enumerate(plot_functions):
+        plot = plot_func(tasks["task_master"])
+        plot_file_name = f"./plot_{i}.png"
+        save_plot_to_image(plot, plot_file_name)
+        time.sleep(3)
+        img = Image(plot_file_name, width=500, height=300)
+        story.append(img)
+
+    data = [
+        [
+            "Task ID",
+            "Title",
+            "Description",
+            "Created",
+            "Deadline",
+            "Progress",
+            "Assignee",
+            "Cost/H",
+            "Estd. Time",
+            "Actual Time",
+            "Priority",
+        ]
+    ]  # This is the header row
+
+    for item in tasks["task_master"]:
+        data.append(
+            [
+                item.get("id", ""),
+                item.get("title", ""),
+                item.get("description", ""),
+                item.get("created", ""),
+                item.get("deadline", ""),
+                item.get("progress", ""),
+                item.get("assignee", ""),
+                item.get("cost_per_hr", ""),
+                item.get("estimation_spent_hrs", ""),
+                item.get("actual_time_hr", ""),
+                item.get("priority", ""),
+            ]
+        )
+
+    # Create the table
+    t = Table(data)
+
+    # Apply styles to the table
+    t.setStyle(table_style)
+
+    # Add table to story
+    story.append(t)
+    story.append(PageBreak())
+
+    title2 = Paragraph("As Assignee", title_style)
+    story.append(title2)
+    story.append(Spacer(1, 6))
+
+    plot_functions = [
+        plot_priority_vs_time,
+        plot_priority_distribution,
+        plot_estimated_vs_actual_time,
+    ]
+
+    for i, plot_func in enumerate(plot_functions):
+        plot = plot_func(tasks["assignee"])
+        plot_file_name = f"./plot_{i}.png"
+        save_plot_to_image(plot, plot_file_name)
+        time.sleep(3)
+        img = Image(plot_file_name, width=500, height=300)
+        story.append(img)
+
+    data = [
+        [
+            "Task ID",
+            "Title",
+            "Description",
+            "Created",
+            "Deadline",
+            "Progress",
+            "Cost/H",
+            "Estd. Time",
+            "Actual Time",
+            "Priority",
+            "Task Master",
+        ]
+    ]  # This is the header row
+
+    for item in tasks["assignee"]:
+        data.append(
+            [
+                item.get("id", ""),
+                item.get("title", ""),
+                item.get("description", ""),
+                item.get("created", ""),
+                item.get("deadline", ""),
+                item.get("progress", ""),
+                item.get("cost_per_hr", ""),
+                item.get("estimation_spent_hrs", ""),
+                item.get("actual_time_hr", ""),
+                item.get("priority", ""),
+                item.get("task_master", ""),
+            ]
+        )
+
+    # Create the table
+    t = Table(data)
+
+    # Apply styles to the table
+    t.setStyle(table_style)
+
+    # Add table to story
+    story.append(t)
+
+    doc.build(story)
+    print(f"PDF generated successfully: {pdf_file_name}")
+    send_email(email, pdf_file_name)
+    return {"Success": True, "Message": "Done!"}
+
+
+def save_plot_to_image(plot, file_name):
+    image_bytes = pio.to_image(plot, format="png")
+    with open(file_name, "wb") as f:
+        f.write(image_bytes)
+
+
+def plot_priority_vs_time(tasks):
+    priority_time = {1: 0, 2: 0, 3: 0}
+    for task in tasks:
+        priority = task.get("priority")
+        time = float(task.get("actual_time_hr", 0))
+        priority_time[priority] += time
+
+    labels = ["Low", "Medium", "High"]
+    values = list(priority_time.values())
+
+    fig = go.Figure(data=[go.Pie(labels=labels, values=values, hole=0.3)])
+    fig.update_layout(title_text="Breakdown of actual time by task priority")
+    return fig
+
+
+def plot_priority_distribution(tasks):
+    priority_count = {1: 0, 2: 0, 3: 0}
+    for task in tasks:
+        priority = task.get("priority")
+        priority_count[priority] += 1
+
+    labels = ["Low", "Medium", "High"]
+    values = list(priority_count.values())
+
+    fig = go.Figure(data=[go.Pie(labels=labels, values=values, hole=0.3)])
+    fig.update_layout(title_text="Distribution of tasks by priority")
+    return fig
+
+
+def plot_estimated_vs_actual_time(tasks):
+    within_estimated, not_within_estimated = 0, 0
+    for task in tasks:
+        estimated_time = float(task.get("estimation_spent_hrs", 0))
+        actual_time = float(task.get("actual_time_hr", 0))
+        if actual_time <= estimated_time:
+            within_estimated += 1
+        else:
+            not_within_estimated += 1
+
+    labels = ["Within Estimated Time", "Not Within Estimated Time"]
+    values = [within_estimated, not_within_estimated]
+
+    fig = go.Figure(data=[go.Pie(labels=labels, values=values, hole=0.3)])
+    fig.update_layout(
+        title_text="Tasks completed within estimated time vs those which were not"
+    )
+    return fig
+
+
+def send_email(email, pdf_file_name):
+    # Create a new thread to send the email
+    def run():
+        # Your email credentials
+        username = "zombies3900w11a@gmx.com"
+        password = "wEvZ28Xm9b3uviN"
+        smtp_server = "mail.gmx.com"
+        smtp_port = 587
+
+        # Creating the message
+        msg = MIMEMultipart()
+        msg["From"] = username
+        msg["To"] = email
+        msg["Subject"] = "Your Task Report"
+
+        # The actual message
+        message = "Please find attached your task report."
+        msg.attach(MIMEText(message, "plain"))
+
+        # Attach the PDF
+        with open(pdf_file_name, "rb") as attachment:
+            part = MIMEBase("application", "octet-stream")
+            part.set_payload(attachment.read())
+
+        encoders.encode_base64(part)
+        part.add_header(
+            "Content-Disposition",
+            f"attachment; filename= {pdf_file_name}",
+        )
+
+        msg.attach(part)
+
+        # Login and send the email
+        try:
+            server = smtplib.SMTP(smtp_server, smtp_port)
+            server.starttls()
+            server.login(username, password)
+            text = msg.as_string()
+            server.sendmail(username, email, text)
+            server.quit()
+            print("Email sent successfully!")
+        except Exception as e:
+            print(f"Error: {e}")
+
+    # Start the thread
+    thread = Thread(target=run)
+    thread.start()

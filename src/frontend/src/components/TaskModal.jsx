@@ -21,6 +21,7 @@ import {
   InputGroup,
   Textarea,
   Text,
+  Tooltip,
 } from '@chakra-ui/react';
 import { AddIcon, CloseIcon } from '@chakra-ui/icons';
 
@@ -31,6 +32,7 @@ const TaskModal = props => {
     task,
     onSubmit,
     userFullName,
+    userEmail,
     assignedTo,
     setAssignedTo,
     connections,
@@ -49,16 +51,9 @@ const TaskModal = props => {
     timeEstimate,
     setTimeEstimate,
     actualTimeSpent,
+    setActualTimeSpent,
     resetActualTime,
   } = props;
-
-  const [actualTime, setActualTime] = useState(actualTimeSpent);
-
-  // Function to handle changes in the actual time spent input
-  const handleActualTimeChange = e => {
-    const actualTimeSpent = e.target.value;
-    setActualTime(actualTimeSpent);
-  };
 
   const handleSubmit = e => {
     e.preventDefault();
@@ -144,7 +139,14 @@ const TaskModal = props => {
                 value={timeEstimate}
                 onChange={e => setTimeEstimate(e.target.value)}
               />
-
+              <Tooltip label="Recommended only to be filled once the task is complete">
+                <Input
+                  type="number"
+                  placeholder="Actual Time (in hours)"
+                  value={actualTimeSpent}
+                  onChange={e => setActualTimeSpent(e.target.value)}
+                />
+              </Tooltip>
               <Stack spacing={2}>
                 {tags.map((tag, index) => (
                   <Flex key={index}>
@@ -176,47 +178,54 @@ const TaskModal = props => {
                 )}
               </Stack>
 
-              <Select
-                placeholder="Assign To"
-                value={assignedTo}
-                onChange={e => setAssignedTo(e.target.value)}
-              >
-                <option value="">Select Assignee</option>
-                <option value={userFullName}>{userFullName}</option>
-                <option value="Alice">Alice</option>
-                <option value="Bob">Bob</option>
-                <option value="Charlie">Charlie</option>
-                {/* <option value="">Select Assignee</option> */}
-
-                {/* {connections.map(connection => (
-                  <option
-                    key={connection.username}
-                    value={connection.first_name}
-                  >
-                    {connection.first_name}
+              {/* {console.log('task modal: ' + connections)} */}
+              {connections && connections.size > 0 && (
+                <Select
+                  placeholder="Assign To"
+                  value={assignedTo}
+                  onChange={e => setAssignedTo(e.target.value)}
+                  size="sm"
+                >
+                  <option value={userEmail}>
+                    {userFullName} {'(Yourself)'}
                   </option>
-                ))} */}
-
-                {/* {console.log('task modal: ' + connections)} */}
-                {/* {connections && connections.length > 0 ? (
-                  <Select
-                    value={assignedTo}
-                    onChange={e => setAssignedTo(e.target.value)}
-                    size="sm"
-                  >
-                    <option value="">Select Assignee</option>
-                    {connections.map(connection => (
-                      <option key={connection.id} value={connection.name}>
-                        {connection.name}
-                      </option>
-                    ))}
-                  </Select>
-                ) : (
-                  <Text fontSize="sm" color="gray.500">
-                    No connections available.
-                  </Text>
-                )} */}
-              </Select>
+                  {connections.connections.map(connection => (
+                    <option key={connection.id} value={connection.email}>
+                      {connection.first_name} {connection.last_name}
+                    </option>
+                  ))}
+                </Select>
+              )}
+              {connections && (
+                <Select
+                  placeholder="Assign To"
+                  value={assignedTo}
+                  onChange={e => setAssignedTo(e.target.value)}
+                  size="sm"
+                >
+                  <option value={userEmail}>
+                    {userFullName} {'(Yourself)'}
+                  </option>
+                  {connections.map(connection => (
+                    <option key={connection.id} value={connection.email}>
+                      {connection.first_name} {connection.last_name}
+                    </option>
+                  ))}
+                </Select>
+              )}
+              {!connections && (
+                <Select
+                  placeholder="Assign To"
+                  value={assignedTo}
+                  onChange={e => setAssignedTo(e.target.value)}
+                  size="sm"
+                >
+                  <option value={userEmail}>
+                    {userFullName} {'(Yourself)'}
+                  </option>
+                </Select>
+              )}
+              {/* {console.log('A: ' + assignedTo)} */}
             </Stack>
           </ModalBody>
           <ModalFooter>

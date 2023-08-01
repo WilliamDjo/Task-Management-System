@@ -1,16 +1,16 @@
 import hashlib
-import sys
-import os
 import re
+import os
+import sys
+
 
 parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_folder)
-
-from database import db
+# from src.database import db_helper
+from database import db, db_tasks, db_helper
 import tokens
 import password
 
-active_users = {}
 
 """
 Generates a SHA-256 hash of the provided data.
@@ -22,33 +22,6 @@ def generate_password_hash(data):
     sha256_hash = hashlib.sha256()
     sha256_hash.update(data.encode("utf-8"))
     return sha256_hash.hexdigest()
-
-
-"""
-    Removes the user with the specified email from the active users.
-
-    Args:
-        email (str): The email of the user to be removed.
-"""
-
-
-def remove_active_user(email):
-    global active_users
-    if email in active_users:
-        del active_users[email]
-
-
-"""
-Adds the user with the specified email to the active users dictionary.
-
-    Args:
-        email (str): The email of the user to be added.
-"""
-
-
-def add_active_user(email):
-    global active_users
-    active_users[email] = tokens.generate_jwt_token(email)
 
 
 """Represents user information.
@@ -179,8 +152,6 @@ def is_name_valid(name):
 
 
 def account_register(first_name, last_name, username, email, password, sys_admin):
-    global active_users
-
     # Check if name is valid:
     if (not is_name_valid(first_name)) or (not is_name_valid(last_name)):
         return {
@@ -236,9 +207,6 @@ def account_register(first_name, last_name, username, email, password, sys_admin
 
     login_token = tokens.generate_jwt_token(email)
 
-    # User.add_active_user(email)
-    active_users[email] = login_token  # Make a function for this HERE
-
     db.addNewUser(new_user_dict)
     del new_user
     return {
@@ -262,9 +230,8 @@ Logs in a user with the provided email and password.
 
 
 def account_login(email, password):
-    global active_users
-
     # Check if email/pw combo matches || Existence is checked in the databse
+
     password = generate_password_hash(password)
     email_password_match = db.isValidUser(email, password)
 
@@ -279,8 +246,6 @@ def account_login(email, password):
     userInfo = email_password_match["User"]
     # Return token
     login_token = tokens.generate_jwt_token(email)
-
-    active_users[email] = login_token
 
     return {
         "Success": True,
@@ -302,22 +267,18 @@ def account_login(email, password):
 
 
 def account_logout(token):
-    global active_users
     valid_jwt = tokens.check_jwt_token(token)
 
     if not valid_jwt["Success"]:
         return {"Success": False, "Message": "Logout unsuccessful"}
 
-    email = valid_jwt["Data"]["email"]
-    if email in active_users:
-        del active_users[email]
-
-    return {"Success": True, "Message": "Logout Successful"}
+    logout_success = tokens.remove_jwt_token(token)
+    if logout_success["Success"]:
+        return {"Success": True, "Message": "Logout Successful"}
+    return {"Success": False, "Message": "Logout unsuccessful"}
 
 
 def update_username(new_username, token):
-    global active_users
-
     if not is_username_valid(new_username)["Success"]:
         return {"Success": False, "Message": "Username not valid "}
 
@@ -328,9 +289,6 @@ def update_username(new_username, token):
 
     email = valid_jwt["Data"]["email"]
 
-    if email not in active_users:
-        return {"Success": False, "Message": "User not active"}
-
     new_user_dict = {"user": new_username}
 
     # Update step
@@ -340,8 +298,6 @@ def update_username(new_username, token):
 
 
 def update_password_account(new_password, token):
-    global active_users
-
     if not is_password_valid(new_password):
         return {"Success": False, "Message": "Password not valid "}
 
@@ -351,9 +307,6 @@ def update_password_account(new_password, token):
         return {"Success": False, "Message": "user not logged in"}
 
     email = valid_jwt["Data"]["email"]
-
-    if email not in active_users:
-        return {"Success": False, "Message": "User not active"}
 
     new_user_dict = {"password": generate_password_hash(new_password)}
 
@@ -367,8 +320,6 @@ Update email on backened
 
 
 def update_email_account(new_email, token):
-    global active_users
-
     if not is_email_valid(new_email):
         return {"Success": False, "Message": "Email Does not exist", "Token": ""}
 
@@ -379,18 +330,12 @@ def update_email_account(new_email, token):
 
     email = valid_jwt["Data"]["email"]
 
-    if email not in active_users:
-        return {"Success": False, "Message": "User not active", "Token": ""}
-
     new_user_dict = {"email": new_email}
 
     # new token
     new_token = tokens.generate_jwt_token(new_email)
 
     db.updateUserInfo(email, new_user_dict)
-
-    remove_active_user(email)
-    active_users[new_email] = new_token
 
     return {"Success": True, "Message": "Email Changed", "Token": new_token}
 
@@ -401,17 +346,12 @@ Update notfication
 
 
 def update_notificiation_set(bool_val, token):
-    global active_users
-
     valid_jwt = tokens.check_jwt_token(token)
 
     if not valid_jwt["Success"]:
         return {"Success": False, "Message": "user not logged in"}
 
     email = valid_jwt["Data"]["email"]
-
-    if email not in active_users:
-        return {"Success": False, "Message": "User not active"}
 
     new_dict = {"notifications": bool_val}
 
@@ -420,15 +360,16 @@ def update_notificiation_set(bool_val, token):
 
 
 def getAccountInfo(token):
-    global active_users
-
     valid_jwt = tokens.check_jwt_token(token)
     if not valid_jwt["Success"]:
         return {"Success": False, "Message": "User not logged in", "Data": ""}
     email = valid_jwt["Data"]["email"]
+
     userInformation = db.getSingleUserInformation(email)
     data = userInformation["Data"]
-    del data["connections"]
+
+    # todo: rem
+    # del data["connections"]
     return {
         "Success": True,
         "Message": "Account info retrieved",
@@ -437,8 +378,6 @@ def getAccountInfo(token):
 
 
 def getAllAccounts(token):
-    global active_users
-
     valid_jwt = tokens.check_jwt_token(token)
     if not valid_jwt["Success"]:
         return {"Success": False, "Message": "Error!", "Data": ""}
@@ -477,8 +416,6 @@ def admin_reset_pw(token, new_password, reset_email):
     new_user_dict = {"password": generate_password_hash(new_password)}
     result = db.updateUserInfo(reset_email, new_user_dict)
 
-    remove_active_user(reset_email)
-
     return {"Success": True, "Message": "Admin reset the password"}
 
 
@@ -492,7 +429,6 @@ def admin_delete_acc(token, email_to_delete):
     if not userInformation["Data"]["SystemAdmin"]:
         return {"Success": False, "Message": "Not an admin"}
 
-    remove_active_user(email_to_delete)
     result = db.deleteUser(email_to_delete)
 
     return {"Success": True, "Message": "User deleted"}
@@ -555,6 +491,35 @@ def add_sys_admin():
     return account_register(first_name, last_name, username, email, password, sys_admin)
 
 
-if __name__ == "__main__":
-    result = add_sys_admin()
-    print(result)
+"""
+Workload Computation
+"""
+
+
+def get_workload(token, email):
+    # check active token
+    # TODO: CHECK WHAT"SUP
+    # valid_jwt = tokens.check_jwt_token(token)
+    # if not valid_jwt["Success"]:
+    #     return {"Success": False, "Message": "Error in active token!"}
+
+    account = db.getSingleUserInformation(email)
+
+    curr_workload = account["Data"]["workload"]
+    return {"Success": True, "Data": curr_workload}
+
+
+# NOT NEEDED
+def get_workload_curr(token):
+    # check active token
+    # TODO: CHECK WHAT"SUP
+    # valid_jwt = tokens.check_jwt_token(token)
+    # if not valid_jwt["Success"]:
+    #     return {"Success": False, "Message": "Error in active token!"}
+
+    user_info = getAccountInfo(token)
+
+    if not user_info["Success"]:
+        return {"Success": False, "Message": "User not found"}
+
+    result = {"Success": True, "Data": user_info["Data"]["workload"]}

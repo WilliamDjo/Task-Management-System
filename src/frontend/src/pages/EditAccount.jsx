@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  AspectRatio,
   Box,
   Button,
   ButtonGroup,
@@ -9,15 +8,12 @@ import {
   Divider,
   FormControl,
   FormLabel,
-  HStack,
   Heading,
-  Image,
   Input,
   Stack,
   useToast,
 } from '@chakra-ui/react';
 
-import logo from '../logo.svg';
 import ProfileBar from '../components/ProfileBar';
 import PasswordBar from '../components/PasswordBar/PasswordBar';
 import { fetchBackend } from '../fetch';
@@ -160,16 +156,6 @@ const EditAccount = () => {
     }
     fetchBackend('/update/notifications', 'PUT', body, toast, successEmailNotifications);
   }
-
-  const handleSubmitImage = () => {
-    // Not yet fully implemented
-    toast({
-      title: 'Profile image successfully changed.',
-      status: 'success',
-      duration: 5000,
-      isClosable: true,
-    });
-  };
 
   return (
     <ProfileBar updateProfile>
@@ -321,36 +307,6 @@ const EditAccount = () => {
                 </Button>
                 </ButtonGroup>
               </Box>
-              <Divider />
-              <Box>
-                <FormControl>
-                  <FormLabel>Update Profile Image:</FormLabel>
-                  <HStack height="100px">
-                    <FormLabel>
-                      <Box>
-                        <AspectRatio ratio={1} minW="100px">
-                          <Image src={logo} borderRadius="full"></Image>
-                        </AspectRatio>
-                      </Box>
-                    </FormLabel>
-                    <Divider orientation="vertical" margin="1" />
-                    <Input
-                      type="file"
-                      height="100px"
-                      accept=".png,.jpeg,.jpg"
-                    />
-                  </HStack>
-                </FormControl>
-              </Box>
-              <Button
-                loadingText="Submitting"
-                bg={'blue.400'}
-                color={'white'}
-                _hover={{ bg: 'blue.500' }}
-                onClick={handleSubmitImage}
-              >
-                Submit
-              </Button>
             </Stack>
           </CardBody>
         </Card>

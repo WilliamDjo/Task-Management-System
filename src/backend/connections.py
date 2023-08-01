@@ -1,15 +1,12 @@
-import hashlib
-import sys
 import os
-import re
+import sys
 
+# # Try removing this maybe?
 parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_folder)
 
 from database import db
 import tokens
-import password
-import account
 from database import db_tasks
 
 """
@@ -26,10 +23,12 @@ def getPendingConnections(token):
     email = valid_jwt["Data"]["email"]
 
     connections = db.getUserConnections(email)
-    pendingConnections = (
-        connections["Connections"]["connectionRequests"]
-        + connections["Connections"]["connectionReceived"]
-    )
+    # pendingConnections = (
+    #     connections["Connections"]["connectionRequests"]
+    #     + connections["Connections"]["connectionReceived"]
+    # )
+
+    pendingConnections = connections["Connections"]["connectionReceived"]
 
     to_return = []
     for i in pendingConnections:
@@ -42,7 +41,7 @@ def getPendingConnections(token):
                 "username": userInfo["Data"]["username"],
             }
         )
-    print(to_return)
+    # print(to_return)
     return {
         "Success": True,
         "Message": "Pending Connections Retrieved",
@@ -72,6 +71,7 @@ def getUserConnections(token):
                     "last_name": userInfo["Data"]["last_name"],
                     "email": userInfo["Data"]["email"],
                     "username": userInfo["Data"]["username"],
+                    "workload": userInfo["Data"]["workload"],
                 }
             )
     return {"Success": True, "Message": "Connections Retrieved", "Data": to_return}
@@ -141,7 +141,12 @@ def getConnections(token, email_to_see):
         if all_tasks["Success"]:
             for i in all_tasks["Data"]:
                 tasks.append(
-                    {"id": i["id"], "title": i["title"], "deadline": i["deadline"]}
+                    {
+                        "id": i["id"],
+                        "title": i["title"],
+                        "deadline": i["deadline"],
+                        "workload": i["workload"],
+                    }
                 )
             tasks = sorted(tasks, key=lambda i: (i["deadline"] is None, i["deadline"]))
 
