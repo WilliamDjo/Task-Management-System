@@ -421,7 +421,7 @@ def server_get_tasks_assigned_to_current():
     else:
         return {"Success": False, "Message": "No token provided"}, 401
 
-    result = get_tasks_assigned_to_curr(token)
+    result = task_sys.get_tasks_assigned_to_curr(token)
 
     result = task_sys.get_tasks_assigned_to_curr(token)
     return jsonify(result)
