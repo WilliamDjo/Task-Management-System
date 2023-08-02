@@ -71,12 +71,16 @@ const SearchEverything = () => {
       }
 
       const successGetProfile = data => {
+        const successGetConnections = (data, email) => {
+          setConnections(data.Data);
+          fetchTasks(email, data.Data);
+          setIsLoading(false);
+        }
         setName(`${data.Data.first_name} ${data.Data.last_name}`);
         setUsername(data.Data.username);
         setEmail(data.Data.email);
-        setConnections(data.Data.connections.connections);
-        fetchTasks(data.Data.email, data.Data.connections.connections);
-        setIsLoading(false);
+
+        fetchBackend('/user/connections', 'POST', { token }, toast, (data2) => successGetConnections(data2, data.Data.email))
       };
 
       fetchBackend(
