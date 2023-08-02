@@ -27,6 +27,7 @@ import { AddIcon, CloseIcon } from '@chakra-ui/icons';
 
 const TaskModal = props => {
   const {
+    id,
     isOpen,
     onClose,
     task,
@@ -52,7 +53,7 @@ const TaskModal = props => {
     setTimeEstimate,
     actualTimeSpent,
     setActualTimeSpent,
-    resetActualTime,
+    isAdmin,
   } = props;
 
   const handleSubmit = e => {
@@ -78,21 +79,11 @@ const TaskModal = props => {
     setTags(updatedTags);
   };
 
-  // Function to reset actual time spent when progress changes to 'To Do' or 'In Progress'
-  useEffect(() => {
-    if (
-      task &&
-      (task.progress === 'To Do' || task.progress === 'In Progress')
-    ) {
-      resetActualTime();
-    }
-  }, [task, resetActualTime]);
-
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="lg">
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>{task ? 'Edit Task' : 'Add Task'}</ModalHeader>
+        <ModalHeader>{task ? `Edit - ${id}` : 'Add Task'}</ModalHeader>
         <ModalCloseButton />
         <form onSubmit={handleSubmit}>
           <ModalBody>
@@ -179,7 +170,8 @@ const TaskModal = props => {
               </Stack>
 
               {/* {console.log('task modal: ' + connections)} */}
-              {connections && connections.size > 0 && (
+
+              {/* {connections && connections.size > 0 && (
                 <Select
                   placeholder="Assign To"
                   value={assignedTo}
@@ -195,8 +187,8 @@ const TaskModal = props => {
                     </option>
                   ))}
                 </Select>
-              )}
-              {connections && (
+              )} */}
+              {!isAdmin && connections && (
                 <Select
                   placeholder="Assign To"
                   value={assignedTo}
@@ -213,7 +205,7 @@ const TaskModal = props => {
                   ))}
                 </Select>
               )}
-              {!connections && (
+              {!isAdmin && !connections && (
                 <Select
                   placeholder="Assign To"
                   value={assignedTo}

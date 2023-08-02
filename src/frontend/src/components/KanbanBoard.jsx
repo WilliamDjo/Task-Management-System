@@ -1,3 +1,4 @@
+/* eslint-disable indent */
 /* eslint-disable multiline-ternary */
 /* eslint-disable object-shorthand */
 /* eslint-disable no-unused-vars */
@@ -7,24 +8,8 @@ import React, { useState, useEffect } from 'react';
 import {
   Box,
   Flex,
-  //   Grid,
-  //   GridItem,
   Heading,
-  //   IconButton,
-  //   Input,
-  //   Modal,
-  //   ModalBody,
-  //   ModalCloseButton,
-  //   ModalContent,
-  //   ModalFooter,
-  //   ModalHeader,
-  //   ModalOverlay,
-  //   Select,
-  //   Spacer,
   Stack,
-  //   Tag,
-  //   Text,
-  //   Textarea,
   useDisclosure,
   useToast,
   Spinner,
@@ -39,11 +24,12 @@ const KanbanBoard = () => {
   const [name, setName] = React.useState('Name');
   const [username, setUsername] = React.useState('username');
   const [email, setEmail] = React.useState('email@example.com');
+  const [id, setID] = useState('');
   //   const [connections, setConnections] = React.useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingTwo, setIsLoadingTwo] = useState(true);
   const [isLoadingThree, setIsLoadingThree] = useState(true);
-  const [isLoadingFour, setIsLoadingFour] = useState(true);
+
   const [organization, setOrganization] = React.useState('Example Company');
   const [emailNotifications, setEmailNotifications] = React.useState(true);
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -63,14 +49,10 @@ const KanbanBoard = () => {
   const [costPerHour, setCostPerHour] = useState(''); // New state for cost per hour
   const [timeEstimate, setTimeEstimate] = useState(''); // New state for time estimate
   const [actualTimeSpent, setActualTimeSpent] = useState('');
-
-  // Function to reset the actual time spent in TaskModal
-  const handleResetActualTime = () => {
-    setActualTimeSpent(0);
-  };
+  const [isAdmin, setIsAdmin] = useState(false);
 
   // Function to fetch user's connections from the backend
-  const fetchConnections = email => {
+  const fetchConnections = (email, isAdmin) => {
     const successGetConnections = data => {
       setConnections(data.Data);
 
@@ -83,7 +65,7 @@ const KanbanBoard = () => {
       // });
       console.log('email ' + email);
       console.log('connections ' + JSON.stringify(data.Data));
-      fetchTasks(email, data.Data);
+      fetchTasks(email, data.Data, isAdmin);
       setIsLoading(false);
     };
     const token = localStorage.getItem('token');
@@ -103,7 +85,7 @@ const KanbanBoard = () => {
     // console.log('baba ' + connections);
   };
 
-  const fetchTasks = (email, connections) => {
+  const fetchTasks = (email, connections, isAdmin) => {
     try {
       // Retrieve the token from the localStorage
       const token = localStorage.getItem('token');
@@ -112,20 +94,25 @@ const KanbanBoard = () => {
         // const newTasks = [...data.Data];
         // Creating a Set for easier lookup
         console.log('con ' + connections);
+
         const connectionSet = new Set(connections.map(c => c.email));
+        if (!isAdmin) {
+          // Filter the tasks
+          const filteredTasks = data.Data.filter(task => {
+            return (
+              task.assignee === email ||
+              connectionSet.has(task.assignee) ||
+              task.task_master === email ||
+              connectionSet.has(task.task_master)
+            );
+          });
 
-        // Filter the tasks
-        const filteredTasks = data.Data.filter(task => {
-          return (
-            task.assignee === email ||
-            connectionSet.has(task.assignee) ||
-            task.task_master === email ||
-            connectionSet.has(task.task_master)
-          );
-        });
-
-        // Now filteredTasks array contains only the tasks that matches your condition
-        setTasks(filteredTasks);
+          // Now filteredTasks array contains only the tasks that matches your condition
+          setTasks(filteredTasks);
+        } else {
+          setTasks(data.Data);
+        }
+        setIsLoadingTwo(false);
       };
 
       const body = {
@@ -160,11 +147,13 @@ const KanbanBoard = () => {
         setName(`${data.Data.first_name} ${data.Data.last_name}`);
         setUsername(data.Data.username);
         setOrganization(data.Data.organization);
+        setIsAdmin(data.Data.SystemAdmin);
+        console.log('Sys ' + data.Data.SystemAdmin);
         // setLoaded(true);
         // console.log(data);
         // fetchAllTasks(data.Data.email);
         setIsLoadingThree(false);
-        fetchConnections(data.Data.email);
+        fetchConnections(data.Data.email, data.Data.SystemAdmin);
       };
 
       fetchBackend(
@@ -265,7 +254,7 @@ const KanbanBoard = () => {
         // For the case when we're creating a new task
       } else {
         const successCreateTask = data => {
-          fetchTasks(email, connections);
+          fetchTasks(email, connections, isAdmin);
         };
 
         fetchBackend('/task/create', 'POST', task, toast, successCreateTask);
@@ -312,7 +301,7 @@ const KanbanBoard = () => {
     const onSuccess = data => {
       // toast({ title: data });
       console.log('Delete Success => ' + JSON.stringify(updatedTasks));
-      fetchTasks(email, connections);
+      fetchTasks(email, connections, isAdmin);
     };
     const onFailure = () => {
       console.log('Failed to remove task');
@@ -386,6 +375,7 @@ const KanbanBoard = () => {
       //   console.log('editing: ' + taskToEdit.progress);
       setEditingTask(taskToEdit);
       setNewTask(taskToEdit.title);
+      setID(taskToEdit.id);
       setDescription(taskToEdit.description);
       setAssignedTo(taskToEdit.assignee);
       setDeadline(taskToEdit.deadline);
@@ -418,128 +408,131 @@ const KanbanBoard = () => {
     onClose();
   };
 
-  return isLoading && isLoadingTwo && isLoadingThree && isLoadingFour ? (
+  return isLoading && isLoadingTwo && isLoadingThree ? (
     <Spinner />
   ) : (
-    <Box p={4}>
-      <Heading as="h1" mb={4}>
-        Zombies Board
-      </Heading>
-      <Flex justify="space-between">
-        {' '}
-        {/* Use Flex container with row direction */}
-        <Box flex={1}>
-          <Flex direction="column" align="center">
-            <Heading size="md" mb={4}>
-              To Do
-            </Heading>
-            <Stack spacing={4} w="300px">
-              {tasks
-                .filter(task => task.progress === 'Not Started')
-                .map(task => (
-                  <TaskCard
-                    key={task.id}
-                    task={task}
-                    onRemove={handleRemoveTask}
-                    onEdit={handleEditTask}
-                    onStatusChange={handleStatusChange}
-                    actualTimeSpent={actualTimeSpent[task.id] || null}
-                  />
-                ))}
-            </Stack>
-            <AddTaskButton onOpen={onOpen} />
-          </Flex>
-        </Box>
-        <Box flex={1}>
-          <Flex direction="column" align="center">
-            <Heading size="md" mb={4}>
-              In Progress
-            </Heading>
-            <Stack spacing={4} w="300px">
-              {tasks
-                .filter(task => task.progress === 'In Progress')
-                .map(task => (
-                  <TaskCard
-                    key={task.id}
-                    task={task}
-                    onRemove={handleRemoveTask}
-                    onEdit={handleEditTask}
-                    onStatusChange={handleStatusChange}
-                  />
-                ))}
-            </Stack>
-          </Flex>
-        </Box>
-        <Box flex={1}>
-          <Flex direction="column" align="center">
-            <Heading size="md" mb={4}>
-              Completed
-            </Heading>
-            <Stack spacing={4} w="300px">
-              {tasks
-                .filter(task => task.progress === 'Completed')
-                .map(task => (
-                  <TaskCard
-                    key={task.id}
-                    task={task}
-                    onRemove={handleRemoveTask}
-                    onEdit={handleEditTask}
-                    onStatusChange={handleStatusChange}
-                  />
-                ))}
-            </Stack>
-          </Flex>
-        </Box>
-        <Box flex={1}>
-          <Flex direction="column" align="center">
-            <Heading size="md" mb={4}>
-              Blocked
-            </Heading>
-            <Stack spacing={4} w="300px">
-              {tasks
-                .filter(task => task.progress === 'Blocked')
-                .map(task => (
-                  <TaskCard
-                    key={task.id}
-                    task={task}
-                    onRemove={handleRemoveTask}
-                    onEdit={handleEditTask}
-                    onStatusChange={handleStatusChange}
-                  />
-                ))}
-            </Stack>
-          </Flex>
-        </Box>
-      </Flex>
-      <TaskModal
-        isOpen={isOpen}
-        onClose={handleCloseModal}
-        task={editingTask}
-        onSubmit={handleAddTask}
-        userFullName={name}
-        userEmail={email}
-        assignedTo={assignedTo}
-        setAssignedTo={setAssignedTo}
-        connections={connections} // Pass the user's connections to the modal
-        newTask={newTask}
-        setNewTask={setNewTask}
-        description={description}
-        setDescription={setDescription}
-        deadline={deadline}
-        setDeadline={setDeadline}
-        tags={tags}
-        setTags={setTags}
-        priority={priority}
-        setPriority={setPriority}
-        costPerHour={costPerHour}
-        setCostPerHour={setCostPerHour}
-        timeEstimate={timeEstimate}
-        setTimeEstimate={setTimeEstimate}
-        actualTimeSpent={actualTimeSpent}
-        setActualTimeSpent={setActualTimeSpent}
-        resetActualTime={handleResetActualTime}
-      />
-    </Box>
+    <div style={{ overflowX: 'auto' }}>
+      <Box p={4}>
+        <Heading as="h1" mb={4}>
+          Zombies Board
+        </Heading>
+        <Flex justify="space-between">
+          {' '}
+          {/* Use Flex container with row direction */}
+          <Box flex={1}>
+            <Flex direction="column" align="center">
+              <Heading size="md" mb={4}>
+                To Do
+              </Heading>
+              <Stack spacing={4} w="300px">
+                {tasks
+                  .filter(task => task.progress === 'Not Started')
+                  .map(task => (
+                    <TaskCard
+                      key={task.id}
+                      task={task}
+                      onRemove={handleRemoveTask}
+                      onEdit={handleEditTask}
+                      onStatusChange={handleStatusChange}
+                      actualTimeSpent={actualTimeSpent[task.id] || null}
+                    />
+                  ))}
+              </Stack>
+              <AddTaskButton onOpen={onOpen} />
+            </Flex>
+          </Box>
+          <Box flex={1}>
+            <Flex direction="column" align="center">
+              <Heading size="md" mb={4}>
+                In Progress
+              </Heading>
+              <Stack spacing={4} w="300px">
+                {tasks
+                  .filter(task => task.progress === 'In Progress')
+                  .map(task => (
+                    <TaskCard
+                      key={task.id}
+                      task={task}
+                      onRemove={handleRemoveTask}
+                      onEdit={handleEditTask}
+                      onStatusChange={handleStatusChange}
+                    />
+                  ))}
+              </Stack>
+            </Flex>
+          </Box>
+          <Box flex={1}>
+            <Flex direction="column" align="center">
+              <Heading size="md" mb={4}>
+                Completed
+              </Heading>
+              <Stack spacing={4} w="300px">
+                {tasks
+                  .filter(task => task.progress === 'Completed')
+                  .map(task => (
+                    <TaskCard
+                      key={task.id}
+                      task={task}
+                      onRemove={handleRemoveTask}
+                      onEdit={handleEditTask}
+                      onStatusChange={handleStatusChange}
+                    />
+                  ))}
+              </Stack>
+            </Flex>
+          </Box>
+          <Box flex={1}>
+            <Flex direction="column" align="center">
+              <Heading size="md" mb={4}>
+                Blocked
+              </Heading>
+              <Stack spacing={4} w="300px">
+                {tasks
+                  .filter(task => task.progress === 'Blocked')
+                  .map(task => (
+                    <TaskCard
+                      key={task.id}
+                      task={task}
+                      onRemove={handleRemoveTask}
+                      onEdit={handleEditTask}
+                      onStatusChange={handleStatusChange}
+                    />
+                  ))}
+              </Stack>
+            </Flex>
+          </Box>
+        </Flex>
+        <TaskModal
+          isAdmin={isAdmin}
+          isOpen={isOpen}
+          onClose={handleCloseModal}
+          task={editingTask}
+          id={id}
+          onSubmit={handleAddTask}
+          userFullName={name}
+          userEmail={email}
+          assignedTo={assignedTo}
+          setAssignedTo={setAssignedTo}
+          connections={connections} // Pass the user's connections to the modal
+          newTask={newTask}
+          setNewTask={setNewTask}
+          description={description}
+          setDescription={setDescription}
+          deadline={deadline}
+          setDeadline={setDeadline}
+          tags={tags}
+          setTags={setTags}
+          priority={priority}
+          setPriority={setPriority}
+          costPerHour={costPerHour}
+          setCostPerHour={setCostPerHour}
+          timeEstimate={timeEstimate}
+          setTimeEstimate={setTimeEstimate}
+          actualTimeSpent={actualTimeSpent}
+          setActualTimeSpent={setActualTimeSpent}
+        />
+      </Box>
+    </div>
   );
 };
 

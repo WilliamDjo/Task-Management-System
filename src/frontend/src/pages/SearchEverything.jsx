@@ -42,7 +42,8 @@ const SearchEverything = () => {
   const [name, setName] = React.useState('Name');
   const [username, setUsername] = React.useState('username');
   const [organization, setOrganization] = React.useState('Example Company');
-  const [emailNotifications, setEmailNotifications] = React.useState(true);
+  const [emailNotifications, setEmailNotifications] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [newTask, setNewTask] = useState('');
   const [description, setDescription] = useState('');
   const [assignedTo, setAssignedTo] = useState('');
@@ -75,7 +76,12 @@ const SearchEverything = () => {
         setUsername(data.Data.username);
         setEmail(data.Data.email);
         setConnections(data.Data.connections.connections);
-        fetchTasks(data.Data.email, data.Data.connections.connections);
+        setIsAdmin(data.Data.SystemAdmin);
+        fetchTasks(
+          data.Data.email,
+          data.Data.connections.connections,
+          data.Data.SystemAdmin
+        );
         setIsLoading(false);
       };
 
@@ -92,7 +98,7 @@ const SearchEverything = () => {
     }
   };
 
-  const fetchTasks = (email, connections) => {
+  const fetchTasks = (email, connections, isAdmin) => {
     try {
       // Retrieve the token from the localStorage
       const token = localStorage.getItem('token');
@@ -101,22 +107,33 @@ const SearchEverything = () => {
         // const newTasks = [...data.Data];
         // Creating a Set for easier lookup
         // console.log('con ' + connections);
-        const connectionSet = new Set(connections.map(c => c.email));
+        if (connections) {
+          const connectionSet = new Set(connections.map(c => c.email));
 
-        // Filter the tasks
-        const filteredTasks = data.Data.filter(task => {
-          return (
-            task.assignee === email ||
-            connectionSet.has(task.assignee) ||
-            task.task_master === email ||
-            connectionSet.has(task.task_master)
-          );
-        });
+          // Filter the tasks
+          const filteredTasks = data.Data.filter(task => {
+            return (
+              task.assignee === email ||
+              connectionSet.has(task.assignee) ||
+              task.task_master === email ||
+              connectionSet.has(task.task_master)
+            );
+          });
 
-        // Now filteredTasks array contains only the tasks that matches your condition
-        setTasks(filteredTasks);
+          // Now filteredTasks array contains only the tasks that matches your condition
+          setTasks(filteredTasks);
+        } else {
+          if (isAdmin) {
+            setTasks(data.Data);
+          } else {
+            // Filter the tasks
+            const filteredTasks = data.Data.filter(task => {
+              return task.assignee === email || task.task_master === email;
+            });
+            setTasks(filteredTasks);
+          }
+        }
         setIsLoadingTwo(false);
-        console.log(filteredTasks);
       };
 
       const body = {
@@ -136,8 +153,12 @@ const SearchEverything = () => {
     setSearchTerm(event.target.value);
   };
 
-  const filteredTasks = tasks.filter(task =>
-    task.title.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredTasks = tasks.filter(
+    task =>
+      task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      task.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      task.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      task.deadline.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleStatusChange = (taskId, progress) => {
@@ -170,7 +191,7 @@ const SearchEverything = () => {
     // const body = { updatedTask, token }; // assuming you have the token available in the scope
     const onSuccess = data => {
       // toast({ title: data });
-      fetchTasks(email, connections);
+      fetchTasks(email, connections, isAdmin);
     };
     const onFailure = () => {
       console.log('Failed to update task');
@@ -233,7 +254,7 @@ const SearchEverything = () => {
           // toast({ title: data });
           console.log('Success ' + updatedTask);
           // fetchAllTasks(email);
-          fetchTasks(email, connections);
+          fetchTasks(email, connections, isAdmin);
         };
 
         const onFailure = () => {
@@ -297,6 +318,42 @@ const SearchEverything = () => {
       onOpen();
       //   onOpen();
     }
+  };
+
+  const handleRemoveTask = taskId => {
+    // setTasks(tasks.filter(task => task.id !== taskId));
+    let id = 0;
+    const updatedTasks = tasks.filter(task => {
+      if (task.id === taskId) {
+        id = task.id;
+      }
+      return task;
+    });
+
+    setTasks(updatedTasks);
+    // Retrieve the token from the localStorage
+    const token = localStorage.getItem('token');
+
+    console.log('remove ' + JSON.stringify(tasks));
+    const onSuccess = data => {
+      // toast({ title: data });
+      console.log('Delete Success => ' + JSON.stringify(updatedTasks));
+      fetchTasks(email, connections, isAdmin);
+    };
+    const onFailure = () => {
+      console.log('Failed to remove task');
+      console.log('id: ' + id);
+      console.log('task: ' + JSON.stringify(updatedTasks));
+    };
+
+    fetchBackend(
+      `/task/delete/${id}`,
+      'DELETE',
+      { token },
+      toast,
+      onSuccess,
+      onFailure
+    );
   };
 
   const handleCloseModal = () => {
@@ -364,6 +421,7 @@ const SearchEverything = () => {
                         // eslint-disable-next-line react/jsx-key
                         <SearchResult
                           onStatusChange={handleStatusChange}
+                          onRemove={handleRemoveTask}
                           onEdit={handleEditTask}
                           task={task}
                         />
@@ -412,6 +470,7 @@ const SearchEverything = () => {
         setTimeEstimate={setTimeEstimate}
         actualTimeSpent={actualTimeSpent}
         setActualTimeSpent={setActualTimeSpent}
+        isAdmin={isAdmin}
       />
     </Box>
   );
