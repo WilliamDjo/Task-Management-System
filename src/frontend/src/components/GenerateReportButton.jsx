@@ -79,12 +79,12 @@ const GenerateReportButton = () => {
         _hover={{ bg: 'blue.500' }}
         onClick={handleModalOpen}
       >
-        Generate Financial Report
+        Generate Report
       </Button>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Generate Financial Report</ModalHeader>
+          <ModalHeader>Generate Report</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             {
