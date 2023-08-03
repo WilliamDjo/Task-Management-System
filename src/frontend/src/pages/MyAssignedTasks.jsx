@@ -1,22 +1,12 @@
 import React from 'react';
 import ProfileBar from '../components/ProfileBar';
 import {
-  Card,
-  CardBody,
   Center,
-  Heading,
-  Hide,
   Spinner,
-  Table,
-  TableContainer,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
   useToast
 } from '@chakra-ui/react';
 import { fetchBackend, isNone } from '../fetch';
+import AssignedTaskList from '../components/AssignedTaskList';
 
 const MyAssignedTasks = () => {
   const [loaded, setLoaded] = React.useState(false);
@@ -34,6 +24,7 @@ const MyAssignedTasks = () => {
     const token = localStorage.getItem('token');
     const successGetTasks = (data) => {
       const newTasks = [...data.Data];
+      console.log(newTasks);
       newTasks.sort((a, b) => {
         if ((isNone(a.deadline) || a.deadline === '') && (isNone(b.deadline) || b.deadline === '')) {
           return 0;
@@ -54,20 +45,6 @@ const MyAssignedTasks = () => {
         }
       })
 
-      for (const task of newTasks) {
-        const deadline = task.deadline;
-        const dateDeadline = new Date(deadline)
-        const monthOptions = { month: 'short' };
-        const month = dateDeadline.toLocaleDateString('en-US', monthOptions);
-
-        const dateOptions = { day: 'numeric' };
-        const date = dateDeadline.toLocaleDateString('en-US', dateOptions);
-
-        const yearOptions = { year: 'numeric' };
-        const year = dateDeadline.toLocaleDateString('en-US', yearOptions);
-
-        task.deadline = `${date} ${month} ${year}`
-      }
       setTasks(newTasks);
       setLoaded(true);
     }
@@ -77,6 +54,13 @@ const MyAssignedTasks = () => {
         if (data.Message === 'No tasks given to by task assignee') {
           setTasks([]);
           setLoaded(true);
+        } else {
+          toast({
+            title: data.Message,
+            status: 'error',
+            duration: 5000,
+            isClosable: true,
+          });
         }
       }
     }
@@ -84,46 +68,14 @@ const MyAssignedTasks = () => {
     const successGetProfile = (data) => {
       const email = data.Data.email;
 
-      fetchBackend(`/task/getAllAssignedTo/${email}`, 'GET', { token }, toast, successGetTasks, failGetTasks);
+      fetchBackend(`/task/getAllAssignedTo/${email}`, 'GET', { token }, null, successGetTasks, failGetTasks);
     }
     fetchBackend('/getuserprofile', 'POST', { token }, toast, successGetProfile);
   }, [])
 
   const myAssignedTaskListLoaded = () => {
     return (
-      <Card mt="4">
-        <CardBody>
-          <Heading fontSize="lg" textTransform="uppercase">
-            Assigned Task List
-          </Heading>
-          <TableContainer>
-            <Table variant="simple">
-              <Thead>
-                <Tr>
-                  <Hide below="sm">
-                    <Th>ID</Th>
-                  </Hide>
-                  <Th>Title</Th>
-                  <Th isNumeric>Deadline</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {tasks.map((task, index) => {
-                  return (
-                    <Tr key={index}>
-                      <Hide below="sm">
-                        <Td>{task.id}</Td>
-                      </Hide>
-                      <Td>{task.title}</Td>
-                      <Td isNumeric>{task.deadline}</Td>
-                    </Tr>
-                  );
-                })}
-              </Tbody>
-            </Table>
-          </TableContainer>
-        </CardBody>
-      </Card>
+      <AssignedTaskList title={'My Assigned Task List'} tasks={tasks} />
     );
   };
 

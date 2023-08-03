@@ -25,6 +25,7 @@ import VerifyEmail from './pages/VerifyEmail';
 import ResetPassword from './pages/ResetPassword';
 import SearchEverything from './pages/SearchEverything';
 import MyAssignedTasks from './pages/MyAssignedTasks';
+import AdminProfile from './pages/AdminProfile';
 // import Connections from './pages/Connections';
 // import AddConnection from './pages/AddConnection';
 // import MyConnections from './pages/MyConnections';
@@ -51,6 +52,7 @@ const App = () => {
           </Route>
           <Route path="admin" element={<Outlet />}>
             <Route index element={<AdminDashboard />} />
+            <Route path=":email" element={<AdminProfile />} />
           </Route>
           <Route path="connections" element={<Outlet />}>
             <Route index element={<Connections />} />
@@ -64,14 +66,13 @@ const App = () => {
               <Route path=":email" element={<PendingProfile />} />
             </Route>
           </Route>
-
-          <Route path="*" element={<PageNotFound />} />
           <Route path="forgotpassword" element={<ForgotPassword />} />
           <Route path="cantlogin" element={<CantLogin />} />
           <Route path="changeemail" element={<ChangeEmail />} />
           <Route path="verifyemail" element={<VerifyEmail />} />
           <Route path="resetpassword" element={<ResetPassword />} />
           <Route path="searcheverything" element={<SearchEverything />} />
+          <Route path="*" element={<PageNotFound />} />
         </Routes>
       </BrowserRouter>
     </ChakraProvider>

@@ -17,9 +17,9 @@ import {
   Text,
   useToast,
 } from '@chakra-ui/react';
-import { EmailIcon } from '@chakra-ui/icons';
 
 import { fetchBackend, isNone } from '../fetch';
+import { SendIcon } from '../components/GoogleIcons';
 
 const ConnectionChat = (props) => {
   const email = props.email;
@@ -42,10 +42,31 @@ const ConnectionChat = (props) => {
   ])
   const [chatInput, setChatInput] = React.useState('');
 
+  const convertTimestamp = (timestamp) => {
+    const timezoneOffset = new Date().getTimezoneOffset();
+    const dateTimestamp = new Date(timestamp);
+    dateTimestamp.setMinutes(dateTimestamp.getMinutes() + timezoneOffset);
+
+    const dateOptions = { day: 'numeric' };
+    const date = dateTimestamp.toLocaleDateString('en-US', dateOptions);
+
+    const monthOptions = { month: 'short' };
+    const month = dateTimestamp.toLocaleDateString('en-US', monthOptions);
+
+    const yearOptions = { year: 'numeric' };
+    const year = dateTimestamp.toLocaleDateString('en-US', yearOptions);
+
+    const chatTimestamp = `${date} ${month} ${year} ${dateTimestamp.toLocaleTimeString('en-US')}`;
+
+    return chatTimestamp;
+  }
+
   React.useEffect(() => {
     const successGetChat = (data) => {
       const chats = data.Data.map((chat) => {
         chat.clicked = false;
+        chat.timestamp = convertTimestamp(chat.timestamp);
+
         return chat;
       })
       setMessages(chats);
@@ -57,13 +78,20 @@ const ConnectionChat = (props) => {
         if (data.Message === 'No chat exists between these users') {
           setMessages([]);
           setLoaded(true);
+        } else {
+          toast({
+            title: data.Message,
+            status: 'error',
+            duration: 5000,
+            isClosable: true,
+          });
         }
       }
     }
 
     const token = localStorage.getItem('token');
 
-    fetchBackend(`/chat/${email}`, 'GET', { token }, toast, successGetChat, failGetChat);
+    fetchBackend(`/chat/${email}`, 'GET', { token }, null, successGetChat, failGetChat);
 
     const id = setInterval(() => {
       fetchBackend(
@@ -90,7 +118,7 @@ const ConnectionChat = (props) => {
       const newMessages = [...messages];
       newMessages.unshift({
         message: chatInput,
-        timestamp: data.Timestamp,
+        timestamp: convertTimestamp(data.Timestamp),
         sender: true,
         clicked: false
       });
@@ -123,11 +151,11 @@ const ConnectionChat = (props) => {
 
   const chatCardLoaded = () => {
     return (
-      <Card mt="4">
+      <Card>
         <CardBody>
           <Stack spacing='4'>
             <Heading fontSize="lg" textTransform="uppercase">
-              Chat
+              {props.name} - Chat
             </Heading>
             <Divider />
             <InputGroup>
@@ -148,7 +176,7 @@ const ConnectionChat = (props) => {
                   color='white'
                   _hover={{ bg: 'blue.500' }}
                   size='sm'
-                  icon={<EmailIcon />}
+                  icon={<SendIcon boxSize={5} />}
                   onClick={sendMessage}
                 />
               </InputRightElement>
@@ -168,6 +196,7 @@ const ConnectionChat = (props) => {
               })}
             </Stack>
           </Stack>
+          {messages.length === 0 && <Center><Text pt='2'>No chat history exists.</Text></Center>}
         </CardBody>
       </Card>
     )
@@ -181,7 +210,8 @@ const ConnectionChat = (props) => {
 };
 
 ConnectionChat.propTypes = {
-  email: PropTypes.bool
+  email: PropTypes.string,
+  name: PropTypes.string
 }
 
 export default ConnectionChat;
