@@ -57,13 +57,20 @@ const ConnectionChat = (props) => {
         if (data.Message === 'No chat exists between these users') {
           setMessages([]);
           setLoaded(true);
+        } else {
+          toast({
+            title: data.Message,
+            status: 'error',
+            duration: 5000,
+            isClosable: true,
+          });
         }
       }
     }
 
     const token = localStorage.getItem('token');
 
-    fetchBackend(`/chat/${email}`, 'GET', { token }, toast, successGetChat, failGetChat);
+    fetchBackend(`/chat/${email}`, 'GET', { token }, null, successGetChat, failGetChat);
 
     const id = setInterval(() => {
       fetchBackend(
@@ -123,11 +130,11 @@ const ConnectionChat = (props) => {
 
   const chatCardLoaded = () => {
     return (
-      <Card mt="4">
+      <Card>
         <CardBody>
           <Stack spacing='4'>
             <Heading fontSize="lg" textTransform="uppercase">
-              Chat
+              {props.name} - Chat
             </Heading>
             <Divider />
             <InputGroup>
@@ -168,6 +175,7 @@ const ConnectionChat = (props) => {
               })}
             </Stack>
           </Stack>
+          {messages.length === 0 && <Center><Text pt='2'>No chat history exists.</Text></Center>}
         </CardBody>
       </Card>
     )
@@ -181,7 +189,8 @@ const ConnectionChat = (props) => {
 };
 
 ConnectionChat.propTypes = {
-  email: PropTypes.bool
+  email: PropTypes.string,
+  name: PropTypes.string
 }
 
 export default ConnectionChat;

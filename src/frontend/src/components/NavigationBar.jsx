@@ -66,7 +66,7 @@ const NavigationBar = () => {
   return (
     <Box bg="black" color="blue.50">
       <Flex alignItems="center">
-        <RouteLink to="/dashboard">
+        <RouteLink to={isAdmin() ? '/admin' : '/dashboard'}>
           <Heading _hover={hoverStyle} size="md">
             TaskMaster
           </Heading>

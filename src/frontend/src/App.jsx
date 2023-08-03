@@ -25,6 +25,7 @@ import VerifyEmail from './pages/VerifyEmail';
 import ResetPassword from './pages/ResetPassword';
 import SearchEverything from './pages/SearchEverything';
 import MyAssignedTasks from './pages/MyAssignedTasks';
+import AdminProfile from './pages/AdminProfile';
 // import Connections from './pages/Connections';
 // import AddConnection from './pages/AddConnection';
 // import MyConnections from './pages/MyConnections';
@@ -51,6 +52,7 @@ const App = () => {
           </Route>
           <Route path="admin" element={<Outlet />}>
             <Route index element={<AdminDashboard />} />
+            <Route path=":email" element={<AdminProfile />} />
           </Route>
           <Route path="connections" element={<Outlet />}>
             <Route index element={<Connections />} />
