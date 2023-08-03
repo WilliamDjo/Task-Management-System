@@ -54,7 +54,6 @@ const SearchEverything = () => {
     try {
       // Retrieve the token from the localStorage
       const token = localStorage.getItem('token');
-      //   console.log(token);
 
       if (!token) {
         console.error('User token not found in localStorage.');
@@ -93,10 +92,6 @@ const SearchEverything = () => {
       // Retrieve the token from the localStorage
       const token = localStorage.getItem('token');
       const successGetTasks = data => {
-        // setTasks(data.Data);
-        // const newTasks = [...data.Data];
-        // Creating a Set for easier lookup
-        // console.log('con ' + connections);
         if (connections) {
           const connectionSet = new Set(connections.map(c => c.email));
 
@@ -130,13 +125,10 @@ const SearchEverything = () => {
         token,
       };
       fetchBackend('/task/getAll', 'GET', body, toast, successGetTasks);
-      // console.log('email ' + email);
-      // console.log('task ' + tasks);
     } catch (error) {
       // Handle error if fetching user profile fails
       console.error('Failed to fetch tasks', error);
     }
-    // console.log('baba');
   };
 
   const handleSearch = event => {
@@ -152,13 +144,6 @@ const SearchEverything = () => {
   );
 
   const handleStatusChange = (taskId, progress) => {
-    // if (progress === 'In Progress' || progress === 'Not Started') {
-    //   // Reset actual time spent to null when changing the status to In Progress or To Do
-    //   setActualTimeSpent(prevState => ({
-    //     ...prevState,
-    //     [taskId]: 0,
-    //   }));
-    // }
     let id = 0;
     let updatedTask = {};
     const updatedTasks = tasks.map(task => {
@@ -178,9 +163,8 @@ const SearchEverything = () => {
     delete updatedTask.id;
 
     updatedTask = { ...updatedTask, token };
-    // const body = { updatedTask, token }; // assuming you have the token available in the scope
+
     const onSuccess = data => {
-      // toast({ title: data });
       fetchTasks(email, connections, isAdmin);
     };
     const onFailure = () => {
@@ -287,9 +271,8 @@ const SearchEverything = () => {
 
   const handleEditTask = taskId => {
     const taskToEdit = tasks.find(task => task.id === taskId);
-    // console.log('id: ' + JSON.stringify(taskToEdit));
+
     if (taskToEdit) {
-      //   console.log('editing: ' + taskToEdit.progress);
       setEditingTask(taskToEdit);
       setNewTask(taskToEdit.title);
       setDescription(taskToEdit.description);
@@ -326,7 +309,6 @@ const SearchEverything = () => {
 
     console.log('remove ' + JSON.stringify(tasks));
     const onSuccess = data => {
-      // toast({ title: data });
       console.log('Delete Success => ' + JSON.stringify(updatedTasks));
       fetchTasks(email, connections, isAdmin);
     };
