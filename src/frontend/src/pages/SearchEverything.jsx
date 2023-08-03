@@ -247,8 +247,6 @@ const SearchEverything = () => {
           onSuccess,
           onFailure
         );
-
-        // For the case when we're creating a new task
       }
 
       setNewTask('');
