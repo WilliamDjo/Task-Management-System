@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable react/no-children-prop */
 /* eslint-disable react/prop-types */
 import React, { useState, useRef } from 'react';
 import {
@@ -11,9 +9,6 @@ import {
   Grid,
   GridItem,
   Flex,
-  Input,
-  InputGroup,
-  InputRightAddon,
   AlertDialog,
   AlertDialogBody,
   AlertDialogFooter,
@@ -26,10 +21,10 @@ import {
 import { EditIcon, CloseIcon } from '@chakra-ui/icons';
 
 const TaskCard = props => {
-  const { task, onRemove, onEdit, onStatusChange, isAdmin } = props;
-  const [actualTimeSpent, setActualTimeSpent] = useState(task.actual_time_hr);
+  const { task, onRemove, onEdit, onStatusChange } = props;
+
   // New state to track the task to be deleted
-  const [taskToDelete, setTaskToDelete] = useState(null);
+  const [, setTaskToDelete] = useState(null);
   const cancelRef = useRef();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -41,7 +36,6 @@ const TaskCard = props => {
 
   // Function to handle task removal (with confirmation)
   const handleRemoveWithConfirmation = () => {
-    // handleRemoveTask(taskToDelete);
     handleRemove();
     onClose();
   };
@@ -56,9 +50,7 @@ const TaskCard = props => {
 
   const handleStatusChange = e => {
     const status = e.target.value;
-    // if (status === 'Done') {
-    //   setActualTimeSpent(''); // Reset actualTimeSpent when status is set to 'Done'
-    // }
+
     onStatusChange(task.id, status);
   };
 
@@ -100,34 +92,28 @@ const TaskCard = props => {
       <Text fontSize="md" color="gray.500" mb={2}>
         {task.description}
       </Text>
-      {/* <Grid templateColumns="repeat(2, 1fr)" gap={2} mb={2}> */}
-      {/* <GridItem> */}
+
       <Text fontSize="sm" fontWeight="bold">
         Assigned By:
       </Text>
       <Text fontSize="sm" color="gray.500">
         {task.task_master}
       </Text>
-      {/* </GridItem> */}
-      {/* <GridItem> */}
+
       <Text fontSize="sm" fontWeight="bold">
         Assigned To:
       </Text>
       <Text fontSize="sm" color="gray.500">
         {task.assignee}
       </Text>
-      {/* </GridItem> */}
-      {/* <GridItem> */}
+
       <Text fontSize="sm" fontWeight="bold">
         Deadline:
-        {/* {console.log('deadline: ' + task.deadline)} */}
       </Text>
       <Text fontSize="sm" color="gray.500">
-        {/* {task.deadline} */}
         {new Date(task.deadline).toISOString().split('T')[0]}
       </Text>
-      {/* </GridItem> */}
-      {/* </Grid> */}
+
       <Box mb={2}>
         <Text fontSize="sm" fontWeight="bold">
           Tags:
@@ -175,7 +161,7 @@ const TaskCard = props => {
           </Text>
         </GridItem>
       </Grid>
-      {/* <Box mb={2}> */}
+
       <Grid templateColumns="repeat(2, 1fr)" gap={2}>
         <GridItem>
           <Text fontSize="sm" fontWeight="bold">
@@ -194,7 +180,6 @@ const TaskCard = props => {
           </Text>
         </GridItem>
       </Grid>
-      {/* </Box> */}
 
       <Flex align="center">
         <IconButton

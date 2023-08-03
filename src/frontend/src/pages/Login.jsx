@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import React, { useState } from 'react';
 import {
   Flex,
@@ -6,8 +5,6 @@ import {
   FormControl,
   FormLabel,
   Input,
-  // InputGroup,
-  // InputRightElement,
   Checkbox,
   Stack,
   Link,
@@ -16,14 +13,8 @@ import {
   Text,
   useColorModeValue,
 } from '@chakra-ui/react';
-import {
-  // BrowserRouter as Router,
-  // Switch,
-  // Route,
-  Link as RouteLink,
-  useNavigate,
-} from 'react-router-dom';
-// import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
+import { Link as RouteLink, useNavigate } from 'react-router-dom';
+
 import PasswordBar from '../components/PasswordBar/PasswordBar';
 import { fetchBackend } from '../fetch';
 
@@ -32,8 +23,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState(false);
   const [loginSuccess, setLoginSuccess] = useState(false);
-  // eslint-disable-next-line no-unused-vars
-  const [sys_admin, setSysAdmin] = useState(false);
+  const [sysAdmin, setSysAdmin] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async () => {
@@ -42,7 +32,7 @@ const Login = () => {
     const credentials = {
       email,
       password,
-      sys_admin,
+      sysAdmin,
     };
 
     try {
@@ -52,7 +42,7 @@ const Login = () => {
         credentials,
         null,
         async data => {
-          const { Token, Sys_admin } = data;
+          const { Token, Sys_admin: SysAdmin } = data;
 
           // Store the token and isAdmin status in localStorage
           if (!Token) {
@@ -62,11 +52,11 @@ const Login = () => {
             console.log(data);
             console.log(Token);
           } else {
-            setSysAdmin(Sys_admin);
+            setSysAdmin(SysAdmin);
             localStorage.setItem('token', Token);
             console.log('Login successful');
             console.log(Token);
-            if (Sys_admin) {
+            if (SysAdmin) {
               navigate('/admin');
             } else {
               navigate('/dashboard');
@@ -127,9 +117,10 @@ const Login = () => {
                 justify={'space-between'}
               >
                 <Checkbox>Remember me</Checkbox>
-                <RouteLink to="/forgotpassword">
-                  <Link color={'blue.400'}>Forgot Password</Link>
-                </RouteLink>
+                <Link as={RouteLink} to="/forgotpassword" color={'blue.400'}>
+                  {' '}
+                  Forgot Password
+                </Link>
               </Stack>
               {loginError && (
                 <Text color="red.500" fontSize="sm">
@@ -155,9 +146,10 @@ const Login = () => {
             <Stack pt={6}>
               <Text align={'center'}>
                 Don`t have an account?{' '}
-                <RouteLink to="/register">
-                  <Link color={'blue.400'}>Register</Link>
-                </RouteLink>
+                <Link as={RouteLink} to="/register" color={'blue.400'}>
+                  {' '}
+                  Register
+                </Link>
               </Text>
             </Stack>
           </Stack>

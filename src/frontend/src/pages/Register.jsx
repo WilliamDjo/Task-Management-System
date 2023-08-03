@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import React, { useState } from 'react';
 
 import {
@@ -16,13 +15,7 @@ import {
   Link,
 } from '@chakra-ui/react';
 
-import {
-  // BrowserRouter as Router,
-  // Switch,
-  // Route,
-  Link as RouteLink,
-  useNavigate,
-} from 'react-router-dom';
+import { Link as RouteLink, useNavigate } from 'react-router-dom';
 import PasswordBar from '../components/PasswordBar/PasswordBar';
 import { fetchBackend } from '../fetch';
 
@@ -30,10 +23,10 @@ const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [first_name, setFirstName] = useState('');
-  const [last_name, setLastName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [username, setUsername] = useState('');
-  const [sys_admin, setSysAdmin] = useState(false);
+  const [sysAdmin, setSysAdmin] = useState(false);
   const [registrationError, setRegistrationError] = useState(false);
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const [passwordMismatchError, setPasswordMismatchError] = useState(false);
@@ -51,10 +44,10 @@ const Register = () => {
       const newUser = {
         email,
         password,
-        first_name,
-        last_name,
+        firstName,
+        lastName,
         username,
-        sys_admin,
+        sysAdmin,
       };
 
       try {
@@ -64,16 +57,16 @@ const Register = () => {
           newUser,
           null,
           async data => {
-            const { Token, Sys_admin } = data;
+            const { Token, Sys_admin: SysAdmin } = data;
 
             // Store the token in localStorage or sessionStorage
             localStorage.setItem('token', Token);
-            // Store the Sys_admin value in state
-            setSysAdmin(Sys_admin);
+            // Store the SysAdmin value in state
+            setSysAdmin(SysAdmin);
 
             console.log('User account created and token received');
-            // Redirect the user based on the Sys_admin value
-            if (Sys_admin) {
+            // Redirect the user based on the SysAdmin value
+            if (SysAdmin) {
               navigate('/admin');
             } else {
               navigate('/dashboard');
@@ -124,7 +117,7 @@ const Register = () => {
                   <FormLabel>First Name</FormLabel>
                   <Input
                     type="text"
-                    value={first_name}
+                    value={firstName}
                     onChange={e => setFirstName(e.target.value)}
                   />
                 </FormControl>
@@ -134,7 +127,7 @@ const Register = () => {
                   <FormLabel>Last Name</FormLabel>
                   <Input
                     type="text"
-                    value={last_name}
+                    value={lastName}
                     onChange={e => setLastName(e.target.value)}
                   />
                 </FormControl>
@@ -202,9 +195,10 @@ const Register = () => {
             <Stack pt={6}>
               <Text align={'center'}>
                 Already a user?{' '}
-                <RouteLink to="/login">
-                  <Link color={'blue.400'}>Login</Link>
-                </RouteLink>
+                <Link as={RouteLink} to="/login" color={'blue.400'}>
+                  {' '}
+                  Login
+                </Link>
               </Text>
             </Stack>
           </Stack>
