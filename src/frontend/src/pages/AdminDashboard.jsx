@@ -195,7 +195,7 @@ const AdminDashboard = () => {
             <LinkBox as={Card} key={index}>
               <CardBody>
                 <Heading fontSize="lg">
-                  <LinkOverlay as={RouteLink} to={`/connections/my/${user.email}`}>
+                  <LinkOverlay as={RouteLink} to={`/admin/${user.email}`}>
                     {user.first_name} {user.last_name}
                   </LinkOverlay>
                 </Heading>
@@ -233,8 +233,10 @@ const AdminDashboard = () => {
     <Box minH="100vh" h="100vh">
       <Flex h="100%" flexFlow="column">
         <NavigationBar />
-        <Heading>User Controls</Heading>
-        {loaded ? adminCards() : <Center><Spinner /></Center>}
+        <Box p='2'>
+          <Heading>User Controls</Heading>
+          {loaded ? adminCards() : <Center><Spinner /></Center>}
+        </Box>
       </Flex>
       <AlertDialog isOpen={isAlertOpen} onClose={onAlertClose}>
         <AlertDialogOverlay>

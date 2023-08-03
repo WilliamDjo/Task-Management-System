@@ -2,6 +2,7 @@ import React from 'react';
 import {
   Box,
   Center,
+  Flex,
   Spinner,
   Tab,
   TabList,
@@ -12,13 +13,12 @@ import {
 } from '@chakra-ui/react';
 import { useParams } from 'react-router-dom';
 
-import ConnectionsBar from '../components/ConnectionsBar';
 import { fetchBackend } from '../fetch';
 import ProfileCard from '../components/ProfileCard';
-import ConnectionChat from './ConnectionChat';
 import AssignedTaskList from '../components/AssignedTaskList';
+import NavigationBar from '../components/NavigationBar';
 
-const ConnectionProfile = () => {
+const AdminProfile = () => {
   const [name, setName] = React.useState('Name');
   const [username, setUsername] = React.useState('username');
   const [workload, setWorkload] = React.useState(10);
@@ -45,7 +45,6 @@ const ConnectionProfile = () => {
       setUsername(data.Data.username);
       setWorkload(data.Data.workload);
       setTasks(data.Tasks);
-      console.log(data.Tasks);
 
       setLoaded(true);
     };
@@ -77,29 +76,28 @@ const ConnectionProfile = () => {
   };
 
   return (
-    <ConnectionsBar myConnections>
-      <Box>
-        <Tabs variant='unstyled' colorScheme='black'>
-          <TabList bg='gray.200' p='1' rounded='full'>
-            <Tab _selected={tabSelectedStyle} rounded='full' fontWeight='bold' color='gray.800' pt='1' pb='1'>Profile</Tab>
-            <Tab _selected={tabSelectedStyle} rounded='full' fontWeight='bold' color='gray.800' pt='1' pb='1'>Chat</Tab>
-            <Tab _selected={tabSelectedStyle} rounded='full' fontWeight='bold' color='gray.800' pt='1' pb='1'>Assigned Tasks</Tab>
-          </TabList>
-          <TabPanels>
-            <TabPanel>
-              {loaded ? connectionProfileLoaded() : (<Center><Spinner /></Center>)}
-            </TabPanel>
-            <TabPanel>
-              <ConnectionChat email={email} name={name}/>
-            </TabPanel>
-            <TabPanel>
-              {loaded ? connectionAssignedTaskListLoaded() : (<Center><Spinner /></Center>)}
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
-      </Box>
-    </ConnectionsBar>
+    <Box minH='100vh' h='100vh'>
+      <Flex h='100%' flexFlow='column'>
+        <NavigationBar />
+        <Box p={2}>
+          <Tabs variant='unstyled' colorScheme='black'>
+            <TabList bg='gray.200' p='1' rounded='full'>
+              <Tab _selected={tabSelectedStyle} rounded='full' fontWeight='bold' color='gray.800' pt='1' pb='1'>Profile</Tab>
+              <Tab _selected={tabSelectedStyle} rounded='full' fontWeight='bold' color='gray.800' pt='1' pb='1'>Assigned Tasks</Tab>
+            </TabList>
+            <TabPanels>
+              <TabPanel>
+                {loaded ? connectionProfileLoaded() : (<Center><Spinner /></Center>)}
+              </TabPanel>
+              <TabPanel>
+                {loaded ? connectionAssignedTaskListLoaded() : (<Center><Spinner /></Center>)}
+              </TabPanel>
+            </TabPanels>
+          </Tabs>
+        </Box>
+      </Flex>
+    </Box>
   );
 };
 
-export default ConnectionProfile;
+export default AdminProfile;
