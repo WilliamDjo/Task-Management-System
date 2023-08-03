@@ -19,7 +19,8 @@ import {
 import { MdSearch } from 'react-icons/md';
 
 import NavigationBar from '../components/NavigationBar';
-import { fetchBackend } from '../fetch';
+
+import { fetchBackend, isNone } from '../fetch';
 
 import TaskModal from '../components/TaskModal';
 import TaskCard from '../components/TaskCard';
@@ -61,17 +62,19 @@ const SearchEverything = () => {
       }
 
       const successGetProfile = data => {
+        const successGetConnections = (data, email, isAdmin) => {
+          setConnections(data.Data);
+          fetchTasks(email, data.Data, isAdmin);
+          setIsLoading(false);
+        };
         setName(`${data.Data.first_name} ${data.Data.last_name}`);
         setUsername(data.Data.username);
         setEmail(data.Data.email);
-        setConnections(data.Data.connections.connections);
         setIsAdmin(data.Data.SystemAdmin);
-        fetchTasks(
-          data.Data.email,
-          data.Data.connections.connections,
-          data.Data.SystemAdmin
+
+        fetchBackend('/user/connections', 'POST', { token }, toast, data2 =>
+          successGetConnections(data2, data.Data.email, data.Data.SystemAdmin)
         );
-        setIsLoading(false);
       };
 
       fetchBackend(
@@ -129,6 +132,7 @@ const SearchEverything = () => {
       // Handle error if fetching user profile fails
       console.error('Failed to fetch tasks', error);
     }
+   
   };
 
   const handleSearch = event => {
@@ -140,10 +144,12 @@ const SearchEverything = () => {
       task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       task.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
       task.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      task.deadline.toLowerCase().includes(searchTerm.toLowerCase())
+      (!isNone(task.deadline) &&
+        task.deadline.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const handleStatusChange = (taskId, progress) => {
+
     let id = 0;
     let updatedTask = {};
     const updatedTasks = tasks.map(task => {
