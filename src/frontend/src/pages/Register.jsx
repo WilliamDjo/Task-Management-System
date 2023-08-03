@@ -44,10 +44,10 @@ const Register = () => {
       const newUser = {
         email,
         password,
-        firstName,
-        lastName,
+        first_name: firstName,
+        last_name: lastName,
         username,
-        sysAdmin,
+        sys_admin: sysAdmin,
       };
 
       try {
@@ -123,7 +123,7 @@ const Register = () => {
                 </FormControl>
               </Box>
               <Box>
-                <FormControl id="lastName">
+                <FormControl id="lastName" isRequired>
                   <FormLabel>Last Name</FormLabel>
                   <Input
                     type="text"
