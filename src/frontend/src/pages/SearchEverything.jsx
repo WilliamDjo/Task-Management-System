@@ -132,7 +132,6 @@ const SearchEverything = () => {
       // Handle error if fetching user profile fails
       console.error('Failed to fetch tasks', error);
     }
-   
   };
 
   const handleSearch = event => {
@@ -149,7 +148,6 @@ const SearchEverything = () => {
   );
 
   const handleStatusChange = (taskId, progress) => {
-
     let id = 0;
     let updatedTask = {};
     const updatedTasks = tasks.map(task => {
