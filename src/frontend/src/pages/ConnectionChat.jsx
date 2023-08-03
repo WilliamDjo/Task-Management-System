@@ -42,10 +42,31 @@ const ConnectionChat = (props) => {
   ])
   const [chatInput, setChatInput] = React.useState('');
 
+  const convertTimestamp = (timestamp) => {
+    const timezoneOffset = new Date().getTimezoneOffset();
+    const dateTimestamp = new Date(timestamp);
+    dateTimestamp.setMinutes(dateTimestamp.getMinutes() + timezoneOffset);
+
+    const dateOptions = { day: 'numeric' };
+    const date = dateTimestamp.toLocaleDateString('en-US', dateOptions);
+
+    const monthOptions = { month: 'short' };
+    const month = dateTimestamp.toLocaleDateString('en-US', monthOptions);
+
+    const yearOptions = { year: 'numeric' };
+    const year = dateTimestamp.toLocaleDateString('en-US', yearOptions);
+
+    const chatTimestamp = `${date} ${month} ${year} ${dateTimestamp.toLocaleTimeString('en-US')}`;
+
+    return chatTimestamp;
+  }
+
   React.useEffect(() => {
     const successGetChat = (data) => {
       const chats = data.Data.map((chat) => {
         chat.clicked = false;
+        chat.timestamp = convertTimestamp(chat.timestamp);
+
         return chat;
       })
       setMessages(chats);
@@ -97,7 +118,7 @@ const ConnectionChat = (props) => {
       const newMessages = [...messages];
       newMessages.unshift({
         message: chatInput,
-        timestamp: data.Timestamp,
+        timestamp: convertTimestamp(data.Timestamp),
         sender: true,
         clicked: false
       });
