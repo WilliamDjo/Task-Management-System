@@ -17,9 +17,9 @@ import {
   Text,
   useToast,
 } from '@chakra-ui/react';
-import { EmailIcon } from '@chakra-ui/icons';
 
 import { fetchBackend, isNone } from '../fetch';
+import { SendIcon } from '../components/GoogleIcons';
 
 const ConnectionChat = (props) => {
   const email = props.email;
@@ -176,7 +176,7 @@ const ConnectionChat = (props) => {
                   color='white'
                   _hover={{ bg: 'blue.500' }}
                   size='sm'
-                  icon={<EmailIcon />}
+                  icon={<SendIcon boxSize={5} />}
                   onClick={sendMessage}
                 />
               </InputRightElement>

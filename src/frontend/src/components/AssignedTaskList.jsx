@@ -1,6 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Card, CardBody, Center, Heading, Hide, Spinner, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr } from '@chakra-ui/react';
+import {
+  Card,
+  CardBody,
+  Center,
+  Heading,
+  Hide,
+  Spinner,
+  Table,
+  TableContainer,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tr
+} from '@chakra-ui/react';
 
 import { isNone } from '../fetch';
 

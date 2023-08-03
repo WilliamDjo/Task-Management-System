@@ -7,17 +7,17 @@ import {
   Tooltip,
   useToast,
 } from '@chakra-ui/react';
-import {
-  ChatIcon,
-  SettingsIcon,
-  UnlockIcon,
-  CopyIcon,
-  Search2Icon,
-} from '@chakra-ui/icons';
 import React from 'react';
 import { Link as RouteLink, useNavigate } from 'react-router-dom';
 
 import { fetchBackend, isNone } from '../fetch';
+import {
+  AccountCircleIcon,
+  AdminPanelSettingsIcon,
+  GroupIcon,
+  SearchIcon,
+  TaskIcon
+} from './GoogleIcons';
 
 const NavigationBar = () => {
   const toast = useToast();
@@ -75,30 +75,30 @@ const NavigationBar = () => {
         {isAdmin() && (
           <RouteLink to="/dashboard">
             <Tooltip label="Task Controls">
-              <CopyIcon m="1" _hover={hoverStyle} />
+              <TaskIcon m="1" _hover={hoverStyle} />
             </Tooltip>
           </RouteLink>
         )}
         {isAdmin() && (
           <RouteLink to="/admin">
             <Tooltip label="User Controls">
-              <UnlockIcon m="1" _hover={hoverStyle} />
+              <AdminPanelSettingsIcon m="1" _hover={hoverStyle} />
             </Tooltip>
           </RouteLink>
         )}
         <RouteLink to="/connections">
           <Tooltip label="Connections">
-            <ChatIcon m="1" _hover={hoverStyle} />
+            <GroupIcon m="1" _hover={hoverStyle} />
           </Tooltip>
         </RouteLink>
         <RouteLink to="/profile">
           <Tooltip label="Profile">
-            <SettingsIcon m="1" _hover={hoverStyle} />
+            <AccountCircleIcon m="1" _hover={hoverStyle} />
           </Tooltip>
         </RouteLink>
         <RouteLink to="/searcheverything">
           <Tooltip label="Search">
-            <Search2Icon m="1" _hover={hoverStyle} />
+            <SearchIcon m="1" _hover={hoverStyle} />
           </Tooltip>
         </RouteLink>
         <Text m="1" _hover={hoverStyle} onClick={handleLogout}>
