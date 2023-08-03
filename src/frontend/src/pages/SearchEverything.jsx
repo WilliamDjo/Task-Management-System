@@ -20,7 +20,7 @@ import { MdSearch } from 'react-icons/md';
 
 import NavigationBar from '../components/NavigationBar';
 
-import { fetchBackend } from '../fetch';
+import { fetchBackend, isNone } from '../fetch';
 
 
 import TaskModal from '../components/TaskModal';
