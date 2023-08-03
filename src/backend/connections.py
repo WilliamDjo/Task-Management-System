@@ -145,7 +145,6 @@ def getConnections(token, email_to_see):
                         "id": i["id"],
                         "title": i["title"],
                         "deadline": i["deadline"],
-                        "workload": i["workload"],
                     }
                 )
             tasks = sorted(tasks, key=lambda i: (i["deadline"] is None, i["deadline"]))
@@ -158,6 +157,7 @@ def getConnections(token, email_to_see):
             "last_name": userInfo_B["Data"]["last_name"],
             "email": userInfo_B["Data"]["email"],
             "username": userInfo_B["Data"]["username"],
+            "workload": userInfo_B["Data"]["workload"],
         },
         "Tasks": tasks,
     }
