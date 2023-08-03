@@ -66,14 +66,13 @@ const App = () => {
               <Route path=":email" element={<PendingProfile />} />
             </Route>
           </Route>
-
-          <Route path="*" element={<PageNotFound />} />
           <Route path="forgotpassword" element={<ForgotPassword />} />
           <Route path="cantlogin" element={<CantLogin />} />
           <Route path="changeemail" element={<ChangeEmail />} />
           <Route path="verifyemail" element={<VerifyEmail />} />
           <Route path="resetpassword" element={<ResetPassword />} />
           <Route path="searcheverything" element={<SearchEverything />} />
+          <Route path="*" element={<PageNotFound />} />
         </Routes>
       </BrowserRouter>
     </ChakraProvider>
