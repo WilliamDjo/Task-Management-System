@@ -26,7 +26,7 @@ import {
 import { EditIcon, CloseIcon } from '@chakra-ui/icons';
 
 const TaskCard = props => {
-  const { task, onRemove, onEdit, onStatusChange } = props;
+  const { task, onRemove, onEdit, onStatusChange, isAdmin } = props;
   const [actualTimeSpent, setActualTimeSpent] = useState(task.actual_time_hr);
   // New state to track the task to be deleted
   const [taskToDelete, setTaskToDelete] = useState(null);
@@ -89,40 +89,45 @@ const TaskCard = props => {
       boxShadow="md"
       w="100%"
     >
-      <Text fontSize="lg" fontWeight="bold" mb={2}>
-        {task.title}
-      </Text>
+      <Flex justifyContent="space-between" alignItems="center">
+        <Text fontSize="lg" fontWeight="bold" mb={2}>
+          {task.title}
+        </Text>
+        <Text fontSize="sm" color="gray.500" mb={2}>
+          ID: {task.id}
+        </Text>
+      </Flex>
       <Text fontSize="md" color="gray.500" mb={2}>
         {task.description}
       </Text>
-      <Grid templateColumns="repeat(2, 1fr)" gap={2} mb={2}>
-        <GridItem>
-          <Text fontSize="sm" fontWeight="bold">
-            Assigned By:
-          </Text>
-          <Text fontSize="sm" color="gray.500">
-            {task.task_master}
-          </Text>
-        </GridItem>
-        <GridItem>
-          <Text fontSize="sm" fontWeight="bold">
-            Assigned To:
-          </Text>
-          <Text fontSize="sm" color="gray.500">
-            {task.assignee}
-          </Text>
-        </GridItem>
-        <GridItem>
-          <Text fontSize="sm" fontWeight="bold">
-            Deadline:
-            {/* {console.log('deadline: ' + task.deadline)} */}
-          </Text>
-          <Text fontSize="sm" color="gray.500">
-            {/* {task.deadline} */}
-            {new Date(task.deadline).toISOString().split('T')[0]}
-          </Text>
-        </GridItem>
-      </Grid>
+      {/* <Grid templateColumns="repeat(2, 1fr)" gap={2} mb={2}> */}
+      {/* <GridItem> */}
+      <Text fontSize="sm" fontWeight="bold">
+        Assigned By:
+      </Text>
+      <Text fontSize="sm" color="gray.500">
+        {task.task_master}
+      </Text>
+      {/* </GridItem> */}
+      {/* <GridItem> */}
+      <Text fontSize="sm" fontWeight="bold">
+        Assigned To:
+      </Text>
+      <Text fontSize="sm" color="gray.500">
+        {task.assignee}
+      </Text>
+      {/* </GridItem> */}
+      {/* <GridItem> */}
+      <Text fontSize="sm" fontWeight="bold">
+        Deadline:
+        {/* {console.log('deadline: ' + task.deadline)} */}
+      </Text>
+      <Text fontSize="sm" color="gray.500">
+        {/* {task.deadline} */}
+        {new Date(task.deadline).toISOString().split('T')[0]}
+      </Text>
+      {/* </GridItem> */}
+      {/* </Grid> */}
       <Box mb={2}>
         <Text fontSize="sm" fontWeight="bold">
           Tags:

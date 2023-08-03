@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import {
   Box,
   Text,
@@ -8,14 +8,24 @@ import {
   Flex,
   Tag,
   Select,
+  Button,
   //   Input,
   //   InputGroup,
   IconButton,
-  //   InputRightAddon,
+  useDisclosure,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogContent,
+  AlertDialogOverlay,
 } from '@chakra-ui/react';
-import { EditIcon } from '@chakra-ui/icons';
+import { EditIcon, CloseIcon } from '@chakra-ui/icons';
 
-const SearchResult = ({ task, onStatusChange, onEdit }) => {
+const SearchResult = ({ task, onStatusChange, onEdit, onRemove }) => {
+  const cancelRef = useRef();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [taskToDelete, setTaskToDelete] = useState(null);
   const getPriorityLabelAndColor = priority => {
     switch (priority) {
       case 1:
@@ -27,6 +37,23 @@ const SearchResult = ({ task, onStatusChange, onEdit }) => {
       default:
         return { label: '', color: 'gray' };
     }
+  };
+  console.log(taskToDelete);
+  // Function to handle opening the confirmation modal
+  const handleDeleteConfirmation = taskId => {
+    setTaskToDelete(taskId);
+    onOpen();
+  };
+
+  // Function to handle task removal (with confirmation)
+  const handleRemoveWithConfirmation = () => {
+    // handleRemoveTask(taskToDelete);
+    handleRemove();
+    onClose();
+  };
+
+  const handleRemove = () => {
+    onRemove(task.id);
   };
 
   const handleStatusChange = e => {
@@ -55,9 +82,14 @@ const SearchResult = ({ task, onStatusChange, onEdit }) => {
       w="100%"
       // maxWidth="1000px"
     >
-      <Text fontSize="lg" fontWeight="bold" mb={2}>
-        {task.title}
-      </Text>
+      <Flex justifyContent="space-between" alignItems="center">
+        <Text fontSize="lg" fontWeight="bold" mb={2}>
+          {task.title}
+        </Text>
+        <Text fontSize="sm" color="gray.500" mb={2}>
+          ID: {task.id}
+        </Text>
+      </Flex>
       <Text fontSize="md" color="gray.500" mb={2}>
         {task.description}
       </Text>
@@ -81,6 +113,7 @@ const SearchResult = ({ task, onStatusChange, onEdit }) => {
       </Grid>
       <Text fontSize="sm" fontWeight="bold">
         Deadline:
+        {console.log('dead ' + task.deadline)}
       </Text>
       <Text fontSize="sm" color="gray.500">
         {new Date(task.deadline).toISOString().split('T')[0]}
@@ -149,9 +182,45 @@ const SearchResult = ({ task, onStatusChange, onEdit }) => {
           size="sm"
           mr={2}
         />
+        <IconButton
+          icon={<CloseIcon />}
+          onClick={handleDeleteConfirmation}
+          aria-label="Remove Task"
+          colorScheme="red"
+          size="sm"
+        />
       </Flex>
+      <AlertDialog
+        isOpen={isOpen}
+        leastDestructiveRef={cancelRef}
+        onClose={onClose}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Delete Task
+            </AlertDialogHeader>
+
+            <AlertDialogBody>
+              Are you sure you want to delete this task?
+            </AlertDialogBody>
+
+            <AlertDialogFooter>
+              <Button ref={cancelRef} onClick={onClose}>
+                Cancel
+              </Button>
+              <Button
+                colorScheme="red"
+                onClick={handleRemoveWithConfirmation}
+                ml={3}
+              >
+                Delete
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
     </GridItem>
-    // </Grid>
   );
 };
 
