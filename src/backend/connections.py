@@ -128,7 +128,7 @@ def getConnections(token, email_to_see):
     userInfo_A = db.getSingleUserInformation(email_user)
     if userInfo_A is False or userInfo_B is False:
         return {
-            "Success": "False",
+            "Success": False,
             "Message": "one of the users don't exist",
             "Data": {},
             "Tasks": [],
@@ -136,7 +136,7 @@ def getConnections(token, email_to_see):
     isAdmin = userInfo_A["Data"]["SystemAdmin"]
     checkConnection = db.checkConnection(email_to_see, email_user)
     tasks = []
-    if checkConnection or isAdmin:
+    if checkConnection["Success"] or isAdmin:
         all_tasks = db_tasks.getTasksAssigned(email_to_see)
         if all_tasks["Success"]:
             for i in all_tasks["Data"]:
@@ -148,9 +148,16 @@ def getConnections(token, email_to_see):
                     }
                 )
             tasks = sorted(tasks, key=lambda i: (i["deadline"] is None, i["deadline"]))
+    else:
+        return {
+            "Success": False, 
+            "Message": checkConnection["Message"],
+            "Data": {},
+            "Tasks": []
+        }
 
     return {
-        "Success": "True",
+        "Success": True,
         "Message": "Information Retrieved",
         "Data": {
             "first_name": userInfo_B["Data"]["first_name"],
