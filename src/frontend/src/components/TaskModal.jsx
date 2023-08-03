@@ -1,8 +1,5 @@
-/* eslint-disable multiline-ternary */
-/* eslint-disable no-unused-vars */
-/* eslint-disable react/no-children-prop */
 /* eslint-disable react/prop-types */
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   Flex,
   Modal,
@@ -20,7 +17,6 @@ import {
   InputRightAddon,
   InputGroup,
   Textarea,
-  Text,
   Tooltip,
 } from '@chakra-ui/react';
 import { AddIcon, CloseIcon } from '@chakra-ui/icons';
@@ -122,7 +118,7 @@ const TaskModal = props => {
                   value={costPerHour}
                   onChange={e => setCostPerHour(e.target.value)}
                 />
-                <InputRightAddon children="AUD" />
+                <InputRightAddon>AUD</InputRightAddon>
               </InputGroup>
               <Input
                 type="number"
@@ -169,25 +165,6 @@ const TaskModal = props => {
                 )}
               </Stack>
 
-              {/* {console.log('task modal: ' + connections)} */}
-
-              {/* {connections && connections.size > 0 && (
-                <Select
-                  placeholder="Assign To"
-                  value={assignedTo}
-                  onChange={e => setAssignedTo(e.target.value)}
-                  size="sm"
-                >
-                  <option value={userEmail}>
-                    {userFullName} {'(Yourself)'}
-                  </option>
-                  {connections.connections.map(connection => (
-                    <option key={connection.id} value={connection.email}>
-                      {connection.first_name} {connection.last_name}
-                    </option>
-                  ))}
-                </Select>
-              )} */}
               {!isAdmin && connections && (
                 <Select
                   placeholder="Assign To"
@@ -217,7 +194,6 @@ const TaskModal = props => {
                   </option>
                 </Select>
               )}
-              {/* {console.log('A: ' + assignedTo)} */}
             </Stack>
           </ModalBody>
           <ModalFooter>

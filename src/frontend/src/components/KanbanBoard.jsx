@@ -1,9 +1,3 @@
-/* eslint-disable indent */
-/* eslint-disable multiline-ternary */
-/* eslint-disable object-shorthand */
-/* eslint-disable no-unused-vars */
-/* eslint-disable camelcase */
-/* eslint-disable react/prop-types */
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -14,7 +8,7 @@ import {
   useToast,
   Spinner,
 } from '@chakra-ui/react';
-// import { AddIcon, CloseIcon, EditIcon } from '@chakra-ui/icons';
+
 import TaskCard from './TaskCard';
 import AddTaskButton from './AddTaskButton';
 import TaskModal from './TaskModal';
@@ -22,16 +16,14 @@ import { fetchBackend } from '../fetch';
 
 const KanbanBoard = () => {
   const [name, setName] = React.useState('Name');
-  const [username, setUsername] = React.useState('username');
+  const [, setUsername] = React.useState('username');
   const [email, setEmail] = React.useState('email@example.com');
   const [id, setID] = useState('');
-  //   const [connections, setConnections] = React.useState(1);
+
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingTwo, setIsLoadingTwo] = useState(true);
   const [isLoadingThree, setIsLoadingThree] = useState(true);
 
-  const [organization, setOrganization] = React.useState('Example Company');
-  const [emailNotifications, setEmailNotifications] = React.useState(true);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
   const [tasks, setTasks] = useState([]);
@@ -41,10 +33,8 @@ const KanbanBoard = () => {
   const [deadline, setDeadline] = useState('');
   const [tags, setTags] = useState([]);
   const [editingTask, setEditingTask] = useState(null);
-  // State to store the user's connections
   const [connections, setConnections] = useState([]);
-  // State to store the user's full name
-  const [userFullName, setUserFullName] = useState('');
+
   const [priority, setPriority] = useState(); // New state for priority
   const [costPerHour, setCostPerHour] = useState(''); // New state for cost per hour
   const [timeEstimate, setTimeEstimate] = useState(''); // New state for time estimate
@@ -56,13 +46,6 @@ const KanbanBoard = () => {
     const successGetConnections = data => {
       setConnections(data.Data);
 
-      // Call fetchAllTasks for each connection here
-      // let i = 0;
-      // data.Data.forEach(connection => {
-      //   fetchTasks(connection.email);
-      //   i = i + 1;
-      //   console.log('i = ' + i);
-      // });
       console.log('email ' + email);
       console.log('connections ' + JSON.stringify(data.Data));
       fetchTasks(email, data.Data, isAdmin);
@@ -76,13 +59,6 @@ const KanbanBoard = () => {
       toast,
       successGetConnections
     );
-    // console.log('hello connections ' + connections);
-    // console.log(response);
-    //   setConnections(response.Data);
-
-    // console.log('baba');
-    // console.log(connections);
-    // console.log('baba ' + connections);
   };
 
   const fetchTasks = (email, connections, isAdmin) => {
@@ -90,9 +66,6 @@ const KanbanBoard = () => {
       // Retrieve the token from the localStorage
       const token = localStorage.getItem('token');
       const successGetTasks = data => {
-        // setTasks(data.Data);
-        // const newTasks = [...data.Data];
-        // Creating a Set for easier lookup
         console.log('con ' + connections);
 
         const connectionSet = new Set(connections.map(c => c.email));
@@ -119,13 +92,10 @@ const KanbanBoard = () => {
         token,
       };
       fetchBackend('/task/getAll', 'GET', body, toast, successGetTasks);
-      // console.log('email ' + email);
-      // console.log('task ' + tasks);
     } catch (error) {
       // Handle error if fetching user profile fails
       console.error('Failed to fetch tasks', error);
     }
-    // console.log('baba');
   };
 
   // Function to fetch user's profile from the backend
@@ -133,7 +103,6 @@ const KanbanBoard = () => {
     try {
       // Retrieve the token from the localStorage
       const token = localStorage.getItem('token');
-      //   console.log(token);
 
       if (!token) {
         console.error('User token not found in localStorage.');
@@ -142,16 +111,13 @@ const KanbanBoard = () => {
 
       const successGetProfile = data => {
         setEmail(data.Data.email);
-        setEmailNotifications(data.Data.emailNotifications);
-        // setConnections(data.Data.connections);
+
         setName(`${data.Data.first_name} ${data.Data.last_name}`);
         setUsername(data.Data.username);
-        setOrganization(data.Data.organization);
+
         setIsAdmin(data.Data.SystemAdmin);
         console.log('Sys ' + data.Data.SystemAdmin);
-        // setLoaded(true);
-        // console.log(data);
-        // fetchAllTasks(data.Data.email);
+
         setIsLoadingThree(false);
         fetchConnections(data.Data.email, data.Data.SystemAdmin);
       };
@@ -163,14 +129,6 @@ const KanbanBoard = () => {
         toast,
         successGetProfile
       );
-
-      // console.log('response: ' + name);
-
-      //   if (response) {
-      //     // const { first_name, last_name } = response.Data;
-      //     setUserFullName({ name });
-      //     console.log('hello1');
-      //   }
     } catch (error) {
       // Handle error if fetching user profile fails
       console.error('Failed to fetch user profile:', error);
@@ -181,16 +139,6 @@ const KanbanBoard = () => {
   useEffect(() => {
     fetchUserProfile();
   }, []);
-  // // Fetch the user's connections on component mount
-  // useEffect(() => {
-  //   fetchConnections();
-  //   console.log('baba ' + JSON.stringify(connections));
-  // }, []);
-
-  // // Fetch the user's connections on component mount
-  // useEffect(() => {
-
-  // }, []);
 
   const handleAddTask = () => {
     if (newTask && assignedTo) {
@@ -233,9 +181,7 @@ const KanbanBoard = () => {
         delete updatedTask.task_master;
         console.log('up ' + JSON.stringify(updatedTask));
         const onSuccess = () => {
-          // toast({ title: data });
           console.log('Success ' + updatedTask);
-          // fetchAllTasks(email);
         };
 
         const onFailure = () => {
@@ -320,13 +266,6 @@ const KanbanBoard = () => {
   };
 
   const handleStatusChange = (taskId, progress) => {
-    // if (progress === 'In Progress' || progress === 'Not Started') {
-    //   // Reset actual time spent to null when changing the status to In Progress or To Do
-    //   setActualTimeSpent(prevState => ({
-    //     ...prevState,
-    //     [taskId]: 0,
-    //   }));
-    // }
     let id = 0;
     let updatedTask = {};
     const updatedTasks = tasks.map(task => {
@@ -346,15 +285,12 @@ const KanbanBoard = () => {
     delete updatedTask.id;
 
     updatedTask = { ...updatedTask, token };
-    // const body = { updatedTask, token }; // assuming you have the token available in the scope
+
     const onSuccess = data => {
-      // toast({ title: data });
       fetchTasks(email, connections);
     };
     const onFailure = () => {
       console.log('Failed to update task');
-      console.log('id: ' + id);
-      console.log('task: ' + JSON.stringify(updatedTask));
     };
 
     fetchBackend(
@@ -370,9 +306,8 @@ const KanbanBoard = () => {
 
   const handleEditTask = taskId => {
     const taskToEdit = tasks.find(task => task.id === taskId);
-    // console.log('id: ' + JSON.stringify(taskToEdit));
+
     if (taskToEdit) {
-      //   console.log('editing: ' + taskToEdit.progress);
       setEditingTask(taskToEdit);
       setNewTask(taskToEdit.title);
       setID(taskToEdit.id);
@@ -390,7 +325,6 @@ const KanbanBoard = () => {
       );
 
       onOpen();
-      //   onOpen();
     }
   };
 
@@ -408,6 +342,7 @@ const KanbanBoard = () => {
     onClose();
   };
 
+  // eslint-disable-next-line multiline-ternary
   return isLoading && isLoadingTwo && isLoadingThree ? (
     <Spinner />
   ) : (

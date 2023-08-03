@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable multiline-ternary */
 import React, { useState, useEffect } from 'react';
 import {
@@ -6,29 +5,24 @@ import {
   Input,
   InputGroup,
   InputLeftElement,
-  Icon,
-  IconButton,
   Tabs,
   TabList,
   TabPanels,
   Tab,
   TabPanel,
-  Text,
-  Button,
   Flex,
-  Stack,
-  Badge,
   Grid,
   useToast,
   Spinner,
   useDisclosure,
 } from '@chakra-ui/react';
 import { MdSearch } from 'react-icons/md';
-import { ChevronDownIcon, ChevronRightIcon } from '@chakra-ui/icons';
+
 import NavigationBar from '../components/NavigationBar';
 import { fetchBackend } from '../fetch';
-import SearchResult from '../components/SearchResults';
+
 import TaskModal from '../components/TaskModal';
+import TaskCard from '../components/TaskCard';
 
 const SearchEverything = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -40,9 +34,8 @@ const SearchEverything = () => {
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [name, setName] = React.useState('Name');
-  const [username, setUsername] = React.useState('username');
-  const [organization, setOrganization] = React.useState('Example Company');
-  const [emailNotifications, setEmailNotifications] = useState(true);
+  const [, setUsername] = React.useState('username');
+
   const [isAdmin, setIsAdmin] = useState(false);
   const [newTask, setNewTask] = useState('');
   const [description, setDescription] = useState('');
@@ -50,10 +43,7 @@ const SearchEverything = () => {
   const [deadline, setDeadline] = useState('');
   const [tags, setTags] = useState([]);
   const [editingTask, setEditingTask] = useState(null);
-  // State to store the user's connections
 
-  // State to store the user's full name
-  const [userFullName, setUserFullName] = useState('');
   const [priority, setPriority] = useState(); // New state for priority
   const [costPerHour, setCostPerHour] = useState(''); // New state for cost per hour
   const [timeEstimate, setTimeEstimate] = useState(''); // New state for time estimate
@@ -419,7 +409,7 @@ const SearchEverything = () => {
                     >
                       {filteredTasks.map(task => (
                         // eslint-disable-next-line react/jsx-key
-                        <SearchResult
+                        <TaskCard
                           onStatusChange={handleStatusChange}
                           onRemove={handleRemoveTask}
                           onEdit={handleEditTask}
