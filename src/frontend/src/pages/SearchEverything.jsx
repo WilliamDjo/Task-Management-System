@@ -26,7 +26,7 @@ import {
 import { MdSearch } from 'react-icons/md';
 import { ChevronDownIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import NavigationBar from '../components/NavigationBar';
-import { fetchBackend } from '../fetch';
+import { fetchBackend, isNone } from '../fetch';
 import SearchResult from '../components/SearchResults';
 import TaskModal from '../components/TaskModal';
 
@@ -158,7 +158,7 @@ const SearchEverything = () => {
       task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       task.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
       task.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      task.deadline.toLowerCase().includes(searchTerm.toLowerCase())
+      (!isNone(task.deadline) && task.deadline.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const handleStatusChange = (taskId, progress) => {
