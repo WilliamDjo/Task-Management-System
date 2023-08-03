@@ -22,7 +22,6 @@ import NavigationBar from '../components/NavigationBar';
 
 import { fetchBackend, isNone } from '../fetch';
 
-
 import TaskModal from '../components/TaskModal';
 import TaskCard from '../components/TaskCard';
 
@@ -56,7 +55,6 @@ const SearchEverything = () => {
     try {
       // Retrieve the token from the localStorage
       const token = localStorage.getItem('token');
-      //   console.log(token);
 
       if (!token) {
         console.error('User token not found in localStorage.');
@@ -68,13 +66,15 @@ const SearchEverything = () => {
           setConnections(data.Data);
           fetchTasks(email, data.Data, isAdmin);
           setIsLoading(false);
-        }
+        };
         setName(`${data.Data.first_name} ${data.Data.last_name}`);
         setUsername(data.Data.username);
         setEmail(data.Data.email);
         setIsAdmin(data.Data.SystemAdmin);
 
-        fetchBackend('/user/connections', 'POST', { token }, toast, (data2) => successGetConnections(data2, data.Data.email, data.Data.SystemAdmin))
+        fetchBackend('/user/connections', 'POST', { token }, toast, data2 =>
+          successGetConnections(data2, data.Data.email, data.Data.SystemAdmin)
+        );
       };
 
       fetchBackend(
@@ -95,7 +95,6 @@ const SearchEverything = () => {
       // Retrieve the token from the localStorage
       const token = localStorage.getItem('token');
       const successGetTasks = data => {
-
         if (connections) {
           const connectionSet = new Set(connections.map(c => c.email));
 
@@ -129,12 +128,10 @@ const SearchEverything = () => {
         token,
       };
       fetchBackend('/task/getAll', 'GET', body, toast, successGetTasks);
-
     } catch (error) {
       // Handle error if fetching user profile fails
       console.error('Failed to fetch tasks', error);
     }
-   
   };
 
   const handleSearch = event => {
@@ -146,11 +143,11 @@ const SearchEverything = () => {
       task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       task.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
       task.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (!isNone(task.deadline) && task.deadline.toLowerCase().includes(searchTerm.toLowerCase()))
+      (!isNone(task.deadline) &&
+        task.deadline.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const handleStatusChange = (taskId, progress) => {
-
     let id = 0;
     let updatedTask = {};
     const updatedTasks = tasks.map(task => {
@@ -170,9 +167,8 @@ const SearchEverything = () => {
     delete updatedTask.id;
 
     updatedTask = { ...updatedTask, token };
-    // const body = { updatedTask, token }; // assuming you have the token available in the scope
+
     const onSuccess = data => {
-      // toast({ title: data });
       fetchTasks(email, connections, isAdmin);
     };
     const onFailure = () => {
@@ -251,8 +247,6 @@ const SearchEverything = () => {
           onSuccess,
           onFailure
         );
-
-        // For the case when we're creating a new task
       }
 
       setNewTask('');
@@ -279,9 +273,8 @@ const SearchEverything = () => {
 
   const handleEditTask = taskId => {
     const taskToEdit = tasks.find(task => task.id === taskId);
-    // console.log('id: ' + JSON.stringify(taskToEdit));
+
     if (taskToEdit) {
-      //   console.log('editing: ' + taskToEdit.progress);
       setEditingTask(taskToEdit);
       setNewTask(taskToEdit.title);
       setDescription(taskToEdit.description);
@@ -318,7 +311,6 @@ const SearchEverything = () => {
 
     console.log('remove ' + JSON.stringify(tasks));
     const onSuccess = data => {
-      // toast({ title: data });
       console.log('Delete Success => ' + JSON.stringify(updatedTasks));
       fetchTasks(email, connections, isAdmin);
     };
