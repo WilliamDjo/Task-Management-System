@@ -1,0 +1,48 @@
+[{
+  "_id": {
+    "$oid": "64ccc640bd4ef2ea7ca51520"
+  },
+  "user": "User1",
+  "email": "user1@user.com",
+  "password": "9d70b27b42655f113d9b3e7767d7664f2d3009237e2ff3253848078c46632d0b",
+  "first_name": "Test",
+  "last_name": "User",
+  "SystemAdmin": false,
+  "workload": 0
+},
+{
+  "_id": {
+    "$oid": "64ccc667bd4ef2ea7ca51529"
+  },
+  "user": "user2",
+  "email": "user2@user.com",
+  "password": "9d70b27b42655f113d9b3e7767d7664f2d3009237e2ff3253848078c46632d0b",
+  "first_name": "Test",
+  "last_name": "User",
+  "SystemAdmin": false,
+  "workload": 20
+},
+{
+  "_id": {
+    "$oid": "64ccc75ebd4ef2ea7ca5157b"
+  },
+  "user": "user3",
+  "email": "user3@user.com",
+  "password": "9d70b27b42655f113d9b3e7767d7664f2d3009237e2ff3253848078c46632d0b",
+  "first_name": "User",
+  "last_name": "user",
+  "SystemAdmin": false,
+  "workload": 0
+},
+{
+  "_id": {
+    "$oid": "64ccc76ebd4ef2ea7ca51584"
+  },
+  "user": "admin",
+  "email": "admin@admin.com",
+  "password": "9d70b27b42655f113d9b3e7767d7664f2d3009237e2ff3253848078c46632d0b",
+  "first_name": "Admin",
+  "last_name": "admin",
+  "SystemAdmin": true,
+  "workload": 0
+}]

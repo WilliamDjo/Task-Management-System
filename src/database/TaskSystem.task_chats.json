@@ -1,0 +1,13 @@
+[{
+  "_id": "64ccc640bd4ef2ea7ca5152064ccc667bd4ef2ea7ca51529",
+  "messages": [
+    {
+      "sender": "user1@user.com",
+      "receiver": "user2@user.com",
+      "message": "Hi",
+      "timestamp": {
+        "$date": "2023-08-04T09:37:31.796Z"
+      }
+    }
+  ]
+}]

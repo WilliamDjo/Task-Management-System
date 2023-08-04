@@ -16,7 +16,7 @@ services:
     image: mongo:latest
     volumes:
       - mongodb_data_container:/data/db
-      - ./database:/docker-entrypoint-initdb.d
+      - ./database:/docker-entrypoint-initdb.d # The directory containing your init-mongo.js and init.sh
     ports:
       - "27017:27017"
 volumes:

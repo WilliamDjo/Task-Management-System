@@ -1,0 +1,80 @@
+[{
+  "_id": {
+    "$oid": "64ccc640bd4ef2ea7ca51520"
+  },
+  "notifications": false,
+  "image": {
+    "$binary": {
+      "base64": "",
+      "subType": "00"
+    }
+  },
+  "organization_name": "",
+  "connectionCount": 1,
+  "connections": {
+    "connections": [
+      "user2@user.com"
+    ],
+    "connectionRequests": [],
+    "connectionReceived": []
+  }
+},
+{
+  "_id": {
+    "$oid": "64ccc667bd4ef2ea7ca51529"
+  },
+  "notifications": false,
+  "image": {
+    "$binary": {
+      "base64": "",
+      "subType": "00"
+    }
+  },
+  "organization_name": "",
+  "connectionCount": 1,
+  "connections": {
+    "connections": [
+      "user1@user.com"
+    ],
+    "connectionRequests": [],
+    "connectionReceived": []
+  }
+},
+{
+  "_id": {
+    "$oid": "64ccc75ebd4ef2ea7ca5157b"
+  },
+  "notifications": false,
+  "image": {
+    "$binary": {
+      "base64": "",
+      "subType": "00"
+    }
+  },
+  "organization_name": "",
+  "connectionCount": 0,
+  "connections": {
+    "connections": [],
+    "connectionRequests": [],
+    "connectionReceived": []
+  }
+},
+{
+  "_id": {
+    "$oid": "64ccc76ebd4ef2ea7ca51584"
+  },
+  "notifications": false,
+  "image": {
+    "$binary": {
+      "base64": "",
+      "subType": "00"
+    }
+  },
+  "organization_name": "",
+  "connectionCount": 0,
+  "connections": {
+    "connections": [],
+    "connectionRequests": [],
+    "connectionReceived": []
+  }
+}]

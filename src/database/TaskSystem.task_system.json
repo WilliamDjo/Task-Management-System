@@ -1,0 +1,36 @@
+[{
+  "_id": {
+    "$oid": "64ccc69bbd4ef2ea7ca5154f"
+  },
+  "id": "TASK1",
+  "title": "Hello",
+  "description": "This is dummy data",
+  "created": "04-08-2023",
+  "deadline": "2023-08-15 00:00:00",
+  "progress": "Not Started",
+  "assignee": "user2@user.com",
+  "cost_per_hr": 2,
+  "estimation_spent_hrs": 4,
+  "actual_time_hr": 4,
+  "priority": 2,
+  "task_master": "user1@user.com",
+  "labels": []
+},
+{
+  "_id": {
+    "$oid": "64ccc6bcbd4ef2ea7ca51558"
+  },
+  "id": "TASK2",
+  "title": "Hello2",
+  "description": "This is dummy data",
+  "created": "04-08-2023",
+  "deadline": "2023-08-19 00:00:00",
+  "progress": "Completed",
+  "assignee": "user1@user.com",
+  "cost_per_hr": 2,
+  "estimation_spent_hrs": 2,
+  "actual_time_hr": 2,
+  "priority": 2,
+  "task_master": "user1@user.com",
+  "labels": []
+}]
