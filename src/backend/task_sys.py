@@ -23,13 +23,11 @@ from reportlab.platypus import (
     PageBreak,
 )
 
-
 parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_folder)
 import account
 import tokens
 from database import db_tasks, db, db_helper
-
 
 
 """
@@ -141,6 +139,9 @@ def is_progress_status(task_progress: str):
     return False
 
 
+"""
+Create tasks
+"""
 
 """Creates a new task with the provided data.
 
@@ -276,11 +277,7 @@ def create_task(token: str, data: dict):
 
     result = db_tasks.addNewTask(new_dict)
 
-    assinge_info = db.getSingleUserInformation(task_assignee)
-
-    if assinge_info['Data']['emailNotifications']:
-        send_task_notification(task_assignee, task_title)
-    
+    # send_task_notification(task_assignee, task_title)
 
     # update workload of the assignee
     db.updateUserInfo(task_assignee, workload_update)
@@ -352,6 +349,8 @@ def update_task_progress(task_id: str, progress: str):
 def update_task_assignee(task_id: str, email: str):
     if not is_assignee_valid(email):
         return {"Success": False, "Message": "Invalid assignee"}
+
+    # Check connections TODO
 
     return db_tasks.updateTaskInfo(task_id, {"assignee": email})
 
@@ -437,26 +436,8 @@ def update_priority(task_id: str, new_priority: int):
         dict: A dictionary containing the result of the update operation, including the success status and any relevant messages.
 
 """
-
-"""Updates the details of a task with the provided task_id.
-
-    Args:
-        token (str): The authentication token of the user.
-        task_id (str): The unique identifier of the task to be updated.
-        new_data (dict): A dictionary containing the new data to update the task with.
-
-    Returns:
-        dict: A dictionary containing the result of the update operation, including the success status and any relevant messages.
-"""
 def update_details(token: str, task_id: str, new_data: dict):
     user_details = account.getAccountInfo(token)
-    
-
-    #current task details
-
-    old_data_repsonse = get_task_details(token, task_id)
-    old_data = old_data_repsonse['Data']
-
 
     old_data_response = get_task_details(token, task_id)
     old_data = old_data_response["Data"]
@@ -523,60 +504,6 @@ def update_details(token: str, task_id: str, new_data: dict):
 
     db.updateUserInfo(task_assignee, new_workload_details_assignee)
 
-
-    #if Priority has changed
-    old_priority = old_data['priority']
-    
-    prev_assignee_email = old_data['assignee']
-    # print(prev_assignee_email)
-    #sub old priority add new priority
-    old_details = db.getSingleUserInformation(prev_assignee_email)
-    # print("old:")
-    print(old_details)
-    # print("old DATA^^^^^^^^^^^^")
-    prev_user_workload = old_details['Data']['workload']
-    updated_workload = prev_user_workload - 10 * old_priority
-    # print("upd")
-    # print(updated_workload)
-    new_workload_details = {
-        'workload': updated_workload
-    }
-
-
-    # print("new deets:")
-    # print(new_workload_details)
-    db.updateUserInfo(prev_assignee_email, new_workload_details)
-
-    #Update new assignee
-
-    new_priority = new_data["priority"]
-    new_assignee = task_assignee
-
-    curr_details = db.getSingleUserInformation(task_assignee)
-    curr_user_workload = curr_details['Data']['workload']
-    new_updated_workload = curr_user_workload + 10 * new_data['priority']
-    # print("UPDATED::")
-    # print(new_updated_workload)
-    new_workload_details_assignee = {
-        'workload': updated_workload
-    }
-
-    if new_data["progress"] == 'Completed':
-        curr_user_workload = curr_details['Data']['workload']
-        completed_workload = curr_user_workload - 10 * new_data["priority"]
-
-        completed_workload_details_assignee = {
-            'workload':  completed_workload
-        }
-
-        db.updateUserInfo(new_data["assignee"], completed_workload_details_assignee)
-
-
-        
-
-
-    db.updateUserInfo(task_assignee, new_workload_details_assignee)
-    
     return db_tasks.updateTaskInfo(task_id, new_data)
 
 
@@ -595,10 +522,10 @@ Delete
 """
 def delete_task(token: str, task_id: str):
     # token_result = tokens.check_jwt_token(token)
-    if not token_result["Success"]:
-        return {"Success": False, "Message": "No user logged in"}
+    # if not token_result["Success"]:
+    #     return {"Success": False, "Message": "No user logged in"}
 
-    user_details = account.getAccountInfo(token)
+    # user_details = account.getAccountInfo(token)
     data_repsonse = get_task_details(token, task_id)
     task_data = data_repsonse["Data"]
     task_assignee = task_data["assignee"]
@@ -626,6 +553,11 @@ Assignee
 """
 def assign_task(task_id: str, assignee_email: str):
     is_assignee_valid(assignee_email)
+
+    # TODO: check if assignee workload permits
+
+    # TODO: send email
+
     update_task_assignee(task_id, assignee_email)
 
 """Sends an email notification to the specified assignee_email when a new task is assigned.
@@ -706,7 +638,12 @@ def send_task_notification(assignee_email, task_title):
         print("Email sent successfully!")
 
     except Exception as e:
-        print(f"Error: {e}")s
+        print(f"Error: {e}")
+
+
+"""
+LABELS
+"""
 
 """ Gets Labels assigned to a task, accessed via provided task_id
 Args:
@@ -783,10 +720,10 @@ def get_tasks_assigned_to_curr(token: str):
     # Get active user details
     acc_info = account.getAccountInfo(token)
 
-    db_result = db.getSingleUserInformation(acc_info['email'])
+    # db_result = db.getSingleUserInformation(acc_info['email'])
 
-    if not (db_result["Success"]):
-        return {"Success": False, "Message": "Email Does not exist"}
+    # if not (db_result["Success"]):
+    #     return {"Success": False, "Message": "Email Does not exist"}
 
     return db_tasks.getTasksAssigned(acc_info["Data"]["email"])
 
@@ -839,11 +776,11 @@ def get_all_tasks(token: str):
         dict: A dictionary containing the search results if successful, or an error message if failed.
 """
 def search_task(token: str, search_word: str):
-    # check token
-    token_result = tokens.check_jwt_token(token)
+    # # check token
+    # token_result = tokens.check_jwt_token(token)
 
-    if not token_result["Success"]:
-        return {"Success": False, "Message": "No user logged in"}
+    # if not token_result["Success"]:
+    #     return {"Success": False, "Message": "No user logged in"}
 
     dummy_data = [
         {

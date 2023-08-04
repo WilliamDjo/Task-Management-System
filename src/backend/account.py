@@ -2,19 +2,20 @@ import hashlib
 import re
 import os
 import sys
-import password
 
 
 parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_folder)
 # from src.database import db_helper
 from database import db, db_tasks, db_helper
-from backend import tokens
+import tokens
+import password
 
 
 """ Generates a SHA-256 hash of the provided data.
 returns: Hashed string
 """
+
 
 def generate_password_hash(data):
     sha256_hash = hashlib.sha256()
@@ -32,6 +33,7 @@ def generate_password_hash(data):
         password (str): The hashed password of the user.
         sys_admin (bool): Indicates whether the user is a system administrator.
 """
+
 
 class User:
     def __init__(
@@ -79,6 +81,7 @@ def is_email_valid(email):
         dict: A dictionary indicating the success of the validation and a corresponding message.
 """
 
+
 def is_username_valid(username):
     if len(username) < 4 or len(username) > 20:
         return {"Success": False, "Message": "Username Too Short"}
@@ -90,7 +93,7 @@ def is_username_valid(username):
     return {"Success": True, "Message": "Username valid"}
 
 
-"""Validates if the password meets the required criteria.
+""" Validates if the password meets the required criteria.
 
     Args:
         password (str): The password to be validated.
@@ -116,14 +119,13 @@ def is_password_valid(password):
     return True
 
 
-""" Validates if the name meets the required criteria.
+"""Validates if the name meets the required criteria.
 
     Args:
         name (str): The name to be validated.
 
     Returns:
-        bool: True if the name is valid, False otherwise.
-"""
+        bool: True if the name is valid, False otherwise."""
 
 
 def is_name_valid(name):
@@ -228,12 +230,11 @@ def account_login(email, password):
     password = generate_password_hash(password)
     email_password_match = db.isValidUser(email, password)
 
-
     if not email_password_match["Success"]:
         return {
             "Success": False,
             "Message": "Email or Password combination does not exist",
-            "Token": "",
+            "token": "",
             "sys_admin": "",
         }
 
@@ -244,7 +245,7 @@ def account_login(email, password):
     return {
         "Success": True,
         "Message": "Logged in",
-        "Token": login_token,
+        "token": login_token,
         "sys_admin": userInfo["SystemAdmin"],
     }
 
@@ -297,7 +298,6 @@ def update_username(new_username, token):
 
     return {"Success": result["Success"], "Message": result["Message"]}
 
-
 """Updates the password of the logged-in user's account with the provided new_password.
 
     Args:
@@ -322,7 +322,6 @@ def update_password_account(new_password, token):
 
     result = db.updateUserInfo(email, new_user_dict)
     return {"Success": result["Success"], "Message": result["Message"]}
-
 
 
 """Updates the email of the logged-in user's account with the provided new_email.
@@ -353,8 +352,6 @@ def update_email_account(new_email, token):
     db.updateUserInfo(email, new_user_dict)
 
     return {"Success": True, "Message": "Email Changed", "Token": new_token}
-
-
 
 
 """Updates the notification settings of the logged-in user's account.
@@ -396,8 +393,6 @@ def getAccountInfo(token):
     userInformation = db.getSingleUserInformation(email)
     data = userInformation["Data"]
 
-    # todo: rem
-    # del data["connections"]
     return {
         "Success": True,
         "Message": "Account info retrieved",
@@ -423,7 +418,6 @@ def getAllAccounts(token):
         return {"Success": False, "Message": "Not an admin", "Data": ""}
 
     allUserInfo = db.getAllUserInformation()
-    # print(allUserInfo)
     return {
         "Success": True,
         "Message": "Info retrieved successfully",
@@ -434,7 +428,6 @@ def getAllAccounts(token):
 """
 Admin Functions
 """
-
 
 """Resets the password for a user account by an admin.
 
@@ -544,9 +537,8 @@ def change_password(email, new_password):
         "Message": update_password["Message"],
     }
 
-'''
-Debugging tools, creation of test data
-'''
+
+# testing code: DO NOT USE
 def add_sys_admin():
     first_name = "Sys"
     last_name = "Admin"
@@ -583,6 +575,7 @@ Workload Computation
 """
 def get_workload(token, email):
     # check active token
+
     valid_jwt = tokens.check_jwt_token(token)
     if not valid_jwt["Success"]:
         return {"Success": False, "Message": "Error in active token!"}
