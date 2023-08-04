@@ -23,22 +23,25 @@ from reportlab.platypus import (
     PageBreak,
 )
 
-
-# # Try removing this maybe?
 parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_folder)
 import account
 import tokens
 from database import db_tasks, db, db_helper
 
-# from database.db import checkUser, getSingleUserInformation
-
 
 """
 Validity 
 """
 
+"""Checks if the provided title string is valid.
 
+    Args:
+        title (str): The title string to be validated.
+
+    Returns:
+        bool: True if the title string is valid, False otherwise.
+"""
 def is_title_valid(title: str):
     min_length = 2
     max_length = 100
@@ -57,7 +60,14 @@ def is_title_valid(title: str):
 
     return True
 
+"""Checks if the provided description string is valid.
 
+    Args:
+        description (str): The description string to be validated.
+
+    Returns:
+        bool: True if the description is valid, False otherwise.
+"""
 def is_description_valid(description: str):
     min_length = 0
     max_length = 1000
@@ -67,7 +77,14 @@ def is_description_valid(description: str):
         return False
     return True
 
+"""Checks if the provided deadline is valid.
 
+    Args:
+        deadline (datetime): The deadline to be validated.
+
+    Returns:
+        bool: True if the deadline is valid (not past), False otherwise.
+"""
 def is_deadline_valid(deadline):
     current_datetime = datetime.now()
     try:
@@ -76,7 +93,14 @@ def is_deadline_valid(deadline):
     except ValueError:
         return False
 
+"""Checks if the provided label is valid.
 
+    Args:
+        label (str): The label to be validated.
+
+    Returns:
+        bool: True if the label is valid (non-empty and within character limit), False otherwise.
+"""
 def is_label_valid(label: str):
     if len(label) == 0:
         return False
@@ -86,7 +110,14 @@ def is_label_valid(label: str):
 
     return True
 
+"""Checks if the provided assignee is valid.
 
+    Args:
+        assignee (str): The assignee's email address to be validated.
+
+    Returns:
+        bool: True if the assignee is valid (not found in the database), False otherwise.
+"""
 def is_assignee_valid(assignee: str):
     res = db.checkUser(assignee)
     if res["Success"]:
@@ -94,7 +125,14 @@ def is_assignee_valid(assignee: str):
 
     return True
 
+"""Checks if the provided task progress status is valid.
 
+    Args:
+        task_progress (str): The task progress status to be validated.
+
+    Returns:
+        bool: True if the task progress status is valid, False otherwise.
+"""
 def is_progress_status(task_progress: str):
     if task_progress in ["Not Started", "In Progress", "Blocked", "Completed"]:
         return True
@@ -105,7 +143,15 @@ def is_progress_status(task_progress: str):
 Create tasks
 """
 
+"""Creates a new task with the provided data.
 
+    Args:
+        token (str): The token of the user's session.
+        data (dict): A dictionary containing the data for the new task, including title, description, deadline, progress, assignee, cost_per_hr, estimation_spent_hrs, actual_time_hr, priority, labels, etc.
+
+    Returns:
+        dict: A dictionary containing the result of the task creation operation, including the success status and any relevant messages.
+"""
 def create_task(token: str, data: dict):
     token = token
     # Verify account login - check the token
@@ -243,7 +289,15 @@ def create_task(token: str, data: dict):
 Update Tasks
 """
 
+"""Updates the title of a task with the provided task_id.
 
+    Args:
+        task_id (str): The unique identifier of the task to be updated.
+        title (str): The new title to be set for the task.
+
+    Returns:
+        dict: A dictionary containing the result of the title update operation, including the success status and any relevant messages.
+"""
 def update_task_title(task_id: str, title: str):
     if not is_title_valid(title):
         return {
@@ -253,21 +307,45 @@ def update_task_title(task_id: str, title: str):
 
     return db_tasks.updateTaskInfo(task_id, {"title": title})
 
+"""Updates the description of a task with the provided task_id.
 
+    Args:
+        task_id (str): The unique identifier of the task to be updated.
+        description (str): The new description to be set for the task.
+
+    Returns:
+        dict: A dictionary containing the result of the description update operation, including the success status and any relevant messages.
+"""
 def update_task_desc(task_id: str, description: str):
     if not is_description_valid(description):
         return {"Success": False, "Message": "Invalid Description, too long"}
 
     return db_tasks.updateTaskInfo(task_id, {"description": description})
 
+"""Updates the progress status of a task with the provided task_id.
 
+    Args:
+        task_id (str): The unique identifier of the task to be updated.
+        progress (str): The new progress status to be set for the task.
+
+    Returns:
+        dict: A dictionary containing the result of the progress status update operation, including the success status and any relevant messages.
+"""
 def update_task_progress(task_id: str, progress: str):
     if not is_progress_status(progress):
         return {"Success": False, "Message": "Invalid Progress status"}
 
     return db_tasks.updateTaskInfo(task_id, {"progress": progress})
 
+"""Updates the assignee of a task with the provided task_id.
 
+    Args:
+        task_id (str): The unique identifier of the task to be updated.
+        email (str): The email address of the new assignee to be set for the task.
+
+    Returns:
+        dict: A dictionary containing the result of the assignee update operation, including the success status and any relevant messages.
+"""
 def update_task_assignee(task_id: str, email: str):
     if not is_assignee_valid(email):
         return {"Success": False, "Message": "Invalid assignee"}
@@ -276,28 +354,60 @@ def update_task_assignee(task_id: str, email: str):
 
     return db_tasks.updateTaskInfo(task_id, {"assignee": email})
 
+"""Updates the cost per hour of a task with the provided task_id.
 
+    Args:
+        task_id (str): The unique identifier of the task to be updated.
+        new_cost (int): The new cost per hour to be set for the task.
+
+    Returns:
+        dict: A dictionary containing the result of the cost update operation, including the success status and any relevant messages.
+"""
 def update_cost(task_id: str, new_cost: int):
     if new_cost < 0:
         return {"Success": False, "Message": "Cost/hr cannot be negative"}
 
     return db_tasks.updateTaskInfo(task_id, {"cost_per_hr": new_cost})
 
+"""Updates the estimation of spent hours for a task with the provided task_id.
 
+    Args:
+        task_id (str): The unique identifier of the task to be updated.
+        new_estimate (int): The new estimation of spent hours to be set for the task.
+
+    Returns:
+        dict: A dictionary containing the result of the estimation update operation, including the success status and any relevant messages.
+"""
 def update_estimate(task_id: str, new_estimate: int):
     if new_estimate < 0:
         return {"Success": False, "Message": "Estimate cannot be negative"}
 
     return db_tasks.updateTaskInfo(task_id, {"estimation_spent_hrs": new_estimate})
 
+"""Updates the actual time spent for a task with the provided task_id.
 
+    Args:
+        task_id (str): The unique identifier of the task to be updated.
+        new_actual (int): The new actual time spent to be set for the task.
+
+    Returns:
+        dict: A dictionary containing the result of the actual time update operation, including the success status and any relevant messages.
+"""
 def update_actual(task_id: str, new_actual: int):
     if new_actual < 0:
         return {"Success": False, "Message": "Cannot be negative"}
 
     return db_tasks.updateTaskInfo(task_id, {"actual_time_hr": new_actual})
 
+"""Updates the priority of a task with the provided task_id.
 
+    Args:
+        task_id (str): The unique identifier of the task to be updated.
+        new_priority (int): The new priority to be set for the task.
+
+    Returns:
+        dict: A dictionary containing the result of the priority update operation, including the success status and any relevant messages.
+"""
 def update_priority(task_id: str, new_priority: int):
     if new_priority < 1 or new_priority > 3:
         return {"Success": False, "Message": "Priority is randked on 3, update failed"}
@@ -315,7 +425,17 @@ def update_priority(task_id: str, new_priority: int):
             "Message": "Invalid Title Format, needs to be > 2 and  < 100",
         }
 
+"""Updates the details of a task with the provided task_id.
 
+    Args:
+        token (str): The authentication token of the user.
+        task_id (str): The unique identifier of the task to be updated.
+        new_data (dict): A dictionary containing the new data to update the task with.
+
+    Returns:
+        dict: A dictionary containing the result of the update operation, including the success status and any relevant messages.
+
+"""
 def update_details(token: str, task_id: str, new_data: dict):
     user_details = account.getAccountInfo(token)
 
@@ -391,7 +511,15 @@ def update_details(token: str, task_id: str, new_data: dict):
 Delete
 """
 
+"""Deletes the task with the provided task_id.
 
+    Args:
+        token (str): The authentication token of the user.
+        task_id (str): The unique identifier of the task to be deleted.
+
+    Returns:
+        dict: A dictionary containing the result of the delete operation, including the success status and any relevant messages.
+"""
 def delete_task(token: str, task_id: str):
     # token_result = tokens.check_jwt_token(token)
     # if not token_result["Success"]:
@@ -417,7 +545,12 @@ def delete_task(token: str, task_id: str):
 Assignee 
 """
 
+"""Assigns the task with the provided task_id to the specified assignee_email.
 
+    Args:
+        task_id (str): The unique identifier of the task to be assigned.
+        assignee_email (str): The email address of the user to whom the task will be assigned.
+"""
 def assign_task(task_id: str, assignee_email: str):
     is_assignee_valid(assignee_email)
 
@@ -427,7 +560,12 @@ def assign_task(task_id: str, assignee_email: str):
 
     update_task_assignee(task_id, assignee_email)
 
+"""Sends an email notification to the specified assignee_email when a new task is assigned.
 
+    Args:
+        assignee_email (str): The email address of the user to whom the task is assigned.
+        task_title (str): The title of the newly assigned task.
+"""
 def send_task_notification(assignee_email, task_title):
     sender_email = "zombies3900w11a@gmx.com"
     sender_password = "wEvZ28Xm9b3uviN"
@@ -507,20 +645,34 @@ def send_task_notification(assignee_email, task_title):
 LABELS
 """
 
+""" Gets Labels assigned to a task, accessed via provided task_id
+Args:
+    task_id (str): The unique identifier of the task.
 
+Returns:
+    list: A list containing the labels associated with the task.
+"""
 def get_labels(task_id: str):
     dict = db_tasks.getTaskFromID(task_id)
     labels = dict["labels"]
 
     return labels
 
-
+""" Adds new labels to a task given a task_id and a label
+Args:
+    task_id (str): The unique identifier of the task to which the label will be added.
+    new_label (str): The label to be added to the task.
+"""
 def add_label(task_id: str, new_label: str):
     curr_labels = get_labels(task_id)
     curr_labels.append(new_label)
     db_tasks.updateTaskInfo(task_id, {"labels": curr_labels})
 
-
+""" Retrieves task details from the database based on the provided task ID.
+    Args:
+        token (str): A JWT token representing the user's authentication status.
+        task_id (str): The unique identifier of the task to retrieve.
+"""
 def get_task_details(token: str, task_id: str):
     # check token
     token_result = tokens.check_jwt_token(token)
@@ -529,7 +681,15 @@ def get_task_details(token: str, task_id: str):
 
     return db_tasks.getTaskFromID(task_id)
 
+""" Retrieves all tasks assigned to a user identified by their email.
 
+    Args:
+        token (str): A JWT token representing the user's authentication status.
+        email (str): The email address of the user for whom the tasks are to be retrieved.
+
+    Returns:
+        dict: A dictionary containing the tasks assigned to the user if successful,
+"""
 def get_all_tasks_assigned_to(token: str, email: str):
     # check token
     token_result = tokens.check_jwt_token(token)
@@ -544,7 +704,13 @@ def get_all_tasks_assigned_to(token: str, email: str):
 
     return db_tasks.getTasksAssigned(email)
 
+"""Retrieves all tasks assigned to the currently authenticated user.
 
+    Parameters:
+        token (str): A JWT token representing the user's authentication status.
+    Returns:
+        dict: A dictionary containing the tasks assigned to the user if successful
+"""
 def get_tasks_assigned_to_curr(token: str):
     # check token
     token_result = tokens.check_jwt_token(token)
@@ -561,7 +727,15 @@ def get_tasks_assigned_to_curr(token: str):
 
     return db_tasks.getTasksAssigned(acc_info["Data"]["email"])
 
+""" Retrieves all tasks given by a specific user identified by their email.
 
+    Args:
+        token (str): A JWT token representing the user's authentication status.
+        email (str): The email address of the user for whom the tasks given are to be retrieved.
+    
+    Returns:
+        dict: A dictionary containing the tasks given by the user if successful,
+"""
 def get_tasks_given_by(token: str, email: str):
     # check token
     token_result = tokens.check_jwt_token(token)
@@ -576,7 +750,14 @@ def get_tasks_given_by(token: str, email: str):
 
     return db_tasks.getTasksGiven(email)
 
+""" Retrieves all tasks from the database.
 
+    Args:
+        token (str): A JWT token representing the user's authentication status.
+
+    Returns:
+        dict: A dictionary containing all tasks if successful, or an error message if failed.
+"""
 def get_all_tasks(token: str):
     # check token
     token_result = tokens.check_jwt_token(token)
@@ -585,7 +766,15 @@ def get_all_tasks(token: str):
 
     return db_tasks.getAllTasks()
 
+""" Searches for tasks in the database based on the provided search word.
 
+    Args:
+        token (str): A JWT token representing the user's authentication status.
+        search_word (str): The word to search for within task titles and descriptions.
+
+    Returns:
+        dict: A dictionary containing the search results if successful, or an error message if failed.
+"""
 def search_task(token: str, search_word: str):
     # # check token
     # token_result = tokens.check_jwt_token(token)
@@ -611,13 +800,31 @@ def search_task(token: str, search_word: str):
     ]
     return {"Success": True, "Message": "Tasks found", "Data": dummy_data}
 
+""" Converts a date string from one format to another.
 
+    Parameters:
+        date_str (str): The input date string to be converted.
+        in_format (str): The format of the input date string (e.g., 'YYYY-MM-DD').
+        out_format (str): The desired format for the output date string.
+
+    Returns:
+        str: The date string converted to the specified output format.
+"""
 def convert_date_format(date_str, in_format, out_format):
     # Converts a date string from one format to another
     date_obj = datetime.strptime(date_str, in_format)
     return date_obj.strftime(out_format)
 
+""" Filters and processes tasks based on their creation dates falling within a specified date range.
 
+    Args:
+        temp (list): A list of task dictionaries to be processed.
+        start_date (datetime): The start date of the range for filtering tasks.
+        end_date (datetime): The end date of the range for filtering tasks.
+
+    Returns:
+        list: A list of task dictionaries whose creation dates fall within the specified range.
+"""
 def process_tasks(temp, start_date, end_date):
     tasks = []
     for i in temp:
@@ -651,7 +858,16 @@ def process_tasks(temp, start_date, end_date):
             tasks.append(task_info)
     return tasks
 
+""" Generates a PDF report containing task-related information for the user.
 
+    Parameters:
+        token (str): A JWT token representing the user's authentication status.
+        start_date_str (str): The start date of the date range to filter tasks (format: "YYYY-MM-DD").
+        end_date_str (str): The end date of the date range to filter tasks (format: "YYYY-MM-DD").
+
+    Returns:
+        dict: A dictionary indicating the success of the report generation.
+"""
 def generate_report(token, start_date_str, end_date_str):
     valid_jwt = tokens.check_jwt_token(token)
 
@@ -836,13 +1052,30 @@ def generate_report(token, start_date_str, end_date_str):
     send_email(email, pdf_file_name)
     return {"Success": True, "Message": "Done!"}
 
+""" Saves a Plotly plot to an image file.
 
+    Args:
+        plot: The Plotly plot object to be saved as an image.
+        file_name (str): The name of the image file to be created (e.g., "plot.png").
+
+    Returns:
+        None: This function does not return any value.
+"""
 def save_plot_to_image(plot, file_name):
     image_bytes = pio.to_image(plot, format="png")
     with open(file_name, "wb") as f:
         f.write(image_bytes)
 
+""" Creates a Pie chart to visualize the breakdown of actual time by task priority.
 
+    Args:
+        tasks (list): A list of task dictionaries, where each dictionary represents a task.
+                      Each task dictionary should contain a 'priority' key to determine the priority level,
+                      and an 'actual_time_hr' key to determine the actual time spent on the task.
+
+    Returns:
+        go.Figure: A Plotly Figure object representing the Pie chart.
+"""
 def plot_priority_vs_time(tasks):
     priority_time = {1: 0, 2: 0, 3: 0}
     for task in tasks:
@@ -857,7 +1090,16 @@ def plot_priority_vs_time(tasks):
     fig.update_layout(title_text="Breakdown of actual time by task priority")
     return fig
 
+""" Creates a Pie chart to visualize the breakdown of actual time by task priority.
 
+    Parameters:
+        tasks (list): A list of task dictionaries, where each dictionary represents a task.
+                      Each task dictionary should contain a 'priority' key to determine the priority level,
+                      and an 'actual_time_hr' key to determine the actual time spent on the task.
+
+    Returns:
+        go.Figure: A Plotly Figure object representing the Pie chart.
+"""
 def plot_priority_distribution(tasks):
     priority_count = {1: 0, 2: 0, 3: 0}
     for task in tasks:
@@ -871,7 +1113,16 @@ def plot_priority_distribution(tasks):
     fig.update_layout(title_text="Distribution of tasks by priority")
     return fig
 
+""" Creates a Pie chart to visualize the comparison between tasks completed within estimated time and those that were not.
 
+    Args:
+        tasks (list): A list of task dictionaries, where each dictionary represents a task.
+                      Each task dictionary should contain 'estimation_spent_hrs' and 'actual_time_hr' keys
+                      to represent the estimated and actual time spent on the task, respectively.
+
+    Returns:
+        go.Figure: A Plotly Figure object representing the Pie chart.
+"""
 def plot_estimated_vs_actual_time(tasks):
     within_estimated, not_within_estimated = 0, 0
     for task in tasks:
@@ -891,7 +1142,16 @@ def plot_estimated_vs_actual_time(tasks):
     )
     return fig
 
+""" Sends an email with an attached PDF report to the specified email address.
 
+    Parameters:
+        email (str): The recipient's email address.
+        pdf_file_name (str): The name of the PDF file to be attached.
+
+    Returns:
+        None: This function does not return any value.
+
+"""
 def send_email(email, pdf_file_name):
     # Create a new thread to send the email
     def run():

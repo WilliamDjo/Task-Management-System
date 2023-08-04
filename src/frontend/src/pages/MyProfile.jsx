@@ -11,12 +11,14 @@ import ProfileBar from '../components/ProfileBar';
 import { fetchBackend } from '../fetch';
 import ProfileCard from '../components/ProfileCard';
 
+// The user's profile, uses the ProfileCard component and shows the user's name, username, email, connections count, organization,
+// whether email notifications are on/off, workload.
 const MyProfile = () => {
-  const [name, setName] = React.useState('Name');
-  const [username, setUsername] = React.useState('username');
-  const [email, setEmail] = React.useState('email@example.com');
-  const [connections, setConnections] = React.useState(1);
-  const [organization, setOrganization] = React.useState('Example Company');
+  const [name, setName] = React.useState('');
+  const [username, setUsername] = React.useState('');
+  const [email, setEmail] = React.useState('');
+  const [connections, setConnections] = React.useState(0);
+  const [organization, setOrganization] = React.useState('');
   const [emailNotifications, setEmailNotifications] = React.useState(true);
   const [workload, setWorkload] = React.useState(0);
 
@@ -50,8 +52,6 @@ const MyProfile = () => {
       setOrganization(data.Data.organization);
       setWorkload(data.Data.workload);
       setLoaded(true);
-
-      console.log(data)
     }
     const token = localStorage.getItem('token');
     fetchBackend('/getuserprofile', 'POST', { token }, toast, successGetProfile);

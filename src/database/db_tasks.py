@@ -18,7 +18,14 @@ import db_helper
 Returns the entire collection
 """
 
+""" Retrieves the "task_system" collection from the specified database.
 
+    Args:
+        db (Database): The MongoDB database object from which to retrieve the collection.
+
+    Returns:
+        Collection: The MongoDB collection object representing the "task_system" collection.
+"""
 def getTaskInfoCollection(db: Database) -> Collection:
     return db["task_system"]
 
@@ -27,7 +34,17 @@ def getTaskInfoCollection(db: Database) -> Collection:
 Adds a new task to the task system
 """
 
+"""Adds a new task to the database with the provided task information.
 
+    Args:
+        data (Dict): A dictionary containing the information of the new task to be inserted.
+                     The dictionary should have the following keys (optional) for the task:
+                     "title", "description", "deadline", "progress", "assignee", "cost_per_hr",
+                     "estimation_spent_hrs", "actual_time_hr", "priority", "task_master", "labels".
+
+    Returns:
+        Dict: A dictionary indicating the success of the task insertion.
+"""
 def addNewTask(data: dict) -> dict:
     db = db_helper.getDB()
 
@@ -65,7 +82,14 @@ def addNewTask(data: dict) -> dict:
     # Return the inserted task information
     return {"Success": True, "id": task_id}
 
+""" Retrieves a task from the database based on the provided task ID.
 
+    Args:
+        task_id (str): The unique identifier of the task to be retrieved.
+
+    Returns:
+        Dict: A dictionary containing the task information if found.
+"""
 def getTaskFromID(task_id: str) -> dict:
     db = db_helper.getDB()
 
@@ -82,7 +106,17 @@ def getTaskFromID(task_id: str) -> dict:
 
     return {"Success": True, "Message": "Task Found", "Data": task_details}
 
+""" Updates the information of a task in the database based on the provided task ID.
 
+    Args:
+        task_id (str): The unique identifier of the task to be updated.
+        data (Dict): A dictionary containing the updated task information.
+                     The dictionary should have the keys that need to be updated
+                     along with their new values.
+
+    Returns:
+        Dict: A dictionary indicating the success of the task update.
+"""
 def updateTaskInfo(task_id: str, data: dict) -> dict:
     # Get the database
     db = db_helper.getDB()
@@ -102,7 +136,14 @@ def updateTaskInfo(task_id: str, data: dict) -> dict:
 
     return {"Success": True, "Message": "Update successful"}
 
+""" Deletes a task from the database based on the provided task ID.
 
+    Parameters:
+        task_id (str): The unique identifier of the task to be deleted.
+
+    Returns:
+        Dict: A dictionary indicating the success of the task deletion.
+"""
 def deleteTask(task_id: str) -> dict:
     # Get the database
     db = db_helper.getDB()
@@ -122,7 +163,11 @@ def deleteTask(task_id: str) -> dict:
     # Return a dictionary indicating success
     return {"Success": True, "Message": "Task deleted successfully"}
 
+""" Retrieves all tasks from the database.
 
+    Returns:
+        Dict: A dictionary containing the retrieved task information.
+"""
 def getAllTasks() -> dict:
     # Get the database
     db = db_helper.getDB()
@@ -135,7 +180,11 @@ def getAllTasks() -> dict:
     return {"Success": True, "Data": data}
 
 
-# Return all tasks given out by the master
+""" Retrieves tasks given out by the specified task master from the database.
+
+    Args:
+        task_master (str): The email or identifier of the task master who assigned the tasks.
+"""
 def getTasksGiven(task_master) -> dict:
     db = db_helper.getDB()
     TaskSystemCollection = getTaskInfoCollection(db)
@@ -160,7 +209,14 @@ def getTasksGiven(task_master) -> dict:
     }
 
 
-# Return all tasks assigned to an assignee
+""" Retrieves tasks assigned to the specified task assignee from the database.
+
+    Args:
+        task_assignee (str): The email or identifier of the task assignee for whom the tasks are assigned.
+
+    Returns:
+        Dict: A dictionary containing the retrieved task information.
+"""
 def getTasksAssigned(task_assignee) -> dict:
     db = db_helper.getDB()
     TaskSystemCollection = getTaskInfoCollection(db)
@@ -184,7 +240,14 @@ def getTasksAssigned(task_assignee) -> dict:
         "Message": "Successfully Returned",
     }
 
+""" Searches for tasks in the database based on the provided search string.
 
+    Args:
+        search_string (str): The string to be used for searching tasks.
+
+    Returns:
+        List[dict]: A list of dictionaries representing the search results.
+"""
 def searchTasks(search_string):
     db = db_helper.getDB()
     TaskSystemCollection = getTaskInfoCollection(db)
@@ -217,7 +280,11 @@ def searchTasks(search_string):
 Helper function to generate IDs
 """
 
+""" Generates the next unique task ID using a sequence in the database.
 
+    Returns:
+        str: The formatted task ID with a desired prefix, e.g., 'TASK001', 'TASK002', ...
+"""
 def get_next_task_id() -> str:
     db = db_helper.getDB()
     sequence_collection = db["sequence_collection"]

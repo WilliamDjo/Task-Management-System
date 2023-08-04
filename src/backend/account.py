@@ -12,8 +12,7 @@ import tokens
 import password
 
 
-"""
-Generates a SHA-256 hash of the provided data.
+""" Generates a SHA-256 hash of the provided data.
 returns: Hashed string
 """
 
@@ -58,8 +57,7 @@ class User:
         }
 
 
-"""
-Validates if the email address is in the correct format.
+""" Validates if the email address is in the correct format.
 
     Args:
         email (str): The email address to be validated.
@@ -74,8 +72,7 @@ def is_email_valid(email):
     return re.match(pattern, email) is not None
 
 
-"""
- Validates if the username meets the required criteria.
+""" Validates if the username meets the required criteria.
 
     Args:
         username (str): The username to be validated.
@@ -96,8 +93,7 @@ def is_username_valid(username):
     return {"Success": True, "Message": "Username valid"}
 
 
-"""
-Validates if the password meets the required criteria.
+""" Validates if the password meets the required criteria.
 
     Args:
         password (str): The password to be validated.
@@ -217,8 +213,7 @@ def account_register(first_name, last_name, username, email, password, sys_admin
     }
 
 
-"""
-Logs in a user with the provided email and password.
+""" Logs in a user with the provided email and password.
 
     Args:
         email (str): The email of the user.
@@ -255,8 +250,7 @@ def account_login(email, password):
     }
 
 
-"""
- Logs out the user with the provided token.
+""" Logs out the user with the provided token.
 
     Args:
         token (str): The token of the user's session.
@@ -277,7 +271,15 @@ def account_logout(token):
         return {"Success": True, "Message": "Logout Successful"}
     return {"Success": False, "Message": "Logout unsuccessful"}
 
+"""Updates the username of the logged-in user with the provided new_username.
 
+    Args:
+        new_username (str): The new username to be set for the user.
+        token (str): The token of the user's session.
+
+    Returns:
+        dict: A dictionary indicating the success of the username update and a corresponding message.
+"""
 def update_username(new_username, token):
     if not is_username_valid(new_username)["Success"]:
         return {"Success": False, "Message": "Username not valid "}
@@ -296,7 +298,15 @@ def update_username(new_username, token):
 
     return {"Success": result["Success"], "Message": result["Message"]}
 
+"""Updates the password of the logged-in user's account with the provided new_password.
 
+    Args:
+        new_password (str): The new password to be set for the user's account.
+        token (str): The token of the user's session.
+
+    Returns:
+        dict: A dictionary indicating the success of the password update and a corresponding message.
+"""
 def update_password_account(new_password, token):
     if not is_password_valid(new_password):
         return {"Success": False, "Message": "Password not valid "}
@@ -314,11 +324,15 @@ def update_password_account(new_password, token):
     return {"Success": result["Success"], "Message": result["Message"]}
 
 
-"""
-Update email on backened
-"""
+"""Updates the email of the logged-in user's account with the provided new_email.
 
+    Args:
+        new_email (str): The new email address to be set for the user's account.
+        token (str): The token of the user's session.
 
+    Returns:
+        dict: A dictionary indicating the success of the email update, a corresponding message, and a new token.
+"""
 def update_email_account(new_email, token):
     if not is_email_valid(new_email):
         return {"Success": False, "Message": "Email Does not exist", "Token": ""}
@@ -340,11 +354,15 @@ def update_email_account(new_email, token):
     return {"Success": True, "Message": "Email Changed", "Token": new_token}
 
 
-"""
-Update notfication 
-"""
+"""Updates the notification settings of the logged-in user's account.
 
+    Args:
+        bool_val (bool): The new value for the notification setting (True or False).
+        token (str): The token of the user's session.
 
+    Returns:
+        dict: A dictionary indicating the success of the notification update and a corresponding message.
+"""
 def update_notificiation_set(bool_val, token):
     valid_jwt = tokens.check_jwt_token(token)
 
@@ -358,7 +376,14 @@ def update_notificiation_set(bool_val, token):
     result = db.updateUserProfile(email, new_dict)
     return {"Success": True, "Message": "Notifications updated"}
 
+"""Retrieves the account information of the logged-in user.
 
+    Args:
+        token (str): The token of the user's session.
+
+    Returns:
+        dict: A dictionary containing the account information of the user.
+"""
 def getAccountInfo(token):
     valid_jwt = tokens.check_jwt_token(token)
     if not valid_jwt["Success"]:
@@ -368,15 +393,20 @@ def getAccountInfo(token):
     userInformation = db.getSingleUserInformation(email)
     data = userInformation["Data"]
 
-    # todo: rem
-    # del data["connections"]
     return {
         "Success": True,
         "Message": "Account info retrieved",
         "Data": data,
     }
 
+"""Retrieves information for all user accounts in the system (only accessible to system administrators).
 
+    Args:
+        token (str): The token of the user's session.
+
+    Returns:
+        dict: A dictionary containing information for all user accounts.
+"""
 def getAllAccounts(token):
     valid_jwt = tokens.check_jwt_token(token)
     if not valid_jwt["Success"]:
@@ -388,7 +418,6 @@ def getAllAccounts(token):
         return {"Success": False, "Message": "Not an admin", "Data": ""}
 
     allUserInfo = db.getAllUserInformation()
-    # print(allUserInfo)
     return {
         "Success": True,
         "Message": "Info retrieved successfully",
@@ -400,7 +429,16 @@ def getAllAccounts(token):
 Admin Functions
 """
 
+"""Resets the password for a user account by an admin.
 
+    Args:
+        token (str): The token of the admin's session.
+        new_password (str): The new password to be set for the user account.
+        reset_email (str): The email address of the user account to reset the password for.
+
+    Returns:
+        dict: A dictionary indicating the success of the password reset and a corresponding message.
+"""
 def admin_reset_pw(token, new_password, reset_email):
     valid_jwt = tokens.check_jwt_token(token)
     if not valid_jwt["Success"]:
@@ -418,7 +456,15 @@ def admin_reset_pw(token, new_password, reset_email):
 
     return {"Success": True, "Message": "Admin reset the password"}
 
+"""Deletes a user account by an admin.
 
+    Args:
+        token (str): The token of the admin's session.
+        email_to_delete (str): The email address of the user account to be deleted.
+
+    Returns:
+        dict: A dictionary indicating the success of the account deletion and a corresponding message.
+"""
 def admin_delete_acc(token, email_to_delete):
     valid_jwt = tokens.check_jwt_token(token)
     if not valid_jwt["Success"]:
@@ -433,7 +479,14 @@ def admin_delete_acc(token, email_to_delete):
 
     return {"Success": True, "Message": "User deleted"}
 
+"""Resets the password for a user account by sending an OTP (One-Time Password).
 
+    Args:
+        email (str): The email address of the user account for which the password will be reset.
+
+    Returns:
+        dict: A dictionary indicating the success of sending the OTP and a corresponding message.
+"""
 def reset_password(email):
     userInformation = db.checkUser(email)
     if userInformation["Success"]:
@@ -441,7 +494,15 @@ def reset_password(email):
     password.reset_password(email)
     return {"Success": True, "Message": "OTP Sent"}
 
+"""Verifies the validity of the provided OTP for a user account.
 
+    Args:
+        email (str): The email address of the user account for which the OTP will be verified.
+        otp (str): The One-Time Password to be checked for validity.
+
+    Returns:
+        dict: A dictionary indicating the success of the OTP verification and a corresponding message.
+"""
 def check_otp(email, otp):
     userInformation = db.checkUser(email)
     if userInformation["Success"]:
@@ -450,7 +511,15 @@ def check_otp(email, otp):
 
     return {"Success": otp_return["Success"], "Message": otp_return["Message"]}
 
+"""Changes the password for a user account.
 
+    Args:
+        email (str): The email address of the user account for which the password will be changed.
+        new_password (str): The new password to be set for the user account.
+
+    Returns:
+        dict: A dictionary indicating the success of the password change and a corresponding message.
+"""
 def change_password(email, new_password):
     userInformation = db.checkUser(email)
     if userInformation["Success"]:
@@ -495,27 +564,40 @@ def add_sys_admin():
 Workload Computation
 """
 
+"""Retrieves the workload information for a user account.
 
+    Args:
+        token (str): The token of the user's session.
+        email (str): The email address of the user account for which the workload will be retrieved.
+
+    Returns:
+        dict: A dictionary containing the workload information for the user account.
+"""
 def get_workload(token, email):
     # check active token
-    # TODO: CHECK WHAT"SUP
-    # valid_jwt = tokens.check_jwt_token(token)
-    # if not valid_jwt["Success"]:
-    #     return {"Success": False, "Message": "Error in active token!"}
+
+    valid_jwt = tokens.check_jwt_token(token)
+    if not valid_jwt["Success"]:
+        return {"Success": False, "Message": "Error in active token!"}
 
     account = db.getSingleUserInformation(email)
 
     curr_workload = account["Data"]["workload"]
     return {"Success": True, "Data": curr_workload}
 
+"""Retrieves the workload information for the current user account.
 
-# NOT NEEDED
+    Args:
+        token (str): The token of the user's session.
+
+    Returns:
+        dict: A dictionary containing the workload information for the current user account.
+"""
 def get_workload_curr(token):
     # check active token
-    # TODO: CHECK WHAT"SUP
-    # valid_jwt = tokens.check_jwt_token(token)
-    # if not valid_jwt["Success"]:
-    #     return {"Success": False, "Message": "Error in active token!"}
+    valid_jwt = tokens.check_jwt_token(token)
+    if not valid_jwt["Success"]:
+        return {"Success": False, "Message": "Error in active token!"}
 
     user_info = getAccountInfo(token)
 

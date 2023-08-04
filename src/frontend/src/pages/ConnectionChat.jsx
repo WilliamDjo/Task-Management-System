@@ -21,25 +21,14 @@ import {
 import { fetchBackend, isNone } from '../fetch';
 import { SendIcon } from '../components/GoogleIcons';
 
+// The chat tab for a connection, allows the user to chat with their connection based on their email address, can send messages and
+// every 30 seconds gets new messages.
 const ConnectionChat = (props) => {
   const email = props.email;
   const toast = useToast();
 
   const [loaded, setLoaded] = React.useState(false);
-  const [messages, setMessages] = React.useState([
-    {
-      message: 'Hello there',
-      timestamp: '2023-07-29 12:00:00PM',
-      sender: true,
-      clicked: false
-    },
-    {
-      message: 'Hi!',
-      timestamp: '2023-07-29 12:01:00PM',
-      sender: false,
-      clicked: false
-    }
-  ])
+  const [messages, setMessages] = React.useState([]);
   const [chatInput, setChatInput] = React.useState('');
 
   const convertTimestamp = (timestamp) => {

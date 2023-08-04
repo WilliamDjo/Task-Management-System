@@ -32,11 +32,14 @@ import {
   useDisclosure,
   useToast,
 } from '@chakra-ui/react';
+import { Link as RouteLink, useNavigate } from 'react-router-dom';
+
 import NavigationBar from '../components/NavigationBar';
 import PasswordBar from '../components/PasswordBar/PasswordBar';
 import { fetchBackend, isNone } from '../fetch';
-import { Link as RouteLink, useNavigate } from 'react-router-dom';
 
+// The user controls screen for an admin, displays all users and allows the admin to reset their passwords, delete their accounts
+// and has links to the AdminProfile screen for each of those users.
 const AdminDashboard = () => {
   const [selectedUser, setSelectedUser] = React.useState('n/a');
   const [selectedUserEmail, setSelectedUserEmail] = React.useState('n/a');
@@ -46,38 +49,7 @@ const AdminDashboard = () => {
 
   const [loaded, setLoaded] = React.useState(false);
 
-  const [users, setUsers] = React.useState([
-    {
-      first_name: 'Akshay',
-      last_name: 'Akshay',
-      user: 'Akshay',
-      email: 'akshay@taskmaster.com',
-    },
-    {
-      first_name: 'Cameron',
-      last_name: 'Cameron',
-      user: 'Cameron',
-      email: 'cameron@taskmaster.com',
-    },
-    {
-      first_name: 'Sanyam',
-      last_name: 'Sanyam',
-      user: 'Sanyam',
-      email: 'sanyam@taskmaster.com',
-    },
-    {
-      first_name: 'William',
-      last_name: 'William',
-      user: 'William',
-      email: 'william@taskmaster.com',
-    },
-    {
-      first_name: 'Jonathan',
-      last_name: 'Jonathan',
-      user: 'Jonathan',
-      email: 'jonathan@taskmaster.com',
-    },
-  ]);
+  const [users, setUsers] = React.useState([]);
 
   const {
     isOpen: isAlertOpen,

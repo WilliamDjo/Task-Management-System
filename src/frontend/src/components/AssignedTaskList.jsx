@@ -19,11 +19,13 @@ import {
 
 import { isNone } from '../fetch';
 
+// Table containing the assigned tasks to the user or connection (with task id, title and deadline for each task).
 const AssignedTaskList = (props) => {
   const [tasks, setTasks] = React.useState([]);
   const [loaded, setLoaded] = React.useState(false);
 
   React.useEffect(() => {
+    // Formatting the deadline.
     const newTasks = props.tasks.map((task) => {
       const deadline = task.deadline;
 

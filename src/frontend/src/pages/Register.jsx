@@ -71,11 +71,6 @@ const Register = () => {
             } else {
               navigate('/dashboard');
             }
-
-            // Redirect the user to the login page
-            // You can use a router library like react-router-dom for navigation
-            // Example:
-            // history.push('/login');
           },
           () => {
             // Registration failed

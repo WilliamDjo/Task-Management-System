@@ -15,8 +15,10 @@ import {
   useDisclosure,
   useToast
 } from '@chakra-ui/react';
+
 import { fetchBackend } from '../fetch';
 
+// The button to generate a report, opens a modal where the user can provide dates starting and finishing, and can click submit.
 const GenerateReportButton = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [fromDate, setFromDate] = React.useState('');

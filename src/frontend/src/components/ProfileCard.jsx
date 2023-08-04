@@ -14,6 +14,8 @@ import PropTypes from 'prop-types';
 
 import { isNone } from '../fetch';
 
+// A card that contains the user's profile, at least their name, username, email, and optionally their workload and other user
+// attributes as info prop.
 const ProfileCard = (props) => {
   const workloadColor = (number) => {
     if (number < 50) {

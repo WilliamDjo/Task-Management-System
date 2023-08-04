@@ -13,6 +13,7 @@ import React from 'react';
 import ConnectionsBar from '../components/ConnectionsBar';
 import { fetchBackend } from '../fetch';
 
+// Allows the user to request a connection based on user input of an email address.
 const AddConnection = () => {
   const [email, setEmail] = React.useState('');
   const [loading, setLoading] = React.useState(false);
