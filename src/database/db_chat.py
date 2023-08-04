@@ -166,3 +166,27 @@ def getChats(
             "Message": "Chat retrieved successfully",
             "Chat": chat["messages"],
         }
+
+def updateEmailInChats(old_email: str, new_email: str) -> dict:
+    try:
+        # Establish a database connection and get the database object
+        db = getDB()
+        chatCollection = getChatCollection(db)
+
+        # Update all the 'sender' fields from old_email to new_email
+        chatCollection.update_many(
+            {"messages.sender": old_email},
+            {"$set": {"messages.$[elem].sender": new_email}},
+            array_filters=[{"elem.sender": old_email}]
+        )
+
+        # Update all the 'receiver' fields from old_email to new_email
+        chatCollection.update_many(
+            {"messages.receiver": old_email},
+            {"$set": {"messages.$[elem].receiver": new_email}},
+            array_filters=[{"elem.receiver": old_email}]
+        )
+
+        return {"Success": True, "Message": "Email updated in chats successfully"}
+    except Exception as e:
+        return {"Success": False, "Message": str(e)}

@@ -276,6 +276,28 @@ def searchTasks(search_string):
     return list(results)
 
 
+def updateEmail(old_email: str, new_email: str) -> dict:
+    # Connect to the MongoDB database and get the TaskSystemCollection
+    db = db_helper.getDB()
+    TaskSystemCollection = getTaskInfoCollection(db)
+
+    # Define the update operations to set the new email
+    update_task_master = {"$set": {"task_master": new_email}}
+    update_assignee = {"$set": {"assignee": new_email}}
+
+    # Perform the update operation for task_master
+    result_task_master = TaskSystemCollection.update_many({"task_master": old_email}, update_task_master)
+
+    # Perform the update operation for assignee
+    result_assignee = TaskSystemCollection.update_many({"assignee": old_email}, update_assignee)
+
+    # Calculate the total documents updated
+    total_updated = result_task_master.modified_count + result_assignee.modified_count
+
+    # Return a status message along with the number of documents updated
+    return {"Success": True, "UpdatedCount": total_updated}
+
+
 """
 Helper function to generate IDs
 """
