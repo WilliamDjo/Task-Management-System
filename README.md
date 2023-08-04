@@ -17,6 +17,7 @@ William
 
 > sh build.sh
 
+> Wait for the message to come up in the terminal - "Ready. Please, go to 'localhost:3000' on your browser."
 
 # Git Workflow
 
