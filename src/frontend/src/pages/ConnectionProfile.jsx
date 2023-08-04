@@ -40,7 +40,6 @@ const ConnectionProfile = () => {
       setUsername(data.Data.username);
       setWorkload(data.Data.workload);
       setTasks(data.Tasks);
-      console.log(data.Tasks);
 
       setLoaded(true);
     };

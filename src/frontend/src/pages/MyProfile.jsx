@@ -52,8 +52,6 @@ const MyProfile = () => {
       setOrganization(data.Data.organization);
       setWorkload(data.Data.workload);
       setLoaded(true);
-
-      console.log(data)
     }
     const token = localStorage.getItem('token');
     fetchBackend('/getuserprofile', 'POST', { token }, toast, successGetProfile);

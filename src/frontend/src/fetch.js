@@ -51,7 +51,6 @@ export const fetchBackend = async (route, method, body, toast, onSuccess, onFail
   }
 
   if (!isSuccess) {
-    console.log(data);
     let errorMessage = 'Error!';
     if (!isNone(data.Error)) {
       errorMessage = data.Error;
