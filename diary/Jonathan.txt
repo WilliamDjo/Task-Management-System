@@ -23,4 +23,7 @@ Week 8
 Working on admin controls for tasks and viewing user profiles, admins can see all users even those who are not connected and configured the admin to be able to see all tasks as well. Made some fixes for connections in backend and frontend to get it to work for demo 2. Had our retro for sprint 2.
 
 Week 9
-Fixed a small bug in backend for task creation and updating. Had a meeting to discuss allocations for sprint 3. Worked on frontend for chat feature and workload estimate.
+Fixed a small bug in backend for task creation and updating. Had a meeting to discuss allocations for sprint 3. Worked on frontend for chat feature and workload estimate. Met for in-person on the weekend to work on the third sprint of the project. 
+
+Week 10
+Created the slides for the final demo. Finished the frontend chat feature, workload feature, and report generation button and modal. Fixed some bugs in my code and others, relating to connections. Fixed up the profile screen accessible for an admin to be different from the connection's profile screen. Completed the user manual and finding the licenses for 3rd-party functionalities.
