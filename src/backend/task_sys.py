@@ -634,7 +634,7 @@ def process_tasks(temp, start_date, end_date):
         # Check if created_date falls in the range
         if start_date <= created_date <= end_date:
             task_info = {
-                "id": i.get("task_id", ""),
+                "id": i.get("id", ""),
                 "title": i.get("title", ""),
                 "description": i.get("description", ""),
                 "created": created_date_str,
