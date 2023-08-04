@@ -112,7 +112,6 @@ const KanbanBoard = () => {
         setUsername(data.Data.username);
 
         setIsAdmin(data.Data.SystemAdmin);
-        console.log('Sys ' + data.Data.SystemAdmin);
 
         setIsLoadingThree(false);
         fetchConnections(data.Data.email, data.Data.SystemAdmin);
@@ -240,7 +239,6 @@ const KanbanBoard = () => {
 
     const onSuccess = data => {
       // toast({ title: data });
-      console.log('Delete Success => ' + JSON.stringify(updatedTasks));
       fetchTasks(email, connections, isAdmin);
     };
     const onFailure = () => {

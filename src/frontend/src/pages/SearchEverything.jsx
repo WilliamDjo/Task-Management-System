@@ -306,13 +306,10 @@ const SearchEverything = () => {
 
     console.log('remove ' + JSON.stringify(tasks));
     const onSuccess = data => {
-      console.log('Delete Success => ' + JSON.stringify(updatedTasks));
       fetchTasks(email, connections, isAdmin);
     };
     const onFailure = () => {
-      console.log('Failed to remove task');
-      console.log('id: ' + id);
-      console.log('task: ' + JSON.stringify(updatedTasks));
+      console.error('Failed to remove task');
     };
 
     fetchBackend(
