@@ -6,16 +6,11 @@ import task_sys
 import connections
 import sys
 import os
-import sys
 
 # """ Accessing Other Files"""
 parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_folder)
-import account
-import task_sys
-import connections
 
-import chat
 
 """Flask Set up"""
 app = Flask(__name__)
@@ -541,7 +536,8 @@ def _build_preflight_response():
     response = jsonify({})
     response.headers.add("Access-Control-Allow-Origin", "*")
     response.headers.add("Access-Control-Allow-Methods", "POST")
-    response.headers.add("Access-Control-Allow-Headers", "Content-Type,Authorization")
+    response.headers.add("Access-Control-Allow-Headers",
+                         "Content-Type,Authorization")
     return response
 
 
@@ -635,4 +631,4 @@ def server_search(search_word):
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host="0.0.0.0",port=5000)
