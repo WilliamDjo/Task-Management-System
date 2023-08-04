@@ -12,7 +12,7 @@ RUN pip install --no-cache-dir -r ./backend/requirements.txt
 COPY ./backend ./backend/
 COPY ./database ./database/
 
-EXPOSE 5000
+EXPOSE 6969
 
 # Run backend/main.py when the container launches
 CMD ["python", "./backend/server.py"]

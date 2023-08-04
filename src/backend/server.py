@@ -537,8 +537,7 @@ def _build_preflight_response():
     response = jsonify({})
     response.headers.add("Access-Control-Allow-Origin", "*")
     response.headers.add("Access-Control-Allow-Methods", "POST")
-    response.headers.add("Access-Control-Allow-Headers",
-                         "Content-Type,Authorization")
+    response.headers.add("Access-Control-Allow-Headers", "Content-Type,Authorization")
     return response
 
 
@@ -632,4 +631,4 @@ def server_search(search_word):
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0",port=5000)
+    app.run(host="0.0.0.0", port=6969)

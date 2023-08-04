@@ -13,7 +13,7 @@ export const fetchBackend = async (
   onFailure
 ) => {
   // delay of 2 seconds
-  const delay = 500;
+  const delay = 100;
 
   // All of your original code is wrapped inside a setTimeout function
   setTimeout(async () => {
@@ -33,7 +33,7 @@ export const fetchBackend = async (
       }
     }
 
-    const response = await fetch(`http://127.0.0.1:5000${route}`, options);
+    const response = await fetch(`http://127.0.0.1:6969${route}`, options);
 
     if (!response.ok) {
       if (!isNone(toast)) {
