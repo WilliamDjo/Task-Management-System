@@ -46,8 +46,6 @@ const KanbanBoard = () => {
     const successGetConnections = data => {
       setConnections(data.Data);
 
-      console.log('email ' + email);
-      console.log('connections ' + JSON.stringify(data.Data));
       fetchTasks(email, data.Data, isAdmin);
       setIsLoading(false);
     };
@@ -66,8 +64,6 @@ const KanbanBoard = () => {
       // Retrieve the token from the localStorage
       const token = localStorage.getItem('token');
       const successGetTasks = data => {
-        console.log('con ' + connections);
-
         const connectionSet = new Set(connections.map(c => c.email));
         if (!isAdmin) {
           // Filter the tasks
@@ -179,7 +175,7 @@ const KanbanBoard = () => {
 
         const { updatedTask, editingTaskId } = successUpdateTask();
         delete updatedTask.task_master;
-        console.log('up ' + JSON.stringify(updatedTask));
+
         const onSuccess = () => {
           console.log('Success ' + updatedTask);
         };
@@ -204,7 +200,6 @@ const KanbanBoard = () => {
         };
 
         fetchBackend('/task/create', 'POST', task, toast, successCreateTask);
-        console.log('task: ' + task);
       }
 
       setNewTask('');
@@ -243,16 +238,13 @@ const KanbanBoard = () => {
     // Retrieve the token from the localStorage
     const token = localStorage.getItem('token');
 
-    console.log('remove ' + JSON.stringify(tasks));
     const onSuccess = data => {
       // toast({ title: data });
       console.log('Delete Success => ' + JSON.stringify(updatedTasks));
       fetchTasks(email, connections, isAdmin);
     };
     const onFailure = () => {
-      console.log('Failed to remove task');
-      console.log('id: ' + id);
-      console.log('task: ' + JSON.stringify(updatedTasks));
+      console.error('Failed to remove task');
     };
 
     fetchBackend(
@@ -290,7 +282,7 @@ const KanbanBoard = () => {
       fetchTasks(email, connections);
     };
     const onFailure = () => {
-      console.log('Failed to update task');
+      console.error('Failed to update task');
     };
 
     fetchBackend(
@@ -301,7 +293,6 @@ const KanbanBoard = () => {
       onSuccess,
       onFailure
     );
-    console.log('baba');
   };
 
   const handleEditTask = taskId => {

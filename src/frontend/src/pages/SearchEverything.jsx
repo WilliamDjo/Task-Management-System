@@ -172,9 +172,7 @@ const SearchEverything = () => {
       fetchTasks(email, connections, isAdmin);
     };
     const onFailure = () => {
-      console.log('Failed to update task');
-      console.log('id: ' + id);
-      console.log('task: ' + JSON.stringify(updatedTask));
+      console.error('Failed to update task');
     };
 
     fetchBackend(
@@ -185,7 +183,6 @@ const SearchEverything = () => {
       onSuccess,
       onFailure
     );
-    console.log('baba');
   };
 
   const handleSubmitTask = () => {
@@ -291,12 +288,10 @@ const SearchEverything = () => {
       );
 
       onOpen();
-      //   onOpen();
     }
   };
 
   const handleRemoveTask = taskId => {
-    // setTasks(tasks.filter(task => task.id !== taskId));
     let id = 0;
     const updatedTasks = tasks.filter(task => {
       if (task.id === taskId) {
