@@ -12,9 +12,11 @@ William
 ### Ports - 3000,6969 and 27017 should be free and the system should be connected to the internet. Docker is a requirement to run this
 
 > cd src/
+
 > chmod +x build.sh
+
 > sh build.sh
->
+
 
 # Git Workflow
 
