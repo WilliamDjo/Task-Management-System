@@ -4,6 +4,7 @@ from flask_cors import CORS, cross_origin
 import account
 import task_sys
 import connections
+import chat
 import sys
 import os
 
