@@ -8,7 +8,7 @@ import sys
 parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_folder)
 
-url = "mongodb+srv://z5272191:QuyvHWVdlycdF84R@zombies.x0az3q5.mongodb.net/?retryWrites=true&w=majority"
+url = "mongodb://mongodb:27017/TaskSystem"
 
 
 def getDB():

@@ -498,11 +498,11 @@ def update_details(token: str, task_id: str, new_data: dict):
     new_workload_details_assignee = {"workload": new_updated_workload}
 
     if new_data["progress"] == "Completed":
-        completed_workload = curr_user_workload - 10 * new_priority
-        completed_workload_details_assignee = {"workload": completed_workload}
+        completed_workload_details_assignee = {"workload": curr_user_workload}
+        print(completed_workload_details_assignee)
         db.updateUserInfo(new_data["assignee"], completed_workload_details_assignee)
-
-    db.updateUserInfo(task_assignee, new_workload_details_assignee)
+    else:
+        db.updateUserInfo(task_assignee, new_workload_details_assignee)
 
     return db_tasks.updateTaskInfo(task_id, new_data)
 

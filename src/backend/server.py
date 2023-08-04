@@ -4,18 +4,14 @@ from flask_cors import CORS, cross_origin
 import account
 import task_sys
 import connections
+import chat
 import sys
 import os
-import sys
 
 # """ Accessing Other Files"""
 parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_folder)
-import account
-import task_sys
-import connections
 
-import chat
 
 """Flask Set up"""
 app = Flask(__name__)
@@ -635,4 +631,4 @@ def server_search(search_word):
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host="0.0.0.0", port=6969)
