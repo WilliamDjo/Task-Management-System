@@ -8,6 +8,7 @@ import {
 import { fetchBackend, isNone } from '../fetch';
 import AssignedTaskList from '../components/AssignedTaskList';
 
+// Displays the user's own assigned tasks with the AssignedTaskList component.
 const MyAssignedTasks = () => {
   const [loaded, setLoaded] = React.useState(false);
   const [tasks, setTasks] = React.useState([
@@ -24,7 +25,8 @@ const MyAssignedTasks = () => {
     const token = localStorage.getItem('token');
     const successGetTasks = (data) => {
       const newTasks = [...data.Data];
-      console.log(newTasks);
+
+      // Sorts the tasks by deadline, if one exists
       newTasks.sort((a, b) => {
         if ((isNone(a.deadline) || a.deadline === '') && (isNone(b.deadline) || b.deadline === '')) {
           return 0;

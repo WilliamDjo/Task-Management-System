@@ -11,6 +11,8 @@ import ProfileBar from '../components/ProfileBar';
 import { fetchBackend } from '../fetch';
 import ProfileCard from '../components/ProfileCard';
 
+// The user's profile, uses the ProfileCard component and shows the user's name, username, email, connections count, organization,
+// whether email notifications are on/off, workload.
 const MyProfile = () => {
   const [name, setName] = React.useState('Name');
   const [username, setUsername] = React.useState('username');

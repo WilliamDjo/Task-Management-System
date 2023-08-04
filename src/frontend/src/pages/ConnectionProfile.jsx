@@ -18,6 +18,7 @@ import ProfileCard from '../components/ProfileCard';
 import ConnectionChat from './ConnectionChat';
 import AssignedTaskList from '../components/AssignedTaskList';
 
+// The profile screen for a connection, has tabs to their profile, chat with them and their assigned task list.
 const ConnectionProfile = () => {
   const [name, setName] = React.useState('Name');
   const [username, setUsername] = React.useState('username');

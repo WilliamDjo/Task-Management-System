@@ -1,6 +1,6 @@
 import { createIcon } from '@chakra-ui/icons';
 
-// Google's Material Design icons via: https://fonts.google.com/icons
+// Some of Google's Material Design icons via: https://fonts.google.com/icons
 export const AccountCircleIcon = createIcon({
   displayName: 'AccountCircleIcon',
   viewBox: '0 -960 960 960',

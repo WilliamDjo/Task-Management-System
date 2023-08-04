@@ -18,6 +18,7 @@ import ProfileBar from '../components/ProfileBar';
 import PasswordBar from '../components/PasswordBar/PasswordBar';
 import { fetchBackend } from '../fetch';
 
+// The Edit Account/Profile screen. Allows the user to change their username, email, password, email notifications toggle on/off.
 const EditAccount = () => {
   const [email, setEmail] = React.useState('');
   const [confirmEmail, setConfirmEmail] = React.useState('');
@@ -33,6 +34,7 @@ const EditAccount = () => {
 
   const toast = useToast();
 
+  // Gets the current email notifications toggle from the user's profile.
   React.useEffect(() => {
     const successGetEmailNotifications = (data) => {
       setEmailNotifications(data.Data.emailNotifications);

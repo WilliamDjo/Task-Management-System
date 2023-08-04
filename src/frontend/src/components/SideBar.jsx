@@ -13,6 +13,8 @@ import { Link as RouteLink } from 'react-router-dom';
 
 import NavigationBar from './NavigationBar';
 
+// The sidebar component, is appears on the left of the screen with links to the desired screens, and highlights the current screen.
+// Additionally, for mobile sizes, it becomes a link to previous OptionsScreen of the current page and hides the sidebar.
 const SideBar = (props) => {
   return (
     <Box minH='100vh' h='100vh'>

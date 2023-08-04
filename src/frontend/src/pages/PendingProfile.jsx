@@ -14,6 +14,8 @@ import ConnectionsBar from '../components/ConnectionsBar';
 import { fetchBackend } from '../fetch';
 import ProfileCard from '../components/ProfileCard';
 
+// Shows the name, the username and email of the pending connection. Can also accept or decline the pending connection on this screen.
+// On accept, will take you to their ConnectionProfile screen, on reject, will take you back to the PendingConnections screen.
 const PendingProfile = () => {
   const [name, setName] = React.useState('Name');
   const [username, setUsername] = React.useState('username');

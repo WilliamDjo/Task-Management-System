@@ -1,5 +1,4 @@
 import React from 'react';
-import ConnectionsBar from '../components/ConnectionsBar';
 import {
   Box,
   Button,
@@ -17,8 +16,11 @@ import {
 } from '@chakra-ui/react';
 import { Link as RouteLink } from 'react-router-dom';
 
+import ConnectionsBar from '../components/ConnectionsBar';
 import { fetchBackend } from '../fetch';
 
+// The pending connections screen contains all the users that have sent connection requests to the current user, and allows the
+// current user to accept or decline any connections. For each user, there is also a link to their PendingProfile screen.
 const PendingConnections = () => {
   const [connections, setConnections] = React.useState([
     {

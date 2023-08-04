@@ -18,6 +18,8 @@ import ProfileCard from '../components/ProfileCard';
 import AssignedTaskList from '../components/AssignedTaskList';
 import NavigationBar from '../components/NavigationBar';
 
+// A profile screen for a user, that only an admin can see (even if they are not a connection), includes tabs to profile and
+// assigned task list.
 const AdminProfile = () => {
   const [name, setName] = React.useState('Name');
   const [username, setUsername] = React.useState('username');

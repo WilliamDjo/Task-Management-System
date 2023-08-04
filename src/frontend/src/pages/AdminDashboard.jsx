@@ -32,11 +32,14 @@ import {
   useDisclosure,
   useToast,
 } from '@chakra-ui/react';
+import { Link as RouteLink, useNavigate } from 'react-router-dom';
+
 import NavigationBar from '../components/NavigationBar';
 import PasswordBar from '../components/PasswordBar/PasswordBar';
 import { fetchBackend, isNone } from '../fetch';
-import { Link as RouteLink, useNavigate } from 'react-router-dom';
 
+// The user controls screen for an admin, displays all users and allows the admin to reset their passwords, delete their accounts
+// and has links to the AdminProfile screen for each of those users.
 const AdminDashboard = () => {
   const [selectedUser, setSelectedUser] = React.useState('n/a');
   const [selectedUserEmail, setSelectedUserEmail] = React.useState('n/a');
