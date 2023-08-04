@@ -3,6 +3,7 @@ import React from 'react';
 
 import SideBar from './SideBar';
 
+// The sidebar for the MyConnections, AddConnection and PendingConnections screens.
 const ConnectionsBar = (props) => {
   const back = {
     screenName: 'Connections',

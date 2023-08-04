@@ -19,6 +19,8 @@ import {
   TaskIcon
 } from './GoogleIcons';
 
+// The top navigation bar of every logged in screen, includes links to Profile, Connections, SearchEverything screens, logout button,
+// and if the user is an admin, then AdminDashboard and Dashboard screens.
 const NavigationBar = () => {
   const toast = useToast();
   const navigate = useNavigate();

@@ -2,6 +2,7 @@ import React from 'react';
 
 import OptionsScreen from '../components/OptionsScreen';
 
+// The connections options screen, containing links to MyConnections, AddConnection and PendingConnections screens.
 const Connections = () => {
   const tabs = [
     {

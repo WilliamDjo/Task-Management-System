@@ -18,18 +18,13 @@ import ProfileCard from '../components/ProfileCard';
 import ConnectionChat from './ConnectionChat';
 import AssignedTaskList from '../components/AssignedTaskList';
 
+// The profile screen for a connection, has tabs to their profile, chat with them and their assigned task list.
 const ConnectionProfile = () => {
-  const [name, setName] = React.useState('Name');
-  const [username, setUsername] = React.useState('username');
-  const [workload, setWorkload] = React.useState(10);
+  const [name, setName] = React.useState('');
+  const [username, setUsername] = React.useState('');
+  const [workload, setWorkload] = React.useState(0);
   const [loaded, setLoaded] = React.useState(false);
-  const [tasks, setTasks] = React.useState([
-    {
-      id: 100,
-      title: 'Task',
-      deadline: '2023-07-15 09:00:00 AM',
-    },
-  ]);
+  const [tasks, setTasks] = React.useState([]);
 
   const { email } = useParams();
 
@@ -45,7 +40,6 @@ const ConnectionProfile = () => {
       setUsername(data.Data.username);
       setWorkload(data.Data.workload);
       setTasks(data.Tasks);
-      console.log(data.Tasks);
 
       setLoaded(true);
     };

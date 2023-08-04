@@ -2,6 +2,8 @@ import React from 'react';
 
 import OptionsScreen from '../components/OptionsScreen';
 
+// The profile options screen, implements the OptionsScreen component with links to MyAssignedTasks, MyProfile, EditAccount and
+// Connections screens.
 const Profile = () => {
   const tabs = [
     {

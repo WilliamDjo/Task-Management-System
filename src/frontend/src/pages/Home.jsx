@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Button, Center, Heading, Stack, Text, useColorModeValue } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 
+// The screen that the user starts at, contains links to Login and Register screens.
 const Home = () => {
   return (
     <Box minH='100vh' h='100vh' bg={useColorModeValue('gray.50', 'gray.800')}>

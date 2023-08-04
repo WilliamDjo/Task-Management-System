@@ -18,23 +18,10 @@ import ConnectionsBar from '../components/ConnectionsBar';
 import { fetchBackend } from '../fetch';
 import { Link as RouteLink } from 'react-router-dom';
 
+// The my connections screen shows each of the user's connections (with their name, email and workload) and contains links to each
+// user's ConnectionProfile screen.
 const MyConnections = () => {
-  const [connections, setConnections] = React.useState([
-    {
-      username: 'Jonathan',
-      first_name: 'Jonathan Sinani',
-      last_name: 'Sinani',
-      email: 'jonathan@jonathan.com',
-      workload: 120
-    },
-    {
-      username: 'Jonathan2',
-      first_name: 'Jonathan2 Sinani',
-      last_name: 'Sinani',
-      email: 'jonathan2@jonathan.com',
-      workload: 75
-    }
-  ]);
+  const [connections, setConnections] = React.useState([]);
   const [loaded, setLoaded] = React.useState(false);
 
   const toast = useToast();
