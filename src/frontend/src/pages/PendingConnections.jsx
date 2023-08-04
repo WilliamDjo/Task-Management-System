@@ -22,20 +22,7 @@ import { fetchBackend } from '../fetch';
 // The pending connections screen contains all the users that have sent connection requests to the current user, and allows the
 // current user to accept or decline any connections. For each user, there is also a link to their PendingProfile screen.
 const PendingConnections = () => {
-  const [connections, setConnections] = React.useState([
-    {
-      username: 'Jonathan',
-      first_name: 'Jonathan',
-      last_name: 'Sinani',
-      email: 'jonathan@jonathan.com'
-    },
-    {
-      username: 'Jonathan2',
-      first_name: 'Jonathan2',
-      last_name: 'Sinani',
-      email: 'jonathan2@jonathan.com'
-    }
-  ]);
+  const [connections, setConnections] = React.useState([]);
   const [loaded, setLoaded] = React.useState(false);
 
   const toast = useToast();

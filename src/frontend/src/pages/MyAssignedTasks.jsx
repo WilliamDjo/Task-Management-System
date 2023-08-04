@@ -11,13 +11,7 @@ import AssignedTaskList from '../components/AssignedTaskList';
 // Displays the user's own assigned tasks with the AssignedTaskList component.
 const MyAssignedTasks = () => {
   const [loaded, setLoaded] = React.useState(false);
-  const [tasks, setTasks] = React.useState([
-    {
-      id: 100,
-      title: 'Hello',
-      deadline: '2023-01-01'
-    }
-  ]);
+  const [tasks, setTasks] = React.useState([]);
 
   const toast = useToast();
 

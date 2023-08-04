@@ -28,20 +28,7 @@ const ConnectionChat = (props) => {
   const toast = useToast();
 
   const [loaded, setLoaded] = React.useState(false);
-  const [messages, setMessages] = React.useState([
-    {
-      message: 'Hello there',
-      timestamp: '2023-07-29 12:00:00PM',
-      sender: true,
-      clicked: false
-    },
-    {
-      message: 'Hi!',
-      timestamp: '2023-07-29 12:01:00PM',
-      sender: false,
-      clicked: false
-    }
-  ])
+  const [messages, setMessages] = React.useState([]);
   const [chatInput, setChatInput] = React.useState('');
 
   const convertTimestamp = (timestamp) => {

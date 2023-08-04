@@ -49,38 +49,7 @@ const AdminDashboard = () => {
 
   const [loaded, setLoaded] = React.useState(false);
 
-  const [users, setUsers] = React.useState([
-    {
-      first_name: 'Akshay',
-      last_name: 'Akshay',
-      user: 'Akshay',
-      email: 'akshay@taskmaster.com',
-    },
-    {
-      first_name: 'Cameron',
-      last_name: 'Cameron',
-      user: 'Cameron',
-      email: 'cameron@taskmaster.com',
-    },
-    {
-      first_name: 'Sanyam',
-      last_name: 'Sanyam',
-      user: 'Sanyam',
-      email: 'sanyam@taskmaster.com',
-    },
-    {
-      first_name: 'William',
-      last_name: 'William',
-      user: 'William',
-      email: 'william@taskmaster.com',
-    },
-    {
-      first_name: 'Jonathan',
-      last_name: 'Jonathan',
-      user: 'Jonathan',
-      email: 'jonathan@taskmaster.com',
-    },
-  ]);
+  const [users, setUsers] = React.useState([]);
 
   const {
     isOpen: isAlertOpen,
