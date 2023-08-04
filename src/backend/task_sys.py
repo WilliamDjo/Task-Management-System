@@ -442,7 +442,7 @@ def update_details(token: str, task_id: str, new_data: dict):
     old_data_response = get_task_details(token, task_id)
     old_data = old_data_response["Data"]
 
-    task_master = user_details["Data"]["email"]
+    task_master = old_data["task_master"]
 
     if not is_title_valid(new_data["title"]):
         return {
@@ -476,35 +476,46 @@ def update_details(token: str, task_id: str, new_data: dict):
         return {"Success": False, "Message": "actual_time_hr cannot be negative"}
 
     if new_data["priority"] < 1 or new_data["priority"] > 3:
-        return {"Success": False, "Message": "Priority is randked on 3, update failed"}
+        return {"Success": False, "Message": "Priority is ranked on 3, update failed"}
 
     task_labels = new_data["labels"]
     valid_labels = [label for label in task_labels if is_label_valid(label)]
-
+    
+    
     old_priority = old_data["priority"]
+    old_progress = old_data["progress"]
 
     prev_assignee_email = old_data["assignee"]
     old_details = db.getSingleUserInformation(prev_assignee_email)
     prev_user_workload = old_details["Data"]["workload"]
-    updated_workload = prev_user_workload - 10 * old_priority
+
+    # Only subtract the workload if the old task was not completed
+    if old_progress != "Completed":
+        updated_workload = prev_user_workload - 10 * old_priority
+    else:
+        updated_workload = prev_user_workload
+
     new_workload_details = {"workload": updated_workload}
     db.updateUserInfo(prev_assignee_email, new_workload_details)
 
     new_priority = new_data["priority"]
     new_assignee = task_assignee
+    new_progress = new_data["progress"]
+
     curr_details = db.getSingleUserInformation(task_assignee)
     curr_user_workload = curr_details["Data"]["workload"]
-    new_updated_workload = curr_user_workload + 10 * new_priority
-    new_workload_details_assignee = {"workload": new_updated_workload}
 
-    if new_data["progress"] == "Completed":
-        completed_workload_details_assignee = {"workload": curr_user_workload}
-        print(completed_workload_details_assignee)
-        db.updateUserInfo(new_data["assignee"], completed_workload_details_assignee)
+    # Add the workload if the new task is not completed
+    if new_progress != "Completed":
+        new_updated_workload = curr_user_workload + 10 * new_priority
     else:
-        db.updateUserInfo(task_assignee, new_workload_details_assignee)
+        new_updated_workload = curr_user_workload
+
+    new_workload_details_assignee = {"workload": new_updated_workload}
+    db.updateUserInfo(new_assignee, new_workload_details_assignee)
 
     return db_tasks.updateTaskInfo(task_id, new_data)
+
 
 
 """
