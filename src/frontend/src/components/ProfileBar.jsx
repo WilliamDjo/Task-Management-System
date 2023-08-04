@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import SideBar from './SideBar';
 
+// The sidebar for the MyAssignedTasks, MyProfile and EditAccount screens.
 const ProfileBar = (props) => {
   const back = {
     screenName: 'Profile',

@@ -11,6 +11,7 @@ import PropTypes from 'prop-types';
 
 import NavigationBar from '../components/NavigationBar';
 
+// A component which is a page with tabs to different links (includes the NavigationBar component).
 const OptionsScreen = (props) => {
   return (
     <Box minH='100vh' h='100vh'>
