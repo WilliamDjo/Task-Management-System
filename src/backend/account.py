@@ -7,7 +7,7 @@ import sys
 parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_folder)
 # from src.database import db_helper
-from database import db, db_tasks, db_helper
+from database import db, db_tasks, db_chat
 import tokens
 import password
 
@@ -350,7 +350,9 @@ def update_email_account(new_email, token):
     new_token = tokens.generate_jwt_token(new_email)
 
     db.updateUserInfo(email, new_user_dict)
-
+    db_tasks.updateEmail(email, new_email)
+    db_chat.updateEmailInChats(email, new_email)
+    
     return {"Success": True, "Message": "Email Changed", "Token": new_token}
 
 
